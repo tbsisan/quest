@@ -15,7 +15,8 @@ startfile=1;
 endfile=length(dcdPruned);
 for dcdi=startfile:endfile
     
-    if dcds ~= [1] % Set dcds to [1] to skip reading in new data, also change loop to cycle list 1:1
+    if dcdFlags == 'useLastDcd' && dcdi>1; display(sprintf('skipping dcd %i',dcdi)); continue; end
+    if dcdFlags ~= 'useLastDcd'
         dcdFullFile = [dcdPath '/' dcdPruned{dcdi}];
     
         %
@@ -68,8 +69,8 @@ for dcdi=startfile:endfile
     %
     % Save some data for easier data exploring, after this script is finished
     %
+    savedData(dcdi).dcd = simName; % for convenience, always save the dcd file name
     for saveIndex=1:length(toSave)
-        savedData(dcdi).dcd = simName; % for convenience, always save the dcd file name
         savedData(dcdi).(toSave{saveIndex}) = eval( toSave{saveIndex} );
     end
     
