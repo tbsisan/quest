@@ -3,9 +3,10 @@
 %
 
 %
-% Run the file that holds the parameters
+% Run the file that sets the parameters:
+% dcdPath, dcds, dcdSettings, dcdFlags, dataToSave, optionalFunctions, dcdPruneStrings
 %
-dcdParameters;
+dcdParameters; 
 
 [ dcdPruned ]   = pruneDcdList( dcds,dcdPruneStrings ); % Prune the list according to patterns
 savedData(length(dcdPruned)) = struct(); % Initialize empty structure array to hold saved data
@@ -14,7 +15,7 @@ startfile=1;
 endfile=length(dcdPruned);
 for dcdi=startfile:endfile
     
-    if dcds ~= [1] % Set dcds to [1] to skip reading in new data
+    if dcds ~= [1] % Set dcds to [1] to skip reading in new data, also change loop to cycle list 1:1
         dcdFullFile = [dcdPath '/' dcdPruned{dcdi}];
     
         %
