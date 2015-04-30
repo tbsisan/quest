@@ -1,0 +1,19 @@
+Custom matlab scripts for Quest's matlab go in here
+
+Generally use functions as much as possible.
+Put a description of the function or script at the top (or near) of the file, as appropriate.
+
+Most comments at the beginning of lines should be formated as
+%
+% Comment text
+%
+
+Capitalize first word of comments
+
+Some less significant comments can be single lines. Use sparingly.
+% Comment text
+
+Most less significant comments should be put at the end of code lines.
+[ functionResult ] = myFunction( param ); % function to do a thing that gets other things
+
+Space out varable names and constants from containing bracketing, as above.

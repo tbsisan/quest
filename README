@@ -1,0 +1,12 @@
+Scripts for 
+1. Creating files for MD simulations (generally NAMD, though modifications could build other setup files), 
+2. Launching jobs on quest (generally with NAMD), 
+3. Processing NAMD data (generally with matlab).
+
+Setup scripts are a mix of shell scripts, vmd tcl functions, and a few perl one-liners or scripts.
+
+Version tracking is done with git.
+
+Currently, the main git branch is being rewritten in a cleaner manner.
+A working system is in another repository.
+Gradually, I am cleaning up and porting portions of the working repository to this one.

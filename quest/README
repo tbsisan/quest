@@ -1,0 +1,5 @@
+Scripts to run NAMD on Quest
+Mostly shell scripts are in here. (also perl?)
+Associated tcl scripts and sometimes matlabScripts are in the corresponding directories.
+
+How to handle the data directories that store untracked files?
