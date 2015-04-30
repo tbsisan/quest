@@ -1,5 +1,5 @@
 function [ data ] = computeFFT( settings, flags, sampleTimes, varargin )
-% Compute the FFT for a group of data in varargin (see matNotes)
+% Compute the FFT for a group of data in varargin (see matNotes TODO)
 % All data must be of the same length and correspond to the same time series
 % The settings variable is a structure.
 % The falgs variable is a cell array.
