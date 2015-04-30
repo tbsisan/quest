@@ -13,7 +13,7 @@ switch fluidStr
     fluidAtoms=1;
   otherwise
     fluidAtoms=3;
-    display(sprintf('\tWarning: fluid atom did not match any known type in guessAtomsPerFluidMol'));
+    display(sprintf('\tWARNING: fluid atom did not match any known type in guessAtomsPerFluidMol'));
 end
 
 [stat,str]=system(['sed -n "/^Info: COORDINATE PDB/"p <' namdFiles.outfStd]);

@@ -1,14 +1,15 @@
-function [ oneXyzs ] = reduceToSingleTrajectory( xyzs, strategy )
+function [ oneXyzs ] = reduceToSingleTrajectory( hostAtomsXyzs, strategy )
 % flatten trajectory of many particles into one trajectory
 % strategy is either a cell array of strings (generally a list of config options) or a string with the reduction strategy
-    if (strategy == 'trackCOM')
-        oneXyzs = mean(xyzs,2);
-    elseif (strategy == 'trackMiddle')
-        oneXyzs = squeeze( centralAtomsXyzs( :, round(size(centralAtomsXyzs,2)/2), : ) );
-    elseif (strategy == 'trackFirst')
-        oneXyzs = squeeze( centralAtomsXyzs( :, 1, : ) );
-    elseif (strategy == 'trackLast')
-        oneXyzs = squeeze( centralAtomsXyzs( :, end, : ) );
+    switch strategy
+        case 'trackCOM'
+            oneXyzs = mean(hostAtomsXyzs,2); %the second dimension should be the list of atoms
+        case 'trackMiddle'
+            oneXyzs = squeeze( hostAtomsXyzs( :, round(size(centralAtomsXyzs,2)/2), : ) );
+        case 'trackFirst'
+            oneXyzs = squeeze( hostAtomsXyzs( :, 1, : ) );
+        case 'trackLast'
+            oneXyzs = squeeze( hostAtomsXyzs( :, end, : ) );
     end
 
 end

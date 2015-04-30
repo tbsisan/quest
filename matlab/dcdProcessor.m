@@ -39,13 +39,13 @@ for dcdi=startfile:endfile
     %
     % Process the xyz data
     %
-    [ hostAtomsXyzs ] = getHostAtomsTrajsAndReducet( xyzs, atomsPerSolventMol, xyzsConfig.shortTimeSteps ); % 3d (spatial dim, atom, timestep)
-    [ oneAtomXyzs ] = reduceToSingleTrajectory( hostAtomsXyzs, xyzsConfig.oneAtomStrategy );
+    [ hostAtomsXyzs ] = getHostAtomsTrajsAndReducet( xyzs, atomsPerSolventMol, dcdSettings.shortTimeSteps ); % 3d (spatial dim, atom, timestep)
+    [ oneAtomXyzs ] = reduceToSingleTrajectory( hostAtomsXyzs, dcdSettings.oneAtomStrategy );
 
     % TODO: unwrap the z coordinates using the PBCs
 
     % Sort trajectories on z-coordinate if requested
-    if xyzsConfig.sortTrajectory == 'sortz'
+    if dcdSettings.sortTrajectory == 'sortz'
         hostAtomsXyzs=sort(hostAtomsXyzs,2); %TODO: this is a temporary space holder, it's pseudocode
     end
         
