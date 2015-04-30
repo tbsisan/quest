@@ -1,3 +1,4 @@
 Custom matlab scripts for Quest's matlab go in here
-Mostly for processing NAMD data.
+Other people's matlab scripts go in downloads/
+These scripts are mostly for processing NAMD data.
 Some scripts also used to set up simulations.
