@@ -40,28 +40,22 @@ for {set atom1 0} {$atom1<$polymerNumMinus1 } {incr atom1} {
     }
 }
 
-# For every frame, measure the bond lengths, and angles, and write to the data files.
-set bondM {}
-set angleM {}
-set dihedralM {}
+# For every frame, measure the bond lengths and angles, and write to the data files.
 for {set i 1} {$i < $tframes} {incr i 1} {
 	set bondLengths {}
 	foreach pair $bondPairs {
 	    lappend bondLengths [measure bond $pair frame $i]
 	}
-	lappend bondM $bondLengths
     puts $bondFile $bondLengths
 	set angles {}
 	foreach trio $angleTrios {
 	    lappend angles [measure angle $trio frame $i]
 	}
-	lappend angleM $angles
     puts $angleFile $angles
 	set dihedrals {}
 	foreach quad $dihedralQuads {
 	    lappend dihedrals [measure dihed $quad frame $i]
 	}
-	lappend dihedralM $dihedrals
     puts $dihedralFile $dihedrals
 }
 close $bondFile
