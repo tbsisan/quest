@@ -1,9 +1,13 @@
 function [ data ] = computeFFT( settings, flags, sampleTimes, varargin )
 % Compute the FFT for a group of data in varargin (see matNotes TODO)
-% All data must be of the same length and correspond to the same time series
+% For example, to compute the fft of dataSet_1 as well as the fft of dataSet_2
+% then you would call the function like:
+% [dataResults] = computeFFT( settings, flags, sampleTs, dataSet1, dataSet2)
+% but all data sets must have the same length and correspond to the time values in sampleTimes.
+% dataResults would be an array of length 2 of structures with the FFT in the field dataResults.power
 % The settings variable is a structure.
 % The falgs variable is a cell array.
-% Taken from fftSpectrum.m
+% Taken from my fftSpectrum.m in PMFscripts folder
 
 numTimePoints=length(sampleTimes);
 numDataArrays=length(varargin);

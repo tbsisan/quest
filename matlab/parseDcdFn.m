@@ -1,6 +1,6 @@
 function [ dcdFnData ] = parseDcdFn( dcdf )
-%parsing the data from the name of the dcd file
-%still a workin in progress
+% Parsing the data from the name of the dcd file
+% TODO: still a workin in progress
 
 display(sprintf('\nGRABBING DATA FROM DCD FILENAME\n'));
 Fcell=regexp(dcdf,'_g([-0-9.]*)','tokens');
