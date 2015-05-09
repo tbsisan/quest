@@ -1,7 +1,11 @@
 function [ fluidAtoms ] = guessFluidAtomsPerMol( fluidStr, namdFiles )
-%parsing the data from the name of the dcd file
-%still a workin in progress
+% gets number of fluid atoms per fluid molecule from the fluid string.  Fluid string should be obtained
+% from another function or manually obtained.  The number of atoms is also predicted from the output of
+% NAMD.  If the second method gives a different result, the fluidAtoms can be changed by +1 or -1, or else
+% panics and sets fluidAtoms=1. A warning is output if the methods disagree.
 
+
+% Hard code in the number of fluid atoms per molecule.
 switch fluidStr
   case {'tip3p','tip3m','spe','tbs0p','ts26a','ts26b'}
     fluidAtoms=3;
@@ -16,8 +20,12 @@ switch fluidStr
     display(sprintf('\tWARNING: fluid atom did not match any known type in guessAtomsPerFluidMol'));
 end
 
-[stat,str]=system(['sed -n "/^Info: COORDINATE PDB/"p <' namdFiles.outfStd]);
+%
+% Guess fluid atoms per molecule.
+%
 
+% Get file name of the pdb file. First check the normal namd output location (namdFiles.outfStd), then the backup location (namdFiles.outfState).
+[stat,str]=system(['sed -n "/^Info: COORDINATE PDB/"p <' namdFiles.outfStd]);
 if (~stat && length(str)>0)
     pdbCell=regexp(str,'[a-z0-9_]+\.pdb','match');
     pdbFile=pdbCell{1};
@@ -28,6 +36,8 @@ else
         pdbFile=pdbCell{1};
     end
 end
+
+% Count the number of atoms that are not carbon, silicon, boron, nitrogen
 [stat, str] = system(['awk "!/ CA| BA| NA| SA/ {count++} END {print count}" <' pdbFile]);
 if (~stat)
   nonTubes = str2num(str);

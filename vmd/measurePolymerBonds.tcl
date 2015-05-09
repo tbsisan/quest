@@ -1,5 +1,6 @@
-# Process a dcd data file from a simulation of a polymer.  Atoms must be spatially ordered be index number.
-# Outputs the data for all the bond lengths, angles, and dihedrals.
+# Run with vmd -dispdev text -psf [psffilename] -dcd [dcdfilename] -e measurePolymerBonds.tcl
+# Processes a dcd data file from a simulation of a polymer.  Atoms must be spatially ordered be index number.
+# Outputs the data for all the bond lengths, angles, and dihedrals, to polymerData directory.
 
 # Get the info needed to name the output files for the bondlengths, angles, and dihedrals.
 set tframes [molinfo top get numframes]
