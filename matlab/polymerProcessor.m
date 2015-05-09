@@ -10,7 +10,7 @@ for fi=1:length(fns)
     % Get bonds, angles, and dihedrals data filenames.
     bondf=fns(fi).name;
     anglef=regexprep(bondf,'bonds$','angles');
-    dihedralf=regexprep(bondf,'bonds$','angles');
+    dihedralf=regexprep(bondf,'bonds$','dihedrals');
     % Each line of data files is a new time step.
     % Rows = time steps, Columns = bonds
     bondData=dlmread([fPath '/' bondf]);
