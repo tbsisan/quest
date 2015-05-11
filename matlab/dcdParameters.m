@@ -7,9 +7,9 @@ dcds        = dir( [dcdPath dcdPattern] ); % Just process the last dcd with: dcd
 
 %
 % Settings and flags control behavior in dcdProcessor.m
-% Settings are for things which always have some value of importance, and are always present.
+% Settings are for things which are noteworthy enough for always including. All available settings are always present.
 % Flags are for things which are frequently not set, to avoid clutter.
-% A list of possible flags is in flags.m
+% A list of possible flags is in flags.m (TODO)
 %
 dcdSettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
                         'shortTimeSteps', 100                                  );

@@ -23,9 +23,27 @@ for fi=1:length(fns)
 	figure;
 	subplot(3,1,1)
 	plot(bonds_v_time);
+    horplot(1.53,'--');
+	title(strrep(bondf,'_','\_'));
+    ylabel('bond lengths')
 	subplot(3,1,2);
 	plot(angles_v_time);
+    horplot(113.6,'--'); horplot(115.0,'--');
+    ylabel('backbone angles')
 	subplot(3,1,3);
 	plot(dihedrals_v_time);
-	title(bondf);
+    horplot(180,'--');
+    ylabel('backbone dihedrals')
+    xlabel('time step')
+    figure;
+    shortTimeArray=1:size(dihedralData,1);
+    if size(dihedralData,1)>150
+        shortTimeArray=round(linspace(1,size(dihedralData,1),100));
+    end
+    dihedralData1=dihedralData(shortTimeArray,1:end-1);
+    dihedralData2=dihedralData(shortTimeArray,2:end);
+    plot(dihedralData1,dihedralData2,'o');
+	title(strrep(dihedralf,'_','\_'));
+    horplot(180,'--');
+    vertplot(180,'--');
 end
