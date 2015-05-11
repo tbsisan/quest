@@ -1,6 +1,7 @@
 %
 % Set dcd parameters before processing with dcdProcessor.m
 %
+projectPath = '/home/tbs246/XiEffects/changeh/projScience';
 dcdPath     = '/projects/p20200/XiEffects/changeh/projScience/namdState';
 dcdPattern  = '/cnt60_*nm66*cgp6*070*ens*T10*coul*run*langevin*.dcd';
 dcds        = dir( [dcdPath dcdPattern] ); % Just process the last dcd with: dcds = [1];

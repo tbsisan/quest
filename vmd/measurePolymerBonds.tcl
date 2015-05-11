@@ -8,9 +8,9 @@ set files [molinfo top get filename]
 set dcdpath [lindex $files 0 1]
 set fn [file tail $dcdpath]
 set fl [file rootname $fn]
-set bondFile [open "polymerData/$fl.bonds" w]
-set angleFile [open "polymerData/$fl.angles" w]
-set dihedralFile [open "polymerData/$fl.dihedrals" w]
+set bondFile [open "/projects/p20200/polymerData/$fl.bonds" w]
+set angleFile [open "/projects/p20200/polymerData/$fl.angles" w]
+set dihedralFile [open "/projects/p20200/polymerData/$fl.dihedrals" w]
 
 # Select the polymer atoms.  TODO: need better way to select rather than just the non CA atoms.
 set polymer [atomselect top "not name CA"]
