@@ -1,4 +1,4 @@
-function [ pbcx, pbcy, pbcz ] = getpbcs( xscf )
+function [ pbcx, pbcy, pbcz ] = getPbcs( xscf )
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 

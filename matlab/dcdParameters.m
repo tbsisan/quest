@@ -11,8 +11,8 @@ dcds        = dir( [dcdPath dcdPattern] ); % Just process the last dcd with: dcd
 % Flags are for things which are frequently not set, to avoid clutter.
 % A list of possible flags is in flags.m
 %
-dcdSettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'COM', ...
-                        'shortTimeSteps', '100'                                  );
+dcdSettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
+                        'shortTimeSteps', 100                                  );
 dcdFlags    =       {   'plotPosition' };
 
 dataToSave  = { 'oneAtomZs' }; % Save this data for each dcd file processed

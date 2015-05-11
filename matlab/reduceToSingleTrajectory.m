@@ -10,6 +10,9 @@ function [ oneXyzs ] = reduceToSingleTrajectory( hostAtomsXyzs, strategy )
             oneXyzs = squeeze( hostAtomsXyzs( :, 1, : ) );
         case 'trackLast'
             oneXyzs = squeeze( hostAtomsXyzs( :, end, : ) );
+        otherwise
+            display(sprintf('\tThe reduction strategy %s is no in the list of known strategies\n',strategy));
+            oneXyzs = hostAtomsXyzs;
     end
 
 end

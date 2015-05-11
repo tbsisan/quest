@@ -3,6 +3,7 @@ function [ dcdFnData ] = parseDcdFn( dcdf )
 % TODO: still a workin in progress
 
 display(sprintf('\nGRABBING DATA FROM DCD FILENAME\n'));
+display(sprintf('\tCalled with %s',dcdf));
 Fcell=regexp(dcdf,'_g([-0-9.]*)','tokens');
 if (length(Fcell)>1)
     FpnCell=Fcell{1};

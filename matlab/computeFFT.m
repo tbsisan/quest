@@ -9,19 +9,23 @@ function [ data ] = computeFFT( settings, flags, sampleTimes, varargin )
 % The falgs variable is a cell array.
 % Taken from my fftSpectrum.m in PMFscripts folder
 
+
 numTimePoints=length(sampleTimes);
 numDataArrays=length(varargin);
-data(numDataArrays)=struct();
-data.power=zeros(1,numTimePoints);
-data.smoothPower=zeros(1,numTimePoints);
-data.freqs=zeros(1,numTimePoints);
+display(sprintf('numDataArrays: %i',numDataArrays));
+timeArrayZeros=zeros(1,numTimePoints);
+data=struct('power',timeArrayZeros, ...
+            'smoothPower',timeArrayZeros, ...
+            'freqs',timeArrayZeros, ...
+            'dataNum',num2cell(1:numDataArrays)); % makes a 0-initialized structure array of size numDataArrays, with fields as listed
 
 for datai=1:numDataArrays
-    dataName = inputname(datai+2);
-    ydata=varargin{datai};
+    dataName = inputname(datai+3)
+    display(sprintf('name of data: %s',dataName));
+    ydata=squeeze(varargin{datai});
     numDataPoints=length(ydata);
     if (numDataPoints ~= numTimePoints)
-        display(sprintf('ERROR: sample time array (%i) has different length than data array (%i) for %s',numTimePoints,numDataPoints,dataName));
+        display(sprintf('ERROR in computeFFT: sample time array (%i) has different length than data array (%i) for %s',numTimePoints,numDataPoints,dataName));
         continue;
     end
     signal = ydata - mean( ydata );
@@ -36,10 +40,11 @@ for datai=1:numDataArrays
     data(datai).power=(power+powern)/2;
     [sgP,~] = savitzy( 2, settings.smoothingWindow, data(datai).power, 1 );
     data(datai).smoothPower=sgP;
-    data(datai).smoothPower(end+1:numTimePoints)=0;
+    data(datai).smoothPower(end+1:length(data(datai).freqs))=0;
     data(datai).name=dataName;
     if (flags == 'plotOn')
         figure;
+        display(sprintf('freq size: %i, power size: %i, smoth size: %i',length(data(datai).freqs),length(data(datai).power),length(data(datai).smoothPower)));
         plot(   data(datai).freqs/1000, data(datai).power,'b', ...
                 data(datai).freqs/1000, data(datai).smoothPower,'g');
         xlabel('freq (1/ps)');

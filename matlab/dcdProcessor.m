@@ -9,6 +9,7 @@
 dcdParameters; 
 
 [ dcdPruned ]   = pruneDcdList( dcds,dcdPruneStrings ); % Prune the list according to patterns
+clear savedData;
 savedData(length(dcdPruned)) = struct(); % Initialize empty structure array to hold saved data
 
 startfile=1;
@@ -24,13 +25,13 @@ for dcdi=startfile:endfile
         %
         [ namdFiles ]                                             = getNamdFileList( dcdFullFile );
         [ pbcx, pbcy, pbcz ]                                      = getPbcs( namdFiles.xscf );
-        [ timeData ]                                              = timeDataFromNamd( namdFiles ); %timestep, runsteps, dcdFreq, framePeriodns, simLength
-        [ dcdFnData ]                                             = parseDcdFn( dcdFullFile );
+        [ timeParams ]                                            = timeDataFromNamd( namdFiles ); %timestep, expectedSteps, dcdFreq, framePeriodns, expectedSimLength
+        [ dcdFnData ]                                             = parseDcdFn( dcdPruned{dcdi} );
         [ ~, simName, ~ ]                                         = fileparts( dcdFullFile );
-        [ atomsPerSolventMol ]                                    = guessAtomsPerSolventMol( dcdFnData.solventModelStr, namdFiles );
-        solventAtomFirst = (dcdFnData.cntL * 4 * dcdFnData.nm1) + 1;
-        solventAtomLast  = solventAtomFirst + (dcdFnData.solventQuantity * atomsPerSolventMol) - 1;
-        atomsToGet = solventAtomFirst:1:solventAtomLast;
+        [ atomsPerFluidMol ]                                      = guessAtomsPerFluidMol( dcdFnData.fluidModelStr, namdFiles );
+        fluidAtomFirst = (dcdFnData.cntL * 4 * dcdFnData.nm1) + 1;
+        fluidAtomLast  = fluidAtomFirst + (dcdFnData.fluidQuantity * atomsPerFluidMol) - 1;
+        atomsToGet = fluidAtomFirst:1:fluidAtomLast;
 
         % 
         % Read in the data in the dcd file
@@ -41,37 +42,42 @@ for dcdi=startfile:endfile
     %
     % Process the xyz data
     %
-    [ hostAtomsXyzs ] = getHostAtomsTrajsAndReducet( xyzs, atomsPerSolventMol, dcdSettings.shortTimeSteps ); % 3d (spatial dim, atom, timestep)
+    [ hostAtomsXyzs, reducedTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, dcdSettings.shortTimeSteps ); % 3d (spatial dim, atom, timestep)
     [ oneAtomXyzs ] = reduceToSingleTrajectory( hostAtomsXyzs, dcdSettings.oneAtomStrategy );
 
     % TODO: unwrap the z coordinates using the PBCs
 
     % Sort trajectories on z-coordinate if requested
-    if dcdSettings.sortTrajectory == 'sortz'
+    if {dcdSettings.sortTrajectory} == 'sortz'
         hostAtomsXyzs=sort(hostAtomsXyzs,2); %TODO: this is a temporary space holder, it's pseudocode
     end
         
     
-    oneAtomXs = oneAtomXyzs(1,:));
-    oneAtomYs = oneAtomXyzs(2,:));
-    oneAtomZs = oneAtomXyzs(3,:));
+    oneAtomXs = oneAtomXyzs(1,:);
+    oneAtomYs = oneAtomXyzs(2,:);
+    oneAtomZs = oneAtomXyzs(3,:);
     oneAtomRs = sqrt( oneAtomXs.^2 + oneAtomYs.^2 );
 
     %
+    % Modules for extra data processing.
     % External module scripts import data into the moduleData structure
     %
     if optionalFunctions == 'fft'
+        [ hostAtomsFullXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
         fftSettings = struct( 'smoothingWindow', 15 );
         fftFlags = { 'plotOn' };
-        [ moduleData.ffts ] = computeFft( fftSettings, fftFlags, { oneAtomZs, oneAtomXs } );
+        hostAtomsZ=squeeze(hostAtomsFullXyzs(3,1,:));
+        hostAtomsX=squeeze(hostAtomsFullXyzs(1,1,:));
+        [ moduleData.ffts ] = computeFFT( fftSettings, fftFlags, fullTimes, hostAtomsZ, hostAtomsX );
+        clear hostAtomsFullXyzs fullTimes hostAtomsX hostAtomsZ
     end
 
     %
     % Save some data for easier data exploring, after this script is finished
     %
     savedData(dcdi).dcd = simName; % for convenience, always save the dcd file name
-    for saveIndex=1:length(toSave)
-        savedData(dcdi).(toSave{saveIndex}) = eval( toSave{saveIndex} );
+    for saveIndex=1:length(dataToSave)
+        savedData(dcdi).(dataToSave{saveIndex}) = eval( dataToSave{saveIndex} );
     end
     
 end
