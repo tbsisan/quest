@@ -3,14 +3,23 @@
 # Outputs the data for all the bond lengths, angles, and dihedrals, to polymerData directory.
 
 # Get the info needed to name the output files for the bondlengths, angles, and dihedrals.
+puts "Starting measurePolymer script"
 set tframes [molinfo top get numframes]
 set files [molinfo top get filename]
 set dcdpath [lindex $files 0 1]
 set fn [file tail $dcdpath]
 set fl [file rootname $fn]
-set bondFile [open "/projects/p20200/polymerData/$fl.bonds" w]
-set angleFile [open "/projects/p20200/polymerData/$fl.angles" w]
-set dihedralFile [open "/projects/p20200/polymerData/$fl.dihedrals" w]
+set bondFile "/projects/p20200/polymerData/$fl.bonds"
+set bondFile "/projects/p20200/polymerData/$fl.bonds"
+set angleFile "/projects/p20200/polymerData/$fl.angles"
+set dihedralFile "/projects/p20200/polymerData/$fl.dihedrals"
+set rFile "/projects/p20200/polymerData/$fl.rs"
+lassign $::argv bondFile angleFile dihedralFile rFile
+puts "bondFile: $bondFile, rFile: $rFile"
+set bondChannel [open $bondFile w]
+set angleChannel [open $angleFile w]
+set dihedralChannel [open $dihedralFile w]
+set rChannel [open $rFile w]
 
 # Select the polymer atoms.  TODO: need better way to select rather than just the non CA atoms.
 set polymer [atomselect top "not name CA"]
@@ -21,7 +30,7 @@ set polymerAtomInds [$polymer get index]
 set polymerNum [llength $polymerAtomInds]
 set polymerNumMinus1 [expr $polymerNum-1]
 
-# Build lists of pairs, trios, and quads
+# Build lists of atoms, pairs, trios, and quads
 for {set atom1 0} {$atom1<$polymerNumMinus1 } {incr atom1} {
     set atom2 [expr $atom1+1]
     set atom3 [expr $atom1+2]
@@ -44,24 +53,33 @@ for {set atom1 0} {$atom1<$polymerNumMinus1 } {incr atom1} {
 # For every frame, measure the bond lengths and angles, and write to the data files.
 for {set i 1} {$i < $tframes} {incr i 1} {
 	set bondLengths {}
+    set rs {}
+    animate goto $i
+    set xs [$polymer get x]
+    set ys [$polymer get y]
+	foreach x $xs y $ys {
+	    lappend rs [expr sqrt($x*$x+$y*$y)]
+	}
+    puts $rChannel $rs
 	foreach pair $bondPairs {
 	    lappend bondLengths [measure bond $pair frame $i]
 	}
-    puts $bondFile $bondLengths
+    puts $bondChannel $bondLengths
 	set angles {}
 	foreach trio $angleTrios {
 	    lappend angles [measure angle $trio frame $i]
 	}
-    puts $angleFile $angles
+    puts $angleChannel $angles
 	set dihedrals {}
 	foreach quad $dihedralQuads {
 	    lappend dihedrals [measure dihed $quad frame $i]
 	}
-    puts $dihedralFile $dihedrals
+    puts $dihedralChannel $dihedrals
 }
-close $bondFile
-close $angleFile
-close $dihedralFile
+close $bondChannel
+close $angleChannel
+close $dihedralChannel
+close $rChannel
 # makeMov
 
 exit;

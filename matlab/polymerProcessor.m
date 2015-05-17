@@ -7,18 +7,18 @@ dcdParameters
 
 for dcdi=1:length(dcdPruned)
     % Bonding data file names
-    dcdFullFile = [dcdPath '/' dcdPruned{dcdi}];
-    bondDataFullFile=['/projects/p20200/polymerData/' regexprep(dcds(dcdi).name,'dcd$','bonds')];
+    dcdFullFile = [paths.dcdPath '/' dcdPruned{dcdi}];
+    bondDataFullFile=[paths.projectStor '/polymerData/' regexprep(dcds(dcdi).name,'dcd$','bonds')];
     angleDataFullFile=regexprep(bondDataFullFile,'bonds$','angles');
     dihedralDataFullFile=regexprep(bondDataFullFile,'bonds$','dihedrals');
+    rDataFullFile=regexprep(bondDataFullFile,'bonds$','rs');
 
     % Process dcd files into bonding data files, if we haven't already done so.
-    if ~exist( bondDataFullFile, 'file' )
-        [ namdFiles ] = getNamdFileList( dcdFullFile );
-        [~,psfFile] = system( ['awk "/Info: STRUCTURE FILE/ {print \$4; exit}" <' namdFiles.outfStd] );
-        psfFullFile = strtrim([projectPath '/psfs/' psfFile]);
+    [ namdFiles ] = getNamdFileList( dcdFullFile, paths );
+    if ~exist( rDataFullFile, 'file' )
         tclFullFile = '/home/tbs246/md/vmd/measurePolymerBonds.tcl';
-        [status] = system(sprintf('vmd -dispdev text -psf %s -dcd %s -e %s', psfFullFile, dcdFullFile, tclFullFile),'-echo');
+        [status] = system(sprintf('vmd -dispdev text -psf %s -dcd %s -e %s -args %s %s %s %s', ...
+                                   namdFiles.psff, dcdFullFile, tclFullFile, bondDataFullFile, angleDataFullFile, dihedralDataFullFile, rDataFullFile),'-echo');
     end
 
     % Read in bonding data.
@@ -28,6 +28,9 @@ for dcdi=1:length(dcdPruned)
 	angleData=dlmread( angleDataFullFile );
 	dihedralData=dlmread( dihedralDataFullFile );
 	dihedralData=mod(dihedralData,360);
+    rData=dlmread( rDataFullFile );
+    cooledInd=round(size(rData,1)*2/3);
+    cooledRs=rData(end*2/3:end,:);
 
     % Average over all bonds for each time step.
 	bonds_v_time=mean(bondData,2);
@@ -52,6 +55,14 @@ for dcdi=1:length(dcdPruned)
     ylabel('backbone dihedrals')
     xlabel('time step')
 
+    % Plot R data
+    figure;
+    hist(cooledRs(:),20);
+    [ ~, rName, ~ ] = fileparts( rDataFullFile );
+	title(strrep(rName,'_','\_'));
+    xlabel('R (angstrom)');
+    ylabel('Histogram of radial positions of polymer atoms');
+
     % Plot dihedral angle m+1 versus dihedral angle m
     figure;
     shortTimeArray=1:size(dihedralData,1);
@@ -63,6 +74,14 @@ for dcdi=1:length(dcdPruned)
     plot(dihedralData1,dihedralData2,'o');
     [ ~, dihedralName, ~ ] = fileparts( dihedralDataFullFile );
 	title(strrep(dihedralName,'_','\_'));
+    xlabel('dihedral angle i');
+    ylabel('dihedral angle i+1');
     horplot(180,'--');
     vertplot(180,'--');
+
+    vmdMovieController = '/home/tbs246/md/vmd/movieController.tcl';
+    vmdMovieCmd = sprintf('vmd -dispdev text -psf %s -dcd %s -e %s -args %s %s %s %s %s', ...
+                           namdFiles.psff, dcdFullFile, vmdMovieController, '1', '1', '70', '/home/tbs246/Dropbox/LichterGroup/meetings/5.14.2015', '~/movs')
+    [ status, cmdOut ] = system(vmdMovieCmd);
 end
+savefigs('/home/tbs246/Dropbox/LichterGroup/meetings/5.14.2015/','nm77_T2_polymerData',1);

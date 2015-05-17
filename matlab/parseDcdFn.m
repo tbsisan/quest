@@ -134,6 +134,14 @@ if (size(poreRc,1)>0)
     dcdFnData.poreR=str2num(poreR);
 end
 
+dcdFnData.justNanotubeAndFluid=true;
+if ( dcdFnData.cntL==0 || ...
+     regexp(dcdf,'_res[0-9]') )
+    dcdFnData.justNanotubeAndFluid=false;
+end
+
+[ ~, dcdFnData.simName, ~ ] = fileparts( dcdf );
+
 myFields = fieldnames(dcdFnData);
 emptyFieldInds=structfun(@isempty,dcdFnData);
 emptyFields=myFields(emptyFieldInds);

@@ -18,20 +18,17 @@ for dcdi=startfile:endfile
     
     if dcdFlags == 'useLastDcd' && dcdi>1; display(sprintf('skipping dcd %i',dcdi)); continue; end
     if dcdFlags ~= 'useLastDcd'
-        dcdFullFile = [dcdPath '/' dcdPruned{dcdi}];
+        dcdFullFile = [paths.dcdPath '/' dcdPruned{dcdi}];
     
         %
         % Figure out important data from the dcd file name
         %
-        [ namdFiles ]                                             = getNamdFileList( dcdFullFile );
+        [ namdFiles ]                                             = getNamdFileList( dcdFullFile, paths );
         [ pbcx, pbcy, pbcz ]                                      = getPbcs( namdFiles.xscf );
         [ timeParams ]                                            = timeDataFromNamd( namdFiles ); %timestep, expectedSteps, dcdFreq, framePeriodns, expectedSimLength
         [ dcdFnData ]                                             = parseDcdFn( dcdPruned{dcdi} );
-        [ ~, simName, ~ ]                                         = fileparts( dcdFullFile );
         [ atomsPerFluidMol ]                                      = guessAtomsPerFluidMol( dcdFnData.fluidModelStr, namdFiles );
-        fluidAtomFirst = (dcdFnData.cntL * 4 * dcdFnData.nm1) + 1;
-        fluidAtomLast  = fluidAtomFirst + (dcdFnData.fluidQuantity * atomsPerFluidMol) - 1;
-        atomsToGet = fluidAtomFirst:1:fluidAtomLast;
+        [ atomsToGet ]                                            = fluidAtomIndexes ( dcdFnData, atomsPerFluidMol, paths );
 
         % 
         % Read in the data in the dcd file
@@ -62,20 +59,24 @@ for dcdi=startfile:endfile
     % Modules for extra data processing.
     % External module scripts import data into the moduleData structure
     %
-    if optionalFunctions == 'fft'
+    if moduleList == 'fft'
         [ hostAtomsFullXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
         fftSettings = struct( 'smoothingWindow', 15 );
         fftFlags = { 'plotOn' };
-        hostAtomsZ=squeeze(hostAtomsFullXyzs(3,1,:));
         hostAtomsX=squeeze(hostAtomsFullXyzs(1,1,:));
-        [ moduleData.ffts ] = computeFFT( fftSettings, fftFlags, fullTimes, hostAtomsZ, hostAtomsX );
+        hostAtomsZ=squeeze(hostAtomsFullXyzs(3,1,:));
+        [ moduleData(dcdi).ffts ] = computeFFT( fftSettings, fftFlags, fullTimes, hostAtomsZ, hostAtomsX ); 
+        % moduleData(1).ffts.hostAtomsZ.smoothPower is the smoothed fft power of hostAtomsZ
         clear hostAtomsFullXyzs fullTimes hostAtomsX hostAtomsZ
     end
 
+    if moduleList == 'makeMovie'
+
+    end
     %
     % Save some data for easier data exploring, after this script is finished
     %
-    savedData(dcdi).dcd = simName; % for convenience, always save the dcd file name
+    savedData(dcdi).dcd = dcdFnData.simName; % for convenience, always save the dcd file name
     for saveIndex=1:length(dataToSave)
         savedData(dcdi).(dataToSave{saveIndex}) = eval( dataToSave{saveIndex} );
     end

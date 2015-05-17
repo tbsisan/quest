@@ -12,20 +12,23 @@ function [ data ] = computeFFT( settings, flags, sampleTimes, varargin )
 
 numTimePoints=length(sampleTimes);
 numDataArrays=length(varargin);
-display(sprintf('numDataArrays: %i',numDataArrays));
-timeArrayZeros=zeros(1,numTimePoints);
-data=struct('power',timeArrayZeros, ...
-            'smoothPower',timeArrayZeros, ...
-            'freqs',timeArrayZeros, ...
-            'dataNum',num2cell(1:numDataArrays)); % makes a 0-initialized structure array of size numDataArrays, with fields as listed
+display(sprintf('\tCOMPUTING FFTs: number of data arrays passed to computeFFT: %i',numDataArrays));
+% TODO: delete below comments.
+% Initialize a struct array with dimension equal to number of input arrays.
+% Changed to struct of structs, so no longer needed.
+% timeArrayZeros=zeros(1,numTimePoints);
+% data=struct('power',timeArrayZeros, ...
+%             'smoothPower',timeArrayZeros, ...
+%             'freqs',timeArrayZeros, ...
+%             'dataNum',num2cell(1:numDataArrays)); % makes a 0-initialized structure array of size numDataArrays, with fields as listed
 
 for datai=1:numDataArrays
     dataName = inputname(datai+3)
-    display(sprintf('name of data: %s',dataName));
+    display(sprintf('\t\tname of data: %s',dataName));
     ydata=squeeze(varargin{datai});
     numDataPoints=length(ydata);
     if (numDataPoints ~= numTimePoints)
-        display(sprintf('ERROR in computeFFT: sample time array (%i) has different length than data array (%i) for %s',numTimePoints,numDataPoints,dataName));
+        display(sprintf('\t\tERROR in computeFFT: sample time array (%i) has different length than data array (%i) for %s',numTimePoints,numDataPoints,dataName));
         continue;
     end
     signal = ydata - mean( ydata );
@@ -33,20 +36,21 @@ for datai=1:numDataArrays
     sampleFreq=1/sampleTime_ns;
     NFFT = 2^nextpow2(numDataPoints);
     Y = fft(signal,NFFT)/numDataPoints;
-    data(datai).freqs = sampleFreq/2*linspace(0,1,NFFT/2+1);
+    data.(dataName).freqs = sampleFreq/2*linspace(0,1,NFFT/2+1);
+    fftLength=length(data.(dataName).freqs);
     power=2*abs(Y(1:NFFT/2+1));
     powern=2*abs(Y(end:-1:NFFT/2+1));
     powern(end+1)=0;
-    data(datai).power=(power+powern)/2;
-    [sgP,~] = savitzy( 2, settings.smoothingWindow, data(datai).power, 1 );
-    data(datai).smoothPower=sgP;
-    data(datai).smoothPower(end+1:length(data(datai).freqs))=0;
-    data(datai).name=dataName;
+    data.(dataName).power=(power+powern)/2;
+    [sgP,~] = savitzy( 2, settings.smoothingWindow, data.(dataName).power, 1 );
+    data.(dataName).name=dataName; % TODO: This is probably not necessary any more
+    data.(dataName).smoothPower=sgP;
+    data.(dataName).smoothPower(end+1:fftLength)=0;
     if (flags == 'plotOn')
         figure;
-        display(sprintf('freq size: %i, power size: %i, smoth size: %i',length(data(datai).freqs),length(data(datai).power),length(data(datai).smoothPower)));
-        plot(   data(datai).freqs/1000, data(datai).power,'b', ...
-                data(datai).freqs/1000, data(datai).smoothPower,'g');
+        display(sprintf('\t\tPlotting data: freq size: %i, power size: %i, smooth power size: %i',fftLength,length(data.(dataName).power),length(data.(dataName).smoothPower)));
+        plot(   data.(dataName).freqs/1000, data.(dataName).power,'b', ...
+                data.(dataName).freqs/1000, data.(dataName).smoothPower,'g');
         xlabel('freq (1/ps)');
         ylabel('power');
         legend('raw data','smoothed data');
