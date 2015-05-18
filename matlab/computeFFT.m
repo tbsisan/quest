@@ -23,7 +23,7 @@ display(sprintf('\tCOMPUTING FFTs: number of data arrays passed to computeFFT: %
 %             'dataNum',num2cell(1:numDataArrays)); % makes a 0-initialized structure array of size numDataArrays, with fields as listed
 
 for datai=1:numDataArrays
-    dataName = inputname(datai+3)
+    dataName = inputname(datai+3);
     display(sprintf('\t\tname of data: %s',dataName));
     ydata=squeeze(varargin{datai});
     numDataPoints=length(ydata);

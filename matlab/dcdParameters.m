@@ -2,7 +2,7 @@
 % Set dcd parameters before processing with dcdProcessor.m
 %
 setPaths;
-dcdPattern  = '/cnt60_*nm77*cgpsem*ens*T2_*coul*run*langevin*.dcd';
+dcdPattern  = '/cnt8_*nm66*spe8*ens*run1*langevin*.dcd';
 dcds        = dir( [paths.dcdPath dcdPattern] ); % Just process the last dcd with: dcds = [1];
 
 %

@@ -27,8 +27,8 @@ for dcdi=startfile:endfile
         [ pbcx, pbcy, pbcz ]                                      = getPbcs( namdFiles.xscf );
         [ timeParams ]                                            = timeDataFromNamd( namdFiles ); %timestep, expectedSteps, dcdFreq, framePeriodns, expectedSimLength
         [ dcdFnData ]                                             = parseDcdFn( dcdPruned{dcdi} );
-        [ atomsPerFluidMol ]                                      = guessAtomsPerFluidMol( dcdFnData.fluidModelStr, namdFiles );
-        [ atomsToGet ]                                            = fluidAtomIndexes ( dcdFnData, atomsPerFluidMol, paths );
+        [ atomsPerFluidMol ]                                      = guessAtomsPerFluidMol( dcdFnData.fluidModelStr, dcdFnData.justNanotubeAndFluid, namdFiles );
+        [ atomsToGet ]                                            = fluidAtomIndexes ( dcdFnData, atomsPerFluidMol, paths, namdFiles.pdbf );
 
         % 
         % Read in the data in the dcd file

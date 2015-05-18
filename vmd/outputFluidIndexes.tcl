@@ -5,7 +5,7 @@
 #mol new [file normalize $pdbFile] type pdb autobonds off waitfor all
 # Open output channel to write list of fluid atom indexes.
 set indexOutputFile [lindex $argv 0]
-set outputFilechannel [open $indexOutputFile w]
+set outputFileChannel [open $indexOutputFile w]
 #set oif [regsub {pdb$} $pdbFile "oi"]
 # TODO: find a better way to get fluid atoms, like using segnames or hijack an element symbol
 set fluids [atomselect top "not name CA and not name SA and not name BA and not name NA"]

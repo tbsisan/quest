@@ -72,8 +72,10 @@ waterCell=regexp(dcdf,'_(cgp[0-9]g|lj|spe|h2o|tbs[0-9]p|ts26[ab]|tip3[a-z]{0,}|t
 if (length(waterCell)>1)
     fluidQuantityStr=waterCell{1}{2};
 elseif (length(waterCell)>0)
-    disp('length waterCell is 1 (or more, but can"t be more) and this is unexpected');
-    fluidQuantityStr=waterCell{1};
+    % TOD0:  This is triggering for "short" systems, where number fluids <10.  What other cases will it trigger?
+    disp(sprintf('\tLength waterCell is 1 (or more, but can"t be more) and this is unexpected'));
+    fluidQuantityStr=waterCell{1}{2};
+    disp(sprintf('\tFluidQuantityStr is %s',fluidQuantityStr));
 else
     fluidQuantityStr='0';
 end

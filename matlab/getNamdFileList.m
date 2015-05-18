@@ -1,6 +1,7 @@
 function [ namdFiles ] = getNamdFileList( dcdf, paths )
-%parsing the data from the name of the dcd file
-%still a workin in progress
+% Parsing the data from the name of the dcd file.
+% The fullnes of the paths to files is largely determined by the input dcdf parameter.
+% It is intended that dcdf be input with an absolute path to the dcd file.
     namdFiles.dcdf=dcdf;
     namdFiles.veldcdf=regexprep(dcdf,'dcd$','veldcd');
     namdFiles.fdcdf=regexprep(dcdf,'dcd$','forcedcd');
@@ -9,6 +10,6 @@ function [ namdFiles ] = getNamdFileList( dcdf, paths )
     namdFiles.xscf=regexprep(dcdf,'dcd$','xsc');
     [~,psfFile] = system( ['awk "/Info: STRUCTURE FILE/ {print \$4; exit}" <' namdFiles.outfStd] );
     namdFiles.psff = strtrim([paths.projectHome '/psfs/' psfFile]);
-    namdFiles.pdbf = regexprep(namdFiles.psff,'psf$','pdb');
+    namdFiles.pdbf = regexprep(namdFiles.psff,'psf','pdb'); % needs to change psf in 2 places
 end
 

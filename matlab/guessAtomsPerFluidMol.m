@@ -1,4 +1,4 @@
-function [ fluidAtoms ] = guessFluidAtomsPerMol( fluidStr, namdFiles )
+function [ fluidAtoms ] = guessFluidAtomsPerMol( fluidStr, justNanotubeAndFluidBool, namdFiles )
 % gets number of fluid atoms per fluid molecule from the fluid string.  Fluid string should be obtained
 % from another function or manually obtained.  The number of atoms is also predicted from the output of
 % NAMD.  If the second method gives a different result, the fluidAtoms can be changed by +1 or -1, or else
@@ -38,25 +38,32 @@ else
 end
 
 % Count the number of atoms that are not carbon, silicon, boron, nitrogen
-[stat, str] = system(['awk "!/ CA| BA| NA| SA/ {count++} END {print count}" <' pdbFile]);
+[stat, str] = system(['awk "!/ CA| BA| NA| SA/ {count++} END {print count}" <' namdFiles.pdbf]);
 if (~stat)
-  nonTubes = str2num(str);
-  if rem(nonTubes,fluidAtoms)==0
-    disp(['Number of fluid atoms per mol confirmed by dcd name and pdb file ' num2Str(fluidAtoms)]);
-  else
-    fluidAtoms=fluidAtoms+1;
+    nonTubes = str2num(str);
     if rem(nonTubes,fluidAtoms)==0
-      disp(['FLUID ATOM DISCREPENCY: changing number of fluid Atoms by +1 to ' num2Str(fluidAtoms)]);
+        disp(['Number of fluid atoms per mol confirmed by dcd name and pdb file ' num2str(fluidAtoms)]);
     else
-      fluidAtoms=fluidAtoms-2;
-      if rem(nonTubes,fluidAtoms)==0
-        disp(['FLUID ATOM DISCREPENCY: changing number of fluid Atoms by -1 to ' num2Str(fluidAtoms)]);
-      else
-        disp('FLUID ATOM DISCREPENCY: warning no good number of fluid atoms per mol, setting to 1');
-        fluidAtoms=1;
-      end
+        if ~justNanotubeAndFluidBool
+	        disp(sprintf('Assuming a system with water in reservoirs, keeping fluid atoms per molecule: %i',fluidAtoms));
+        else
+	        fluidAtoms=fluidAtoms+1;
+	        if rem(nonTubes,fluidAtoms)==0
+	            disp('FLUID ATOM DISCREPENCY: changing number of fluid Atoms by +1');
+	            disp(sprintf('number of fluids expected was %i but determined from non CAs was %i',fluidAtoms,nonTubes));
+	        else
+	            fluidAtoms=fluidAtoms-2;
+	            if rem(nonTubes,fluidAtoms)==0
+	                disp(['FLUID ATOM DISCREPENCY: changing number of fluid Atoms by -1 to ' num2str(fluidAtoms)]);
+	            else
+	                disp('FLUID ATOM DISCREPENCY: warning no good number of fluid atoms per mol, setting to 1');
+	                fluidAtoms=1;
+	            end
+	        end
+        end
     end
-  end
+else
+    disp(sprintf('WARNING:Did not determine the number fluid atoms using awk of pdb file in %s',mfilename));
 end
 
 end

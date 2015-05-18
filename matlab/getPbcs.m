@@ -2,7 +2,7 @@ function [ pbcx, pbcy, pbcz ] = getPbcs( xscf )
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 
-display(sprintf('\nGETTING PBCS\n'));
+display(sprintf('\nGETTING PBCS from file: %s\n',xscf));
 pbcz=0; pbcx=0; pbcy=0;
 
 [stat,str]=system(['awk "/^[0-9.]/ {printf \"%f\", \$10; exit}" <' xscf]);
