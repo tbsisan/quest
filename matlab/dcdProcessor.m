@@ -28,12 +28,12 @@ for dcdi=startfile:endfile
         [ timeParams ]                                            = timeDataFromNamd( namdFiles ); %timestep, expectedSteps, dcdFreq, framePeriodns, expectedSimLength
         [ dcdFnData ]                                             = parseDcdFn( dcdPruned{dcdi} );
         [ atomsPerFluidMol ]                                      = guessAtomsPerFluidMol( dcdFnData.fluidModelStr, dcdFnData.justNanotubeAndFluid, namdFiles );
-        [ atomsToGet ]                                            = fluidAtomIndexes ( dcdFnData, atomsPerFluidMol, paths, namdFiles.pdbf );
+        [ atomsToGet ]                                            = mobileAtomIndexes ( dcdFnData, atomsPerFluidMol, paths, namdFiles.pdbf );
 
         % 
         % Read in the data in the dcd file
         %
-        [ xyzs ] = readdcd( namdFiles.dcdf, atomsToGet );
+        [ xyzs ] = readdcd( namdFiles.dcdf, atomsToGet.fluid );
     end
     
     %
@@ -63,12 +63,27 @@ for dcdi=startfile:endfile
         [ hostAtomsFullXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
         fftSettings = struct( 'smoothingWindow', 15 );
         fftFlags = { 'plotOn' };
-        hostAtomsX=squeeze(hostAtomsFullXyzs(1,1,:));
-        hostAtomsZ=squeeze(hostAtomsFullXyzs(3,1,:));
-        [ moduleData(dcdi).ffts ] = computeFFT( fftSettings, fftFlags, fullTimes, hostAtomsZ, hostAtomsX ); 
+        oneAtomX=squeeze(hostAtomsFullXyzs(1,1,:));
+        oneAtomZ=squeeze(hostAtomsFullXyzs(3,1,:));
+        [ moduleData(dcdi).ffts ] = computeFFT( fftSettings, fftFlags, fullTimes, oneAtomZ, oneAtomX ); 
         % moduleData(1).ffts.hostAtomsZ.smoothPower is the smoothed fft power of hostAtomsZ
-        clear hostAtomsFullXyzs fullTimes hostAtomsX hostAtomsZ
+        clear hostAtomsFullXyzs fullTimes hostAtomsX hostAtomsZ;
     end
+
+    if moduleList == 'trackReservoirs'
+        if ~dcdFnData.justNanotubeAndFluid
+            [ hostAtomsAllXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
+            hostAtomsZ = squeeze(hostAtomsAllXyzs(3,:,:));
+            [ nonFluidGeometry ] = getNonFluidGeometry( namdFiles.pdbf );
+            [ pistonXyzs ] = readdcd( namdFiles.dcdf, atomsToGet.pistons );
+            [ pistonsZ ] = getPistonsZ( pistonXyzs, nonFluidGeometry );
+            [ reservoirSizes ] = trackReservoirs( hostAtomsZ, pistonsZ, nonFluidGeometry );
+            clear hostAtomsAllXyzs hostAtomsZ pistonXyzs pistonsZ;
+        else
+            disp(sprintf('\tWARNING: tracking reservoirs but justNanotubeAndFluid is set'));
+        end
+    end
+
 
     if moduleList == 'makeMovie'
 
