@@ -1,12 +1,12 @@
-function [ reservoirSizes ] = trackReservoirs( fluidMoleculeZs, pistonsZs, cntReservoirGeometry )
+function [ reservoirData ] = trackReservoirs( fluidMoleculeZs, pistonsZs, reservoirTimes, cntReservoirGeometry )
 % For a system with two reservoirs, return the difference in the number of water molecules in the two reservoirs
 % Expects the z coordinate of the fluid molecule locations.  Usually this can be the location of the "central" atom in the fluid.
 
 % Count up fluids in reservoirs.
 topBool = fluidMoleculeZs > cntReservoirGeometry.membraneTop;
 btmBool = fluidMoleculeZs < cntReservoirGeometry.membraneBtm;
-reservoirSizes.topCount = sum(topBool);
-reservoirSizes.btmCount = sum(btmBool);
+reservoirData.topCount = sum(topBool);
+reservoirData.btmCount = sum(btmBool);
 %topReservoirNet=topReservoirCount-topReservoirCount(1);
 %btmReservoirNet=btmReservoirCount-btmReservoirCount(1);
 
@@ -15,5 +15,6 @@ reservoirSizes.btmCount = sum(btmBool);
 % Averaging them together should smooth out this error, as shown below.
 % Qestimate = ( topReservoirNet+(-btmReservoirNet)) / 2;
 
-reservoirSizes.topPistonZ = mean(pistonsZs.top);
-reservoirSizes.btmPistonZ = mean(pistonsZs.btm);
+reservoirData.topPistonZ = mean(pistonsZs.top);
+reservoirData.btmPistonZ = mean(pistonsZs.btm);
+reservoirData.times = reservoirTimes;

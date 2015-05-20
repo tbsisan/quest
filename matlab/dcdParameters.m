@@ -2,6 +2,7 @@
 % Set dcd parameters before processing with dcdProcessor.m
 %
 setPaths;
+setAvailableModules;
 dcdPattern  = '/cnt8_*nm66*spe8*ens*run1*langevin*.dcd';
 dcds        = dir( [paths.dcdPath dcdPattern] ); % Just process the last dcd with: dcds = [1];
 
@@ -17,7 +18,8 @@ dcdFlags    =       {   'useLastDcd', 'plotPosition' };
 
 dataToSave  = { 'oneAtomZs' }; % Save this data for each dcd file processed
 
-moduleList = { 'trackReservoirs' }; % List of optional data processing options. Full list in TODO:
+moduleList = { 'trackReservoirs' }; % List of optional data processing options. Full list in makeAvailableModules:
+for module=moduleList; if availableModules~=module; error([ 'Module ' cell2mat(module) ' not available' ]); end; end
 
 dcdPruneStrings = { 'aaaaaaa',  ...
                     'replaceMeWithAStringToMatchAdcdFileNameForExclusion',  ...
