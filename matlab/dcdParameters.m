@@ -13,11 +13,11 @@ dcds        = dir( [paths.dcdPath dcdPattern] ); % Just process the last dcd wit
 %
 dcdSettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
                         'shortTimeSteps', 100                                  );
-dcdFlags    =       {   'plotPosition' };
+dcdFlags    =       {   'useLastDcd', 'plotPosition' };
 
 dataToSave  = { 'oneAtomZs' }; % Save this data for each dcd file processed
 
-moduleList = { 'fft' }; % List of optional data processing options. Full list in TODO:
+moduleList = { 'trackReservoirs' }; % List of optional data processing options. Full list in TODO:
 
 dcdPruneStrings = { 'aaaaaaa',  ...
                     'replaceMeWithAStringToMatchAdcdFileNameForExclusion',  ...

@@ -17,7 +17,7 @@ endfile=length(dcdPruned);
 for dcdi=startfile:endfile
     
     if dcdFlags == 'useLastDcd' && dcdi>1; display(sprintf('skipping dcd %i',dcdi)); continue; end
-    if dcdFlags ~= 'useLastDcd'
+    if dcdFlags ~= 'useLastDcd' || ~exist( 'xyzs', 'var' );
         dcdFullFile = [paths.dcdPath '/' dcdPruned{dcdi}];
     
         %
@@ -72,13 +72,15 @@ for dcdi=startfile:endfile
 
     if moduleList == 'trackReservoirs'
         if ~dcdFnData.justNanotubeAndFluid
-            [ hostAtomsAllXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
+            [ hostAtomsAllXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 500 ); % 3d (spatial dim, atom, timestep)
             hostAtomsZ = squeeze(hostAtomsAllXyzs(3,:,:));
-            [ nonFluidGeometry ] = getNonFluidGeometry( namdFiles.pdbf );
+            geometryOutputFile = [paths.projectStor '/geometry/' dcdFnData.simName '.geom'];
+            [ nonFluidGeometry ] = getNonFluidGeometry( namdFiles.pdbf, geometryOutputFile, paths );
             [ pistonXyzs ] = readdcd( namdFiles.dcdf, atomsToGet.pistons );
-            [ pistonsZ ] = getPistonsZ( pistonXyzs, nonFluidGeometry );
+            [ pistonAllXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( pistonXyzs, timeParams, 1, 500 ); % 3d (spatial dim, atom, timestep)
+            [ pistonsZ ] = getPistonsZ( pistonAllXyzs, nonFluidGeometry );
             [ reservoirSizes ] = trackReservoirs( hostAtomsZ, pistonsZ, nonFluidGeometry );
-            clear hostAtomsAllXyzs hostAtomsZ pistonXyzs pistonsZ;
+            clear hostAtomsAllXyzs hostAtomsZ pistonsZ pistonXyzs pistonAllXyzs;
         else
             disp(sprintf('\tWARNING: tracking reservoirs but justNanotubeAndFluid is set'));
         end

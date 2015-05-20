@@ -12,10 +12,10 @@ proc listPlusOne {inList} {
         lset namdIndexes $listIndex [expr $vmdIndex+1] 
         incr listIndex
     }
-    return namdIndexes
+    return $namdIndexes
 }
 proc writeIndexes {outputFile vmdSelection} {
-    set outputHandler [open $OutputFile w]
+    set outputHandler [open $outputFile w]
     set selectionIndexes [$vmdSelection get index]
     set namdSelectionIndexes [listPlusOne $selectionIndexes]
     puts $outputHandler $namdSelectionIndexes
@@ -26,7 +26,7 @@ set fluidIndexOutputFile [lindex $argv 0]
 set fluidSelection [atomselect top {not name "[CBNS]A"}]
 writeIndexes $fluidIndexOutputFile $fluidSelection
 
-set pistonIndexOutputFile [lindex $argv 0]
+set pistonIndexOutputFile [lindex $argv 1]
 set pistonSelection [atomselect top {segname "[TB]PS"}]
 writeIndexes $pistonIndexOutputFile $pistonSelection
 #set oif [regsub {pdb$} $pdbFile "oi"]
