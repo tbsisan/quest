@@ -43,9 +43,9 @@ for datai=1:numDataArrays
     powern(end+1)=0;
     data.(dataName).power=(power+powern)/2;
     [sgP,~] = savitzy( 2, settings.smoothingWindow, data.(dataName).power, 1 );
+    sgP(end+1:fftLength)=0;
     data.(dataName).name=dataName; % TODO: This is probably not necessary any more
     data.(dataName).smoothPower=sgP;
-    data.(dataName).smoothPower(end+1:fftLength)=0;
     if (flags == 'plotOn')
         figure;
         display(sprintf('\t\tPlotting data: freq size: %i, power size: %i, smooth power size: %i',fftLength,length(data.(dataName).power),length(data.(dataName).smoothPower)));

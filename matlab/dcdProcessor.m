@@ -71,6 +71,7 @@ for dcdi=startfile:endfile
     end
 
     if moduleList == 'trackReservoirs'
+        reservoirSettings = struct( 'plot', dcdFnData.simName, 'smoothingWindow', 15 );
         if ~dcdFnData.justNanotubeAndFluid
             timeStepReduce = 500;
             [ hostAtomsAllXyzs, reducedTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, timeStepReduce ); % 3d (spatial dim, atom, timestep)
@@ -80,12 +81,17 @@ for dcdi=startfile:endfile
             [ pistonXyzs ] = readdcd( namdFiles.dcdf, atomsToGet.pistons );
             [ pistonAllXyzs, reducedTimes ] = getHostAtomsTrajsAndReducet( pistonXyzs, timeParams, 1, timeStepReduce ); % 3d (spatial dim, atom, timestep)
             [ pistonsZ ] = getPistonsZ( pistonAllXyzs, nonFluidGeometry );
-            [ moduleData(dcdi).reservoirs ] = trackReservoirs( hostAtomsZ, pistonsZ, reducedTimes, nonFluidGeometry );
+            [ moduleData(dcdi).reservoirs ] = trackReservoirs( hostAtomsZ, pistonsZ, reducedTimes, nonFluidGeometry, reservoirSettings );
             clear hostAtomsAllXyzs hostAtomsZ pistonsZ pistonXyzs pistonAllXyzs;
         else
             disp(sprintf('\tWARNING: tracking reservoirs but justNanotubeAndFluid is set'));
         end
     end
+
+    if moduleList == 'plotReservoirs'
+        % requireModule('trackReservoirs');
+    end
+
 
 
     if moduleList == 'makeMovie'
