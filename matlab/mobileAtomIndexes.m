@@ -9,9 +9,9 @@ function [ atomIndexes ] = mobileAtomIndexes( fnData, atomsPerFluid, paths, pdbF
         fluidOutputFile = [paths.projectStor '/indexes/' fnData.simName '.fluids.ind'];
         pistonOutputFile = [paths.projectStor '/indexes/' fnData.simName '.pistons.ind'];
         [ status, outp ] = system(sprintf('vmd -dispdev text -pdb %s -e %s -args %s %s', pdbFullFile, tclFullFile, fluidOutputFile, pistonOutputFile));
-        fileID = fopen('vmdindexoutput','w');
-        fprintf(fileID,'%s',outp);
-        fclose(fileID);
+        % fileID = fopen('vmdindexoutput','w');
+        % fprintf(fileID,'%s',outp);
+        % fclose(fileID);
         disp(sprintf('\tReading coords from noninfinite system %s using index file .ind', fluidOutputFile));
         atomIndexes.fluid=dlmread(fluidOutputFile);
         atomIndexes.pistons=dlmread(pistonOutputFile);

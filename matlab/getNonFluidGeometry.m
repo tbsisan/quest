@@ -3,7 +3,7 @@ function [ nonFluidGeometry ] = getNonFluidGeometry( pdb, geometryFile, paths );
 
 disp(sprintf('\tReading in system geometry of nonFluid atoms from geometry file %s',geometryFile));
 tclFullFile = [paths.scriptPath '/vmd/outputNonFluidGeometry.tcl'];
-[ stat, outp ] = system(sprintf('vmd -dispdev text -pdb %s -e %s -args %s',pdb,tclFullFile,geometryFile), '-echo');
+[ stat, outp ] = system(sprintf('vmd -dispdev text -pdb %s -e %s -args %s',pdb,tclFullFile,geometryFile));
 geometryData = dlmread(geometryFile);
 systemMiddle = mean(geometryData(:));
 nonFluidGeometry = struct(  ...

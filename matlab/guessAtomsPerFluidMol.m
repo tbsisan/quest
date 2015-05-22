@@ -4,7 +4,7 @@ function [ fluidAtoms ] = guessFluidAtomsPerMol( fluidStr, justNanotubeAndFluidB
 % NAMD.  If the second method gives a different result, the fluidAtoms can be changed by +1 or -1, or else
 % panics and sets fluidAtoms=1. A warning is output if the methods disagree.
 
-
+disp('Guessing Fluid atoms per molecule');
 % Hard code in the number of fluid atoms per molecule.
 switch fluidStr
   case {'tip3p','tip3m','spe','tbs0p','ts26a','ts26b'}
@@ -42,21 +42,21 @@ end
 if (~stat)
     nonTubes = str2num(str);
     if rem(nonTubes,fluidAtoms)==0
-        disp(['Number of fluid atoms per mol confirmed by dcd name and pdb file ' num2str(fluidAtoms)]);
+        disp(sprintf('\tNumber of fluid atoms per mol confirmed by dcd name and pdb file: %i', fluidAtoms));
     else
         if ~justNanotubeAndFluidBool
-	        disp(sprintf('Assuming a system with water in reservoirs, keeping fluid atoms per molecule: %i',fluidAtoms));
+	        disp(sprintf('\tAssuming a system with water in reservoirs, keeping fluid atoms per molecule: %i',fluidAtoms));
         else
 	        fluidAtoms=fluidAtoms+1;
 	        if rem(nonTubes,fluidAtoms)==0
-	            disp('FLUID ATOM DISCREPENCY: changing number of fluid Atoms by +1');
-	            disp(sprintf('number of fluids expected was %i but determined from non CAs was %i',fluidAtoms,nonTubes));
+	            disp(sprintf('\tFLUID ATOM DISCREPENCY: changing number of fluid Atoms by +1'));
+	            disp(sprintf('\tNumber of fluids expected was %i but determined from non CAs was %i',fluidAtoms,nonTubes));
 	        else
 	            fluidAtoms=fluidAtoms-2;
 	            if rem(nonTubes,fluidAtoms)==0
-	                disp(['FLUID ATOM DISCREPENCY: changing number of fluid Atoms by -1 to ' num2str(fluidAtoms)]);
+	                disp(sprintf('\tFLUID ATOM DISCREPENCY: changing number of fluid Atoms by -1 to %i', fluidAtoms));
 	            else
-	                disp('FLUID ATOM DISCREPENCY: warning no good number of fluid atoms per mol, setting to 1');
+	                disp(sprintf('\tFLUID ATOM DISCREPENCY: warning no good number of fluid atoms per mol, setting to 1'));
 	                fluidAtoms=1;
 	            end
 	        end
