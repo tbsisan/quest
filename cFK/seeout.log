@@ -1,0 +1,144 @@
+----------------------------------------
+PBS: Begin PBS Prologue Tue May 26 17:19:53 CDT 2015 1432678793
+PBS: Job ID:		15949938.qsched02.quest.it.northwestern.edu
+PBS: Username:		tbs246
+PBS: Group:		tbs246
+PBS: Executing queue:     short
+PBS: Job name:		N70E1k9F0
+PBS: Account:		p20200
+----------------------------------------
+   The following variables are not
+   guaranteed to be the same in 
+   prologue and the job run script  
+----------------------------------------
+PBS: Temporary Dir($TMPDIR):	/tmp/15949938.qsched02.quest.it.northwestern.edu
+PBS: Master Node($PBS_MSHOST):		qnode0563
+PBS: node file($PBS_NODEFILE):  /hpc/opt/torque/nodes/qnode0563/aux//15949938.qsched02.quest.it.northwestern.edu
+PBS: PATH (in prologue) : /bin:/usr/bin
+PBS: WORKDIR ($PBS_O_WORKDIR) is:  /home/tbs246/md/cFK
+----------------------------------------
+PBS: End PBS Prologue Tue May 26 17:19:53 CDT 2015 1432678793
+-bash: BASH_FUNC_module(): line 0: syntax error near unexpected token `)'
+-bash: BASH_FUNC_module(): line 0: `BASH_FUNC_module() () {  eval `/software/Modules/$MODULE_VERSION/bin/modulecmd bash $*`'
+-bash: error importing function definition for `BASH_FUNC_module'
+-bash: BASH_FUNC_exe(): line 0: syntax error near unexpected token `)'
+-bash: BASH_FUNC_exe(): line 0: `BASH_FUNC_exe() () {  echo "\$ $@";'
+-bash: error importing function definition for `BASH_FUNC_exe'
+[?1034h[?1034hin compute node dir: /home/tbs246/md/cFK
+/hpc/opt/torque/nodes/qnode0563/mom_priv/jobs/15949938.qsched02.quest.it.northwestern.edu.SC: line 21: ./questbatches/ifort.N70.ens1.k9.F0.out: No such file or directory
+[?1034h----------------------------------------
+PBS job ended
+Begin PBS Epilogue Tue May 26 17:19:58 CDT 2015 1432678798
+JobID: 15949938.qsched02.quest.it.northwestern.edu
+Session ID:			16753
+Resources Used:			cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:00
+Job exit value:			127
+----------------------------------------
+----------------------------------------
+PBS: Begin PBS Prologue Tue May 26 17:29:41 CDT 2015 1432679381
+PBS: Job ID:		15950167.qsched02.quest.it.northwestern.edu
+PBS: Username:		tbs246
+PBS: Group:		tbs246
+PBS: Executing queue:     short
+PBS: Job name:		N70E1k9F0
+PBS: Account:		p20200
+----------------------------------------
+   The following variables are not
+   guaranteed to be the same in 
+   prologue and the job run script  
+----------------------------------------
+PBS: Temporary Dir($TMPDIR):	/tmp/15950167.qsched02.quest.it.northwestern.edu
+PBS: Master Node($PBS_MSHOST):		qnode0561
+PBS: node file($PBS_NODEFILE):  /hpc/opt/torque/nodes/qnode0561/aux//15950167.qsched02.quest.it.northwestern.edu
+PBS: PATH (in prologue) : /bin:/usr/bin
+PBS: WORKDIR ($PBS_O_WORKDIR) is:  /home/tbs246/md/cFK
+----------------------------------------
+PBS: End PBS Prologue Tue May 26 17:29:41 CDT 2015 1432679381
+-bash: BASH_FUNC_module(): line 0: syntax error near unexpected token `)'
+-bash: BASH_FUNC_module(): line 0: `BASH_FUNC_module() () {  eval `/software/Modules/$MODULE_VERSION/bin/modulecmd bash $*`'
+-bash: error importing function definition for `BASH_FUNC_module'
+-bash: BASH_FUNC_exe(): line 0: syntax error near unexpected token `)'
+-bash: BASH_FUNC_exe(): line 0: `BASH_FUNC_exe() () {  echo "\$ $@";'
+-bash: error importing function definition for `BASH_FUNC_exe'
+[?1034h[?1034hin compute node dir: /home/tbs246/md/cFK
+ RANDOM SEED:  1932101605  1280880885
+ FIRST RANDOM SEED:  1932101605
+ Nbuf =       131072
+ system size is   2.456000125494739E-008
+ will do         2500  runs
+ STATUSWAIT:            0
+ ens:01
+forrtl: No such file or directory
+forrtl: severe (29): file not found, unit 1010, file /home/tbs246/md/cFK/events/events0001.dat
+Image              PC                Routine            Line        Source             
+ifort.N70.ens1.k9  00000000004B773E  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  00000000004B61D6  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  000000000046A692  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  0000000000426CFB  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  0000000000426262  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  0000000000430828  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  00000000004116C6  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  00000000004030EC  Unknown               Unknown  Unknown
+libc.so.6          00002B49193BBCDD  Unknown               Unknown  Unknown
+ifort.N70.ens1.k9  0000000000402FE9  Unknown               Unknown  Unknown
+[?1034h----------------------------------------
+PBS job ended
+Begin PBS Epilogue Tue May 26 17:29:47 CDT 2015 1432679387
+JobID: 15950167.qsched02.quest.it.northwestern.edu
+Session ID:			27679
+Resources Used:			cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:01
+Job exit value:			29
+----------------------------------------
+----------------------------------------
+PBS: Begin PBS Prologue Tue May 26 17:32:00 CDT 2015 1432679520
+PBS: Job ID:		15950168.qsched02.quest.it.northwestern.edu
+PBS: Username:		tbs246
+PBS: Group:		tbs246
+PBS: Executing queue:     short
+PBS: Job name:		N70E1k9F0
+PBS: Account:		p20200
+----------------------------------------
+   The following variables are not
+   guaranteed to be the same in 
+   prologue and the job run script  
+----------------------------------------
+PBS: Temporary Dir($TMPDIR):	/tmp/15950168.qsched02.quest.it.northwestern.edu
+PBS: Master Node($PBS_MSHOST):		qnode0561
+PBS: node file($PBS_NODEFILE):  /hpc/opt/torque/nodes/qnode0561/aux//15950168.qsched02.quest.it.northwestern.edu
+PBS: PATH (in prologue) : /bin:/usr/bin
+PBS: WORKDIR ($PBS_O_WORKDIR) is:  /home/tbs246/md/cFK
+----------------------------------------
+PBS: End PBS Prologue Tue May 26 17:32:00 CDT 2015 1432679520
+-bash: BASH_FUNC_module(): line 0: syntax error near unexpected token `)'
+-bash: BASH_FUNC_module(): line 0: `BASH_FUNC_module() () {  eval `/software/Modules/$MODULE_VERSION/bin/modulecmd bash $*`'
+-bash: error importing function definition for `BASH_FUNC_module'
+-bash: BASH_FUNC_exe(): line 0: syntax error near unexpected token `)'
+-bash: BASH_FUNC_exe(): line 0: `BASH_FUNC_exe() () {  echo "\$ $@";'
+-bash: error importing function definition for `BASH_FUNC_exe'
+[?1034h[?1034hin compute node dir: /home/tbs246/md/cFK
+ RANDOM SEED:  -455218254  -906731045
+ FIRST RANDOM SEED:  -455218254
+ Nbuf =       131072
+ system size is   2.456000125494739E-008
+ will do         2500  runs
+ STATUSWAIT:            0
+ ens:01
+Run #:    1
+Starting Positions:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000
+Running with constants (k,h,eta,T,bgH,G):   1.0000  14.0000   0.0000*********  10.0000   0.0000   0.0000
+hardcore radius:   0.0000
+labels:LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+status update every (steps):         0
+Max Write Size:   16000000.
+corWindow: 192937984
+Steps for each run:  25000000
+ RANDOM SEED:   431392579   775991903
+ FIRST RANDOM SEED:   431392579
+[?1034h----------------------------------------
+PBS job ended
+Begin PBS Epilogue Tue May 26 17:32:59 CDT 2015 1432679579
+JobID: 15950168.qsched02.quest.it.northwestern.edu
+Session ID:			30695
+Resources Used:			cput=00:00:52,mem=0kb,vmem=0kb,walltime=00:00:54
+Job exit value:			0
+----------------------------------------
