@@ -1,5 +1,13 @@
 *.[oa]
+*.dat
+*.mod
+*.out
+*.in
+*.log
+*.forquest.f90
 *~
+cFK/questbatches/**
+cFK/ifort/**
 workIdeas
 changes
 worklog

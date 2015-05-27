@@ -60,11 +60,11 @@ gfort/WallMod.o : WallMod.f95
 
 ifort.out : cFK.xy.f90 ifort/cFKdata.o ifort/RNG.o ifort/dataTypes.o 
 	ifort $(INTOPTIM) ifort/cFKdata.o ifort/RNG.o ifort/dataTypes.o ifort/WallMod.o cFK.xy.f90 -Iifort -module ifort -o ifort.out
-	@echo "Turn on warnings if you want them"
+	@echo "Turn on warnings if you want them, currently suppressed with -w compiler flag"
 
 ifort.forquest.out : cFK.xy.forquest.f90 ifort/cFKdata.forquest.o ifort/RNG.o ifort/dataTypes.o 
 	ifort $(INTOPTIM) ifort/cFKdata.forquest.o ifort/RNG.o ifort/dataTypes.o ifort/WallMod.o cFK.xy.forquest.f90 -Iifort -module ifort -o ifort.forquest.out
-	@echo "Turn on warnings if you want them"
+	@echo "Turn on warnings if you want them, currently suppressed with -w compiler flag"
 
 ifort/cFKdata.o : ifort/dataTypes.o cFKdata.xy.f90
 	ifort $(INTOPTIM) -c cFKdata.xy.f90 -Iifort -module ifort -o ifort/cFKdata.o

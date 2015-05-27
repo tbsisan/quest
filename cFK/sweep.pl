@@ -17,7 +17,7 @@ sub logspace{
     if ($num == 1) {$den=2};
     my $spacing = ( log10($end) - log10($start) )/($den-1);
     my @exponents = map {log10($start) + $_*$spacing} (0 .. ($num-1));
-    print "exponents: @exponents";
+    # print "exponents: @exponents";
     @logVals = map { 10**$_ } (@exponents);
   }
   return @logVals
@@ -28,12 +28,12 @@ sub log10 {
 }
 
 # set to zero to change values with divvyProcs.sh
-my $kstart=1.4e1; #(4,4) 47, (5,5) 28.9
-my $kend=1.4e1;
+my $kstart=0.0e0; #(4,4) 47, (5,5) 28.9, polymer 14
+my $kend=0.0e0;
 my $knum=1;
 my @k=logspace($kstart,$kend,$knum);
-my $hstart=1.53e-20; #(4,4) 1.21e-21, (5,5) 5.53e-23
-my $hend=1.53e-20;
+my $hstart=5.53e-21; #(4,4) 1.21e-21, (5,5) 5.53e-23
+my $hend=5.53e-21;
 my $hnum=1;
 my @h=logspace($hstart,$hend,$hnum);
 my $bgstart=0;
