@@ -29,6 +29,7 @@ program cFK
    INTEGER :: runsRan=0
    REAL(KIND=BR), DIMENSION(N) :: eigen
    REAL(KIND=BR) :: sigma, soundSpeed
+   REAL :: coolCompletionPct, newtargetT, scaledThermal
 
    namelist /cFKconstants/ ens,k,eta,h,Temp,bgH,G,M
    namelist /xInit/ eigen
@@ -197,7 +198,6 @@ SWEEP: do run=1,size(ens)
       soundSpeed=sqrt(k(run)*oneOverM(run))*WL
       write(999,*) 'sound Speed (m/s):',soundSpeed
 
-      sigma=sqrt(dt)*oneOverM(run)*thermalStrength(run)
 !
 ! State Initialization
 !
@@ -226,7 +226,17 @@ SWEEP: do run=1,size(ens)
 !
       CALL Energy(0)
       CALL writeState()
+
+      scaledThermal=thermalStrength(run)
+      sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
+
       do tstep=1,steps
+         IF ( (tstep == 1 .or. mod(tstep,100)==0) .and. tstep <= coolDownSteps) THEN
+             coolCompletionPct = real(tstep)/real(coolDownSteps)
+             newtargetT = real(Tstart) * (1_BR-coolCompletionPct) + Temp(run)*coolCompletionPct
+             scaledThermal=thermalStrength(run) * sqrt(newTargetT/Temp(run))
+             sigma=sqrt(dt)*oneOverM(run)*scaledThermal
+         END IF
          CALL advanceState()  
       end do
       CALL Energy(steps)
@@ -587,7 +597,7 @@ CONTAINS
       REAL(KIND=BR), SAVE :: dt2 = dt**2
       INTEGER, INTENT(IN) :: currentDim
       IF (STOCHASTICS) THEN
-         Ft=thermalStrength(run)*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
       END IF
       IF (tstep .eq. 1) THEN
          F(currentDim,1,:)=cFKa(currentDim,xSub,vSub,Ft,rdiffSub1,ldiffSub1)
@@ -616,7 +626,7 @@ CONTAINS
          write(999,*) "WARNING VVERLET HAS NO BLOWTHROUGH DETECTION"
       ENDIF
       IF (STOCHASTICS) THEN
-         Ft=thermalStrength(run)*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
       END IF
       dx=dt*vSub+onehalf*dt2*F(currentDim,1,:)
       xSub=xSub+dx
@@ -689,7 +699,7 @@ CONTAINS
       LOGICAL :: blowthrough
       blowthrough=.false.
       IF (STOCHASTICS) THEN
-         Ft=thermalStrength(run)*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
       END IF
       dv = dt*cFKa(currentDim,xSub,vSub,Ft,rdiffSub,ldiffSub)
       !F(currentDim,2,:)=cFKa(currentDim,xSub,rdiffSub=rdiffSubSde,ldiffSub=ldiffSubSde)
@@ -767,7 +777,7 @@ CONTAINS
       REAL(KIND=BR), INTENT(INOUT), DIMENSION(NSim) :: xSub,vSub
       INTEGER, INTENT(IN) :: currentDim
       IF (STOCHASTICS) THEN
-         Ft=thermalStrength(run)*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
       END IF
       dv(currentDim,2,:)=dt*cFKa(currentDim,xSub,vSub,Ft,rdiffSub,ldiffSub)       ! the new a
       vGuess=vSub+threehalf*dv(currentDim,1,:)-onehalf*dv(currentDim,2,:)       ! guess at the new v
@@ -793,7 +803,7 @@ CONTAINS
       blowthrough=.false.
 
       IF (STOCHASTICS) THEN
-         Ft=thermalStrength(run)*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
       END IF
       !write(999,*) 'Ft:',Ft(1:5)
       dx(1,:)=dt*vSub

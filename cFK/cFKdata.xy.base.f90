@@ -25,9 +25,10 @@ REAL(KIND=BR), PARAMETER :: Ly=WL
 !REAL(KIND=BR), PARAMETER :: Lsim=2.0_BR*pi*real(WLsim,KIND=BR), LcSim=a*(Nsim-1)
 REAL(KIND=BR), PARAMETER :: eps = 10.0_BR**INT(-PRECISION(L)+5.0_BR)
 
-REAL, PARAMETER :: T=50.0e-9, dt=2.0*1.0000e-15
+REAL, PARAMETER :: T=5.0e-9, dt=2.0*1.0000e-15
 INTEGER, PARAMETER :: steps=T/dt
 INTEGER, PARAMETER :: Gwait=1e0
+INTEGER, PARAMETER :: coolDownSteps=5e5, Tstart=100
 
 LOGICAL :: D2 = .false. !TWO DIMENSIONS?
 REAL(KIND=BR), DIMENSION(NSim) :: x,y,vx,vy,xTotal,a_old

@@ -66,8 +66,8 @@ ifort.forquest.out : cFK.xy.forquest.f90 ifort/cFKdata.forquest.o ifort/RNG.o if
 	ifort $(INTOPTIM) ifort/cFKdata.forquest.o ifort/RNG.o ifort/dataTypes.o ifort/WallMod.o cFK.xy.forquest.f90 -Iifort -module ifort -o ifort.forquest.out
 	@echo "Turn on warnings if you want them, currently suppressed with -w compiler flag"
 
-ifort/cFKdata.o : ifort/dataTypes.o cFKdata.xy.f90
-	ifort $(INTOPTIM) -c cFKdata.xy.f90 -Iifort -module ifort -o ifort/cFKdata.o
+ifort/cFKdata.o : ifort/dataTypes.o cFKdata.xy.base.f90
+	ifort $(INTOPTIM) -c cFKdata.xy.base.f90 -Iifort -module ifort -o ifort/cFKdata.o
 
 ifort/cFKdata.forquest.o : ifort/dataTypes.o cFKdata.xy.forquest.f90
 	ifort $(INTOPTIM) -c cFKdata.xy.forquest.f90 -Iifort -module ifort -o ifort/cFKdata.forquest.o
