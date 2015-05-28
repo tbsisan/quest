@@ -23,7 +23,6 @@ program cFK
    CHARACTER(LEN=8) :: kChar,hChar,Gchar,Tchar,etaChar,runtimechar
    CHARACTER(LEN=2) :: ensChar
    CHARACTER(LEN=10) :: startClockChar
-   CHARACTER(LEN=7) :: projDir='polymer'
    REAL(KIND=BR), DIMENSION(size(Temp)) :: kbT, thermalStrength
    REAL(KIND=BR), DIMENSION(7) :: lastrun, running
    INTEGER :: runsRan=0
@@ -162,22 +161,22 @@ SWEEP: do run=1,size(ens)
       close(unit=9999)
       open(unit=1010,file='events/events'//runNumberChar//'.dat')
       IF (ASCIIFORMAT) THEN
-         open(unit=1,file='/projects/p20200/cFK/'//projDir//'/x.'//runNumberChar//'.dat')
-         open(unit=2,file='/projects/p20200/cFK/'//projDir//'/vx.'//runNumberChar//'.dat')
+         open(unit=1,file=projDir//'/x.'//runNumberChar//'.dat')
+         open(unit=2,file=projDir//'/vx.'//runNumberChar//'.dat')
          IF (D2) THEN
-            open(unit=1111,file='/projects/p20200/cFK/'//projDir//'/y.'//runNumberChar//'.dat')
-            open(unit=2222,file='/projects/p20200/cFK/'//projDir//'/vy.'//runNumberChar//'.dat')
+            open(unit=1111,file=projDir//'/y.'//runNumberChar//'.dat')
+            open(unit=2222,file=projDir//'/vy.'//runNumberChar//'.dat')
          ENDIF
       ELSE
-         open(unit=1,file='/projects/p20200/cFK/'//projDir//'/x.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-         open(unit=2,file='/projects/p20200/cFK/'//projDir//'/vx.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
+         open(unit=1,file=projDir//'/x.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
+         open(unit=2,file=projDir//'/vx.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
          IF (D2) THEN
             !open(unit=1111,file='/projects/p20200/cFK/nm44checkT/y.'//runNumberChar//'.dat',form='unformatted')
-            open(unit=1112,file='/projects/p20200/cFK/'//projDir//'/xsep.'//runNumberChar//'.dat',form='unformatted')
-            open(unit=1113,file='/projects/p20200/cFK/'//projDir//'/ysep.'//runNumberChar//'.dat',form='unformatted')
+            open(unit=1112,file=projDir//'/xsep.'//runNumberChar//'.dat',form='unformatted')
+            open(unit=1113,file=projDir//'/ysep.'//runNumberChar//'.dat',form='unformatted')
             !open(unit=2222,file='/projects/p20200/cFK/nm44checkT/vy.'//runNumberChar//'.dat',form='unformatted')
-            open(unit=1111,file='/projects/p20200/cFK/'//projDir//'/y.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-            open(unit=2222,file='/projects/p20200/cFK/'//projDir//'/vy.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
+            open(unit=1111,file=projDir//'/y.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
+            open(unit=2222,file=projDir//'/vy.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
          ENDIF
       END IF
       open(unit=999,file='/projects/p20200/cFK/'//projDir//'/log.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
