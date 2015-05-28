@@ -4,7 +4,7 @@
 setPaths;
 setAvailableModules;
 % dcdPattern  = '/cnt4*nm66*spe4*ens*run1*langevin*.dcd';
-dcds        = dir( [paths.dcdPath dcdPattern] ); % Just process the last dcd with: dcds = [1];
+
 
 %
 % Settings and flags control behavior in dcdProcessor.m
@@ -25,3 +25,6 @@ dcdPruneStrings = { 'aaaaaaa',  ...
                     'replaceMeWithAStringToMatchAdcdFileNameForExclusion',  ...
                     '9999999' }; % dcd files matching these pattern strings will be excluded from processing
 
+if dcdFlags ~= 'useLastDcd'
+    dcds        = dir( [paths.dcdPath '/' dcdPattern] ); % Just process the last dcd with: dcds = [1];
+end

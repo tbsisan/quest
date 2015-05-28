@@ -71,9 +71,9 @@ for dcdi=startfile:endfile
     end
 
     if moduleList == 'trackReservoirs'
-        reservoirSettings = struct( 'plot', dcdFnData.simName, 'smoothingWindow', 15 );
+        reservoirSettings = struct( 'plot', dcdFnData.simName, 'smoothingWindow', 25 );
         if ~dcdFnData.justNanotubeAndFluid
-            timeStepReduce = 500;
+            timeStepReduce = 0;
             [ hostAtomsAllXyzs, reducedTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, timeStepReduce ); % 3d (spatial dim, atom, timestep)
             hostAtomsZ = squeeze(hostAtomsAllXyzs(3,:,:));
             geometryOutputFile = [paths.projectStor '/geometry/' dcdFnData.simName '.geom'];

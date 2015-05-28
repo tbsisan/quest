@@ -179,7 +179,7 @@ SWEEP: do run=1,size(ens)
             open(unit=2222,file=projDir//'/vy.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
          ENDIF
       END IF
-      open(unit=999,file='/projects/p20200/cFK/'//projDir//'/log.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
+      open(unit=999,file=projDir//'/log.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
       !if (ALL(running == lastrun)) CYCLE
       !IF (ALL(running == 0.0)) THEN
       !	 write(1010,*) ''

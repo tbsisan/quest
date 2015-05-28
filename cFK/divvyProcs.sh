@@ -2,12 +2,12 @@
 # note: a function exe() to echo commands is defined and exported in ~/.bashrc
 module load intel
 Nlist=$( seq 60 30 200 ); export Nlist
-Nlist=$( seq 70 1 70 ); export Nlist
+Nlist=$( seq 90 1 90 ); export Nlist
 enslist=$( seq 1 1 1 ); export enslist
 #klist=$( seq 1 1 5 ); export enslist
 klist="1 1.46779926762207 2.15443469003188 3.16227766016838 4.64158883361278 6.81292069057961 10 14.6779926762207 21.5443469003188 31.6227766016838 46.4158883361278 68.1292069057961 100";
 klist="3.2"; export klist
-klist="5 7 9 12 16 20";
+klist="60 80 100 120 140 160";
 Flist="1.0e-17 2.5e-17 5.0e-17 1.00e-16 2.50e-16 5e-16 1.0e-15 2.5e-15 5e-15"; export Flist
 Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
 Flist="0"; export Flist

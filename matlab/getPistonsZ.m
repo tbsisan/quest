@@ -6,6 +6,8 @@ pistonZs = squeeze(pistonXyzs(3,:,:));
 topPistonZsBool = pistonZs > nonFluidGeometry.systemMiddle;
 btmPistonZsBool = pistonZs < nonFluidGeometry.systemMiddle;
 
-pistonsZ.top = pistonZs( all( topPistonZsBool == 1 ), : );
-pistonsZ.btm = pistonZs( all( btmPistonZsBool == 1 ), : );
+topInds = all(topPistonZsBool == 1, 2);
+btmInds = all(btmPistonZsBool == 1, 2);
+pistonsZ.top = pistonZs( topInds, : );
+pistonsZ.btm = pistonZs( btmInds, : );
 
