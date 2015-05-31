@@ -64,7 +64,7 @@ program cFK
    read(unit=100,nml=cFKconstants, iostat=myerr)
 
    kbT=0.0690_BR*Temp ! old units
-   kbT=1.38e-23*Temp
+   kbT=kb*Temp
    IF (STOCHASTICS) THEN
       thermalStrength=sqrt(two*eta*kbT*M/dt)
    ELSE
@@ -170,6 +170,8 @@ SWEEP: do run=1,size(ens)
       ELSE
          open(unit=1,file=projDir//'/x.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
          open(unit=2,file=projDir//'/vx.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
+         open(unit=3854,file=projDir//'/units.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
+         write(3854,*) 'asdf'
          IF (D2) THEN
             !open(unit=1111,file='/projects/p20200/cFK/nm44checkT/y.'//runNumberChar//'.dat',form='unformatted')
             open(unit=1112,file=projDir//'/xsep.'//runNumberChar//'.dat',form='unformatted')
@@ -240,7 +242,7 @@ SWEEP: do run=1,size(ens)
       end do
       CALL Energy(steps)
 
-      !CALL printConclusions()
+      CALL printConclusions()
 
       runsRan=runsRan+1
       lastrun=running
@@ -1660,20 +1662,35 @@ CONTAINS
 !
 !
    SUBROUTINE printConclusions()
+      REAL :: kbar_SLY_Roxin_1, kbar_SLY_Roxin_2, kbar_orighere, lo_FvdM
+      REAL :: width_Braun_1, width_Braun_2, hbar_1, hbar_2, hK, Wd_FvdM
       write(999,*) ' '
-      write(999,*) 'Q:',Q
-      write(999,*) 'R:',R
-      write(999,*) 'Q/tau:',Q/T
-      write(999,*) 'R/tau:',R/T
-      write(999,*) 'Q/nanosec:',Q/T/0.513e-12*1e-9
-      write(999,*) 'R/nanosec:',R/T/0.513e-12*1e-9
-      write(11,'(2F8.4)') Q/T/0.513e-12*1e-9,crossCorrelation
+      !write(999,*) 'Q:',Q
+      !write(999,*) 'R:',R
+      !write(999,*) 'Q/tau:',Q/T
+      !write(999,*) 'R/tau:',R/T
+      !write(999,*) 'Q/nanosec:',Q/T/0.513e-12*1e-9
+      !write(999,*) 'R/nanosec:',R/T/0.513e-12*1e-9
+      !write(11,'(2F8.4)') Q/T/0.513e-12*1e-9,crossCorrelation
       write(999,*) 'Sim ran for about: ',T*0.5e-12/1e-9,' nanoseconds'
-      write(999,*) 'Vx',sum(vx**2)
-      write(999,*) 'Vy',sum(vy**2)
-      write(999,*) 'nondimensional g:', k(run)*(WL/WLperN/2.0/pi)**2/h(run)
+      !write(999,*) 'Vx',sum(vx**2)
+      !write(999,*) 'Vy',sum(vy**2)
+      kbar_SLY_Roxin_1=k(run)/h(run)*(WL/two/pi)**2
+      kbar_SLY_Roxin_2=k(run)/h(run)*(WL/WLperN/two/pi)**2
+      write(999,*) 'nondimensional g:', kbar_SLY_Roxin_2
+      kbar_orighere=k(run)/h(run)*(WL/WLperN/2.0/pi)**2/h(run)
+      lo_FvdM=sqrt(k(run)*a*a/4/h(run))
+      width_Braun_1=sqrt(kbar_SLY_Roxin_1)
+      width_Braun_2=sqrt(kbar_SLY_Roxin_2)
+      hbar_1=1/kbar_SLY_Roxin_1
+      hbar_2=1/kbar_SLY_Roxin_2
+      hK=h(run)/kb
+      Wd_FvdM=8*hK*lo_FvdM/pi
+      write(3854,*) 'kbar1, kbar2, kbarHere, lo, w_braun1, w_braun2, hbar_1, hbar2, hK, Wd '
+      write(3854,*) kbar_SLY_Roxin_1, kbar_SLY_Roxin_2, kbar_orighere, lo_FvdM,&
+        width_Braun_1, width_Braun_2, hbar_1, hbar_2, hK, Wd_FvdM
+      close(3854)
    END SUBROUTINE printConclusions
-
 
 end program cFK
     

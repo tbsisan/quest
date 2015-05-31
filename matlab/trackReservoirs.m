@@ -41,7 +41,7 @@ if isfield(settings,'plot')
     plot(r.times,netQ);
     hold on;
     [ netQsm, QdotSm ] = savitzyGolaySmoothing( 2, settings.smoothingWindow, netQ, 1 );
-    netQsm(end+1:length(r.times))=0;
+    netQsm(end+1:length(r.times))=netQsm(end);
     integerFluxEventsr=sum(abs(diff(round(netQsm))))
     integerFluxEventsc=sum(abs(diff(ceil(netQsm))))
     flux=(integerFluxEventsr+integerFluxEventsc)/r.times(end)/2
