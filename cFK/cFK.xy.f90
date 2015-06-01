@@ -24,11 +24,11 @@ program cFK
    CHARACTER(LEN=2) :: ensChar
    CHARACTER(LEN=10) :: startClockChar
    REAL(KIND=BR), DIMENSION(size(Temp)) :: kbT, thermalStrength
+   REAL(KIND=BR) :: scaledThermal
    REAL(KIND=BR), DIMENSION(7) :: lastrun, running
    INTEGER :: runsRan=0
    REAL(KIND=BR), DIMENSION(N) :: eigen
    REAL(KIND=BR) :: sigma, soundSpeed
-   REAL :: coolCompletionPct, newtargetT, scaledThermal
 
    namelist /cFKconstants/ ens,k,eta,h,Temp,bgH,G,M
    namelist /xInit/ eigen
@@ -163,15 +163,17 @@ SWEEP: do run=1,size(ens)
       IF (ASCIIFORMAT) THEN
          open(unit=1,file=projDir//'/x.'//runNumberChar//'.dat')
          open(unit=2,file=projDir//'/vx.'//runNumberChar//'.dat')
+         open(unit=33,file=projDir//'/Ux.'//runNumberChar//'.dat')
          IF (D2) THEN
             open(unit=1111,file=projDir//'/y.'//runNumberChar//'.dat')
             open(unit=2222,file=projDir//'/vy.'//runNumberChar//'.dat')
+            open(unit=3333,file=projDir//'/Uy.'//runNumberChar//'.dat')
          ENDIF
       ELSE
          open(unit=1,file=projDir//'/x.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
          open(unit=2,file=projDir//'/vx.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
+         open(unit=33,file=projDir//'/Ux.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
          open(unit=3854,file=projDir//'/units.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
-         write(3854,*) 'asdf'
          IF (D2) THEN
             !open(unit=1111,file='/projects/p20200/cFK/nm44checkT/y.'//runNumberChar//'.dat',form='unformatted')
             open(unit=1112,file=projDir//'/xsep.'//runNumberChar//'.dat',form='unformatted')
@@ -179,6 +181,7 @@ SWEEP: do run=1,size(ens)
             !open(unit=2222,file='/projects/p20200/cFK/nm44checkT/vy.'//runNumberChar//'.dat',form='unformatted')
             open(unit=1111,file=projDir//'/y.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
             open(unit=2222,file=projDir//'/vy.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
+            open(unit=3333,file=projDir//'/Uy.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
          ENDIF
       END IF
       open(unit=999,file=projDir//'/log.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
@@ -207,8 +210,10 @@ SWEEP: do run=1,size(ens)
       lastwrap=N
       CALL initState()
       write(999,*) 'starting xs after initState():',x(1:9)
+      write(999,*) 'starting vxs after initState():',vx(1:9)
       CALL printStartup()
       write(999,*) 'starting xs after printStartup():',x(1:9)
+      write(999,*) 'starting vxs after printStartup():',vx(1:9)
 
       ! Check that rigid chains are all same length
       IF (CHAINBC .eq. INFINITECHAIN .AND. &
@@ -230,13 +235,10 @@ SWEEP: do run=1,size(ens)
 
       scaledThermal=thermalStrength(run)
       sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
-
       do tstep=1,steps
          IF ( (tstep == 1 .or. mod(tstep,100)==0) .and. tstep <= coolDownSteps) THEN
-             coolCompletionPct = real(tstep)/real(coolDownSteps)
-             newtargetT = real(Tstart) * (1_BR-coolCompletionPct) + Temp(run)*coolCompletionPct
-             scaledThermal=thermalStrength(run) * sqrt(newTargetT/Temp(run))
-             sigma=sqrt(dt)*oneOverM(run)*scaledThermal
+           scaledThermal=currentTemp(tstep,coolDownSteps,thermalStrength(run),Temp(run))
+           sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
          END IF
          CALL advanceState()  
       end do
@@ -249,6 +251,7 @@ SWEEP: do run=1,size(ens)
       close(unit=1010)
       close(unit=1)
       close(unit=2)
+      close(unit=33)
 
 end do SWEEP
 
@@ -264,6 +267,14 @@ write(999,*) 'DONE'
 !
 
 CONTAINS
+    FUNCTION currentTemp(tstep,coolDownSteps,eqThermalStrength,eqTemp) RESULT(scaledThermal)
+      REAL(KIND=BR), INTENT(IN) :: eqThermalStrength, eqTemp
+      INTEGER, INTENT(IN) :: tstep, coolDownSteps
+      REAL :: eqCompletionPct, newtargetT, scaledThermal
+           eqCompletionPct = real(tstep)/real(coolDownSteps)
+           newtargetT = real(Tstart) * (1_BR-eqCompletionPct) + eqTemp*eqCompletionPct
+           scaledThermal=eqThermalStrength * sqrt(newTargetT/eqTemp)
+    END FUNCTION currentTemp
 !
 ! Initialize
 ! State Variables
@@ -283,22 +294,21 @@ CONTAINS
 
    SUBROUTINE Energy(tstep)
       INTEGER, INTENT(IN) :: tstep
-      REAL(KIND=BR) :: KEx,KEy,PEx,PEy
       REAL(KIND=BR), DIMENSION(NSim) :: rdiffx,ldiffx,rdiffy,ldiffy
       CALL rightLeft(x,rdiffx,ldiffx)
       CALL upDown(y,rdiffy,ldiffy)
       !CALL findWrapPt(rdiffx)
       !CALL fixWrapPtDiff(rdiffx)
-      PEx = sum(onehalf*k(1)*(rdiffx-ax)**2)
-      PEy = sum(onehalf*k(1)*rdiffy**2)
-      KEx = sum(onehalf*vx**2)
-      KEy = sum(onehalf*vy**2)
-      write(999,*) "Time Step:",tstep
+      PEx = sum(onehalf*k(run)*(rdiffx-ax)**2)
+      PEy = sum(onehalf*k(run)*rdiffy**2)
+      KEx = sum(onehalf*M(run)*vx**2)
+      KEy = sum(onehalf*M(run)*vy**2)
+      !write(999,*) "Time Step:",tstep
       !write(999,*) "Ys:",y
       !write(999,*) "VYs:",vy
       !write(999,*) "k:",k(1)
-      write(999,*) "KEx:",KEx,"KEy:",KEy
-      write(999,*) "PEx:",PEx,"PEy:",PEy
+      !write(999,*) "KEx:",KEx,"KEy:",KEy
+      !write(999,*) "PEx:",PEx,"PEy:",PEy
    END SUBROUTINE Energy
 
    SUBROUTINE nondimensionalize()
@@ -338,8 +348,8 @@ CONTAINS
       vx=0.0_BR
       write(999,*) 'System width:',L
       write(999,*) 'starting xs: from within initState() before random',x(1:9)
-      write(999,*) 'starting vxs:fromwithininitState() before random',vx(1:100)
-      vMean=sqrt(kbT(run)*oneOverM(run))
+      write(999,*) 'starting vxs:fromwithininitState() before random',vx(1:10)
+      vMean=sqrt(kb*300.0*oneOverM(run))
       SELECT CASE(ICS)
          CASE (UNIFORMLINE)
             ! TBS: the below was +(L-chainL)/2.0
@@ -412,7 +422,7 @@ CONTAINS
       label(:(N/2))='L'
       label(N/2+1:)='R'
       write(999,*) 'starting xs from within initState() after random:',x(1:9)
-      write(999,*) 'starting vxs from within initState() after random:',vx(1:100)
+      write(999,*) 'starting vxs from within initState() after random:',vx(1:10)
       write(999,*) 'ending xs:',x(-16),x(-15)
       CALL writeState()
 
@@ -1589,20 +1599,25 @@ CONTAINS
          CALL startTimer()
       END IF
       !write(999,*) tstep,MAXVAL(x),MAXVAL(y)
+      IF (WRITEU) CALL Energy(tstep)
 
       IF (ASCIIFORMAT) THEN
          IF (WRITEX) write(1,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,x
          IF (WRITEV) write(2,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vx
+         IF (WRITEU) write(33,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEx,PEx
          IF (D2) THEN
             IF (WRITEX) write(1111,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,y
             IF (WRITEV) write(2222,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vy
+            IF (WRITEU) write(3333,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEy,PEy
          ENDIF
       ELSE
          IF (WRITEX) write(1) REAL(tstep*dt,KIND=SMREAL),REAL(x,KIND=SMREAL)
          IF (WRITEV) write(2) REAL(tstep*dt,KIND=SMREAL),REAL(vx,KIND=SMREAL)
+         IF (WRITEU) write(33) REAL(tstep*dt,KIND=SMREAL),REAL(KEx,KIND=SMREAL),REAL(PEx,KIND=SMREAL)
          IF (D2) THEN
             IF (WRITEX) write(1111) REAL(tstep*dt,KIND=SMREAL),REAL(y,KIND=SMREAL)
             IF (WRITEV) write(2222) REAL(tstep*dt,KIND=SMREAL),REAL(vy,KIND=SMREAL)
+            IF (WRITEU) write(3333) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL)
          ENDIF
       END IF
       !write(999,*) vx
@@ -1625,6 +1640,7 @@ CONTAINS
       write(*,'(A,I4)')'Run #: ',run
       write(*,'(A,'//NinCharForm//formatReal//')')'Starting Positions:',x
       write(999,*) 'starting xs from within printStartup():',x(1:9)
+      write(999,*) 'starting vxs from within printStartup():',vx(1:9)
       !IF (WRITEV) write(2,'(I8,'//NinCharForm//formatReal//')') tstep,v
       write(*,'(A,'//runningSize//formatReal//')')'Running with constants (k,h,eta,T,bgH,G):', running
       write(*,'(A,'//formatReal//')')'hardcore radius:',hardcore
