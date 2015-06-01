@@ -36,7 +36,7 @@ program cFK
    tstep=0
    CM=Lc/two
    write(printingWidthRealsAsChar,'(I2)') printingWidthReals
-   formatReal='F'//printingWidthRealsAsChar//'.4'
+   formatReal='E'//printingWidthRealsAsChar//'.4'
    write(NinCharForm,'(I3)') N
    write(LinCharForm,'(I3)') channelWL
 
@@ -110,7 +110,6 @@ program cFK
    print*, 'will do ',size(k),' runs'
    print*, 'STATUSWAIT: ',STATUSWAIT
 
-   IF (RUNTESTS) THEN
       !constant energy
       !SELECT CASE(UNITTESTS)
       !   CASE (CONSTANTENERGY)
@@ -125,20 +124,6 @@ program cFK
 
       ! Test for INITRANDOMX, INITRANDOMY
 
-      CALL initState()
-      CALL Energy(0)
-      !CALL printConclusions()
-      !IF (WRITEV) write(2,'(I8,'//NinCharForm//formatReal//')') tstep,v
-      run=1
-      running=(/ens(run),k(run),h(run),eta(run),Temp(run),bgH(run),G(run)/)
-      !write(*,'(A,6'//formatReal//')')'Running with constants (ens,k,h,eta,T,bgH,G):', running
-      do tstep=1,50
-         CALL advanceState()  
-      end do
-      CALL Energy(tstep)
-      !CALL printConclusions()
-
-   ELSE
 !
 ! Iterate over parameter list in sweep.in
 !
@@ -155,107 +140,94 @@ SWEEP: do run=1,size(ens)
       write(Gchar,'(E8.2)') G(run)
       write(runtimechar,'(E8.2)') T
       write(ensChar,'(I0.2)') INT(ens(run))
-      print*, 'ens:',ensChar
-      open(unit=9999,file='log.dat',position='APPEND')
-      write(9999,*)running
-      close(unit=9999)
-      open(unit=1010,file='events/events'//runNumberChar//'.dat')
-      IF (ASCIIFORMAT) THEN
-         open(unit=1,file=projDir//'/x.'//runNumberChar//'.dat')
-         open(unit=2,file=projDir//'/vx.'//runNumberChar//'.dat')
-         open(unit=33,file=projDir//'/Ux.'//runNumberChar//'.dat')
-         IF (D2) THEN
-            open(unit=1111,file=projDir//'/y.'//runNumberChar//'.dat')
-            open(unit=2222,file=projDir//'/vy.'//runNumberChar//'.dat')
-            open(unit=3333,file=projDir//'/Uy.'//runNumberChar//'.dat')
-         ENDIF
-      ELSE
-         open(unit=1,file=projDir//'/x.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-         open(unit=2,file=projDir//'/vx.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-         open(unit=33,file=projDir//'/Ux.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-         open(unit=3854,file=projDir//'/units.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
-         IF (D2) THEN
-            !open(unit=1111,file='/projects/p20200/cFK/nm44checkT/y.'//runNumberChar//'.dat',form='unformatted')
-            open(unit=1112,file=projDir//'/xsep.'//runNumberChar//'.dat',form='unformatted')
-            open(unit=1113,file=projDir//'/ysep.'//runNumberChar//'.dat',form='unformatted')
-            !open(unit=2222,file='/projects/p20200/cFK/nm44checkT/vy.'//runNumberChar//'.dat',form='unformatted')
-            open(unit=1111,file=projDir//'/y.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-            open(unit=2222,file=projDir//'/vy.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-            open(unit=3333,file=projDir//'/Uy.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat',form='unformatted')
-         ENDIF
-      END IF
-      open(unit=999,file=projDir//'/log.'//ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//'_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar//'.dat')
-      !if (ALL(running == lastrun)) CYCLE
-      !IF (ALL(running == 0.0)) THEN
-      !	 write(1010,*) ''
-      !	 close(unit=1010)
-      !	 CYCLE
-      !END IF
-      
-      write(999,*) 'thermalStren:',thermalStrength(run)
-      write(999,*) 'ens:',ens(run)
-      write(999,*) 'h:',h(run)
-      write(999,*) 'G:',G(run)
-      write(999,*) 'k:',k(run)
-      write(999,*) 'eta:',eta(run)
-      write(999,*) 'iter:',iter
-      soundSpeed=sqrt(k(run)*oneOverM(run))*WL
-      write(999,*) 'sound Speed (m/s):',soundSpeed
 
-!
-! State Initialization
-!
-      Q=0
-      R=0
-      lastwrap=N
-      CALL initState()
-      write(999,*) 'starting xs after initState():',x(1:9)
-      write(999,*) 'starting vxs after initState():',vx(1:9)
-      CALL printStartup()
-      write(999,*) 'starting xs after printStartup():',x(1:9)
-      write(999,*) 'starting vxs after printStartup():',vx(1:9)
+      CALL openFiles()
+      IF (RUNTESTS) THEN
 
-      ! Check that rigid chains are all same length
-      IF (CHAINBC .eq. INFINITECHAIN .AND. &
-         INTERACTIONMODEL .eq. RIGIDBARS) THEN
-      CALL rigidSanityCheck()
-      END IF
-         
-      IF (ICS .eq. IMPINGER .and. COORDBC .ne. INFINITECOORD) THEN
-         write(999,*) 'CHOSEN ICS SHOULD HAVE INFINITE COORD'
-         !stop
-      END IF
-   
-
-!
-! Main Simulation Loop
-!
-      CALL Energy(0)
-      CALL writeState()
-
-      scaledThermal=thermalStrength(run)
-      sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
-      do tstep=1,steps
-         IF ( (tstep == 1 .or. mod(tstep,100)==0) .and. tstep <= coolDownSteps) THEN
-           scaledThermal=currentTemp(tstep,coolDownSteps,thermalStrength(run),Temp(run))
-           sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
-         END IF
+        CALL initState()
+        CALL Energy(0)
+      !CALL printConclusions()
+        do tstep=1,50
          CALL advanceState()  
-      end do
-      CALL Energy(steps)
+        end do
+        CALL Energy(tstep)
+        !CALL printConclusions()
+        
+      ELSE
 
-      CALL printConclusions()
+        !
+        ! Production Run
+        !
 
-      runsRan=runsRan+1
-      lastrun=running
-      close(unit=1010)
-      close(unit=1)
-      close(unit=2)
-      close(unit=33)
+        !if (ALL(running == lastrun)) CYCLE
+        !IF (ALL(running == 0.0)) THEN
+        !	 write(1010,*) ''
+        !	 close(unit=1010)
+        !	 CYCLE
+        !END IF
+      
+        write(999,*) 'thermalStren:',thermalStrength(run)
+        write(999,*) 'ens:',ens(run)
+        write(999,*) 'h:',h(run)
+        write(999,*) 'G:',G(run)
+        write(999,*) 'k:',k(run)
+        write(999,*) 'eta:',eta(run)
+        write(999,*) 'iter:',iter
+        soundSpeed=sqrt(k(run)*oneOverM(run))*WL
+        write(999,*) 'sound Speed (m/s):',soundSpeed
+        print*, 'ens:',ensChar
+  
+  !
+  ! State Initialization
+  !
+        Q=0
+        R=0
+        lastwrap=N
+        CALL initState()
+        write(999,*) 'starting xs after initState():',x(1:9)
+        write(999,*) 'starting vxs after initState():',vx(1:9)
+        CALL printStartup()
+        write(999,*) 'starting xs after printStartup():',x(1:9)
+        write(999,*) 'starting vxs after printStartup():',vx(1:9)
+  
+        ! Check that rigid chains are all same length
+        IF (CHAINBC .eq. INFINITECHAIN .AND. &
+           INTERACTIONMODEL .eq. RIGIDBARS) THEN
+        CALL rigidSanityCheck()
+        END IF
+           
+        IF (ICS .eq. IMPINGER .and. COORDBC .ne. INFINITECOORD) THEN
+           write(999,*) 'CHOSEN ICS SHOULD HAVE INFINITE COORD'
+           !stop
+        END IF
+     
+  
+  !
+  ! Main Simulation Loop
+  !
+        CALL Energy(0)
+        CALL writeState()
+  
+        scaledThermal=thermalStrength(run)
+        sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
+        do tstep=1,steps
+           IF ( (tstep == 1 .or. mod(tstep,100)==0) .and. tstep <= coolDownSteps) THEN
+             scaledThermal=currentTemp(tstep,coolDownSteps,thermalStrength(run),Temp(run))
+             sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
+           END IF
+           CALL advanceState()  
+        end do
+        CALL Energy(steps)
+  
+        CALL printConclusions()
+  
+        runsRan=runsRan+1
+        lastrun=running
+        CALL closeFiles()
+    END IF
 
 end do SWEEP
 
-END IF
 
 CALL SYSTEM_CLOCK(clock)
 write(999,*) T*runsRan*0.513e-12*1e9/((clock-startClock)/1e3/60),'nanoseconds per minute'
@@ -267,13 +239,57 @@ write(999,*) 'DONE'
 !
 
 CONTAINS
+    SUBROUTINE openFiles()
+    CHARACTER(LEN=:), ALLOCATABLE :: runName
+    
+    runName=ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//&
+            '_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
+
+      open(unit=3854,file=projDir//'/units.'//runName//'.dat')
+      open(unit=1010,file=projDir//'/events.'//runName//'.dat')
+      open(unit=999,file=projDir//'/log.'//runName//'.dat')
+      IF (ASCIIFORMAT) THEN
+         open(unit=101,file=projDir//'/x.'//runName//'.ascii.dat')
+         open(unit=201,file=projDir//'/vx.'//runName//'.ascii.dat')
+         open(unit=301,file=projDir//'/Ux.'//runName//'.ascii.dat')
+         IF (D2) THEN
+            open(unit=102,file=projDir//'/y.'//runName//'.ascii.dat')
+            open(unit=202,file=projDir//'/vy.'//runName//'.ascii.dat')
+            open(unit=302,file=projDir//'/Uy.'//runName//'.ascii.dat')
+         ENDIF
+      ELSE
+         open(unit=101,file=projDir//'/x.'//runName//'.dat',form='unformatted')
+         open(unit=201,file=projDir//'/vx.'//runName//'.dat',form='unformatted')
+         open(unit=301,file=projDir//'/Ux.'//runName//'.dat',form='unformatted')
+         IF (D2) THEN
+            open(unit=111,file=projDir//'/xsep.'//runName//'.dat',form='unformatted')
+            open(unit=112,file=projDir//'/ysep.'//runName//'.dat',form='unformatted')
+            open(unit=102,file=projDir//'/y.'//runName//'.dat',form='unformatted')
+            open(unit=202,file=projDir//'/vy.'//runName//'.dat',form='unformatted')
+            open(unit=302,file=projDir//'/Uy.'//runName//'.dat',form='unformatted')
+         ENDIF
+      END IF
+    END SUBROUTINE openFiles
+
+    SUBROUTINE closeFiles()
+        close(101)
+        close(201)
+        close(301)
+        close(102)
+        close(202)
+        close(302)
+        close(unit=1010)
+        close(unit=999)
+    END SUBROUTINE closeFiles
+
     FUNCTION currentTemp(tstep,coolDownSteps,eqThermalStrength,eqTemp) RESULT(scaledThermal)
       REAL(KIND=BR), INTENT(IN) :: eqThermalStrength, eqTemp
       INTEGER, INTENT(IN) :: tstep, coolDownSteps
       REAL :: eqCompletionPct, newtargetT, scaledThermal
-           eqCompletionPct = real(tstep)/real(coolDownSteps)
-           newtargetT = real(Tstart) * (1_BR-eqCompletionPct) + eqTemp*eqCompletionPct
-           scaledThermal=eqThermalStrength * sqrt(newTargetT/eqTemp)
+
+      eqCompletionPct = real(tstep)/real(coolDownSteps)
+      newtargetT = real(Tstart) * (1_BR-eqCompletionPct) + eqTemp*eqCompletionPct
+      scaledThermal=eqThermalStrength * sqrt(newTargetT/eqTemp)
     END FUNCTION currentTemp
 !
 ! Initialize
@@ -423,7 +439,6 @@ CONTAINS
       label(N/2+1:)='R'
       write(999,*) 'starting xs from within initState() after random:',x(1:9)
       write(999,*) 'starting vxs from within initState() after random:',vx(1:10)
-      write(999,*) 'ending xs:',x(-16),x(-15)
       CALL writeState()
 
    END SUBROUTINE initState
@@ -863,8 +878,8 @@ CONTAINS
       REAL(KIND=BR), INTENT(IN), DIMENSION(NSim) :: rdiffSub
       INTEGER, INTENT(IN) :: currentDim
       
-      IF (mod(tstep,WRITESTATEWAIT)==0 .and. currentDim==1) write(1112) REAL(tstep*dt,KIND=SMREAL),REAL(rdiffSub,KIND=SMREAL)
-      IF (mod(tstep,WRITESTATEWAIT)==0 .and. currentDim==2) write(1113) REAL(tstep*dt,KIND=SMREAL),REAL(rdiffSub,KIND=SMREAL)
+      IF (mod(tstep,WRITESTATEWAIT)==0 .and. currentDim==1) write(111) REAL(tstep*dt,KIND=SMREAL),REAL(rdiffSub,KIND=SMREAL)
+      IF (mod(tstep,WRITESTATEWAIT)==0 .and. currentDim==2) write(112) REAL(tstep*dt,KIND=SMREAL),REAL(rdiffSub,KIND=SMREAL)
    END SUBROUTINE writeSeps
 
    FUNCTION cFKa(currentDim,rSub,vSub,Ft,rdiffSub,ldiffSub)
@@ -1602,22 +1617,22 @@ CONTAINS
       IF (WRITEU) CALL Energy(tstep)
 
       IF (ASCIIFORMAT) THEN
-         IF (WRITEX) write(1,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,x
-         IF (WRITEV) write(2,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vx
-         IF (WRITEU) write(33,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEx,PEx
+         IF (WRITEX) write(101,'(E12.4,'//NinCharForm//formatReal//')') tstep*dt,x
+         IF (WRITEV) write(201,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vx
+         IF (WRITEU) write(301,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEx,PEx
          IF (D2) THEN
-            IF (WRITEX) write(1111,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,y
-            IF (WRITEV) write(2222,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vy
-            IF (WRITEU) write(3333,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEy,PEy
+            IF (WRITEX) write(102,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,y
+            IF (WRITEV) write(202,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vy
+            IF (WRITEU) write(302,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEy,PEy
          ENDIF
       ELSE
-         IF (WRITEX) write(1) REAL(tstep*dt,KIND=SMREAL),REAL(x,KIND=SMREAL)
-         IF (WRITEV) write(2) REAL(tstep*dt,KIND=SMREAL),REAL(vx,KIND=SMREAL)
-         IF (WRITEU) write(33) REAL(tstep*dt,KIND=SMREAL),REAL(KEx,KIND=SMREAL),REAL(PEx,KIND=SMREAL)
+         IF (WRITEX) write(101) REAL(tstep*dt,KIND=SMREAL),REAL(x,KIND=SMREAL)
+         IF (WRITEV) write(201) REAL(tstep*dt,KIND=SMREAL),REAL(vx,KIND=SMREAL)
+         IF (WRITEU) write(301) REAL(tstep*dt,KIND=SMREAL),REAL(KEx,KIND=SMREAL),REAL(PEx,KIND=SMREAL)
          IF (D2) THEN
-            IF (WRITEX) write(1111) REAL(tstep*dt,KIND=SMREAL),REAL(y,KIND=SMREAL)
-            IF (WRITEV) write(2222) REAL(tstep*dt,KIND=SMREAL),REAL(vy,KIND=SMREAL)
-            IF (WRITEU) write(3333) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL)
+            IF (WRITEX) write(102) REAL(tstep*dt,KIND=SMREAL),REAL(y,KIND=SMREAL)
+            IF (WRITEV) write(202) REAL(tstep*dt,KIND=SMREAL),REAL(vy,KIND=SMREAL)
+            IF (WRITEU) write(302) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL)
          ENDIF
       END IF
       !write(999,*) vx
@@ -1642,7 +1657,7 @@ CONTAINS
       write(999,*) 'starting xs from within printStartup():',x(1:9)
       write(999,*) 'starting vxs from within printStartup():',vx(1:9)
       !IF (WRITEV) write(2,'(I8,'//NinCharForm//formatReal//')') tstep,v
-      write(*,'(A,'//runningSize//formatReal//')')'Running with constants (k,h,eta,T,bgH,G):', running
+      write(*,'(A,'//runningSize//formatReal//')')'Running with constants (ens,k,h,eta,T,bgH,G):', running
       write(*,'(A,'//formatReal//')')'hardcore radius:',hardcore
       write(*,'(A,'//NinCharForm//'A)')'labels:',label
       write(*,'(A,I10)')'status update every (steps):',STATUSWAIT
@@ -1688,7 +1703,7 @@ CONTAINS
       !write(999,*) 'Q/nanosec:',Q/T/0.513e-12*1e-9
       !write(999,*) 'R/nanosec:',R/T/0.513e-12*1e-9
       !write(11,'(2F8.4)') Q/T/0.513e-12*1e-9,crossCorrelation
-      write(999,*) 'Sim ran for about: ',T*0.5e-12/1e-9,' nanoseconds'
+      write(999,*) 'Sim ran for about: ',T*1e9,' nanoseconds'
       !write(999,*) 'Vx',sum(vx**2)
       !write(999,*) 'Vy',sum(vy**2)
       kbar_SLY_Roxin_1=k(run)/h(run)*(WL/two/pi)**2
