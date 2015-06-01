@@ -240,33 +240,40 @@ write(999,*) 'DONE'
 
 CONTAINS
     SUBROUTINE openFiles()
-    CHARACTER(LEN=:), ALLOCATABLE :: runName
+    CHARACTER(LEN=900) :: runName
+    CHARACTER(LEN=25) :: arg1
     
     runName=ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//&
             '_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
 
-      open(unit=3854,file=projDir//'/units.'//runName//'.dat')
-      open(unit=1010,file=projDir//'/events.'//runName//'.dat')
-      open(unit=999,file=projDir//'/log.'//runName//'.dat')
+    CALL getarg(1, arg1)
+    if (LEN(arg1) .gt. 0) then
+        runName=trim(runName)//'.'//trim(arg1)
+    endif
+    
+
+      open(unit=3854,file=projDir//'/units.'//trim(runName)//'.dat')
+      open(unit=1010,file=projDir//'/events.'//trim(runName)//'.dat')
+      open(unit=999,file=projDir//'/log.'//trim(runName)//'.dat')
       IF (ASCIIFORMAT) THEN
-         open(unit=101,file=projDir//'/x.'//runName//'.ascii.dat')
-         open(unit=201,file=projDir//'/vx.'//runName//'.ascii.dat')
-         open(unit=301,file=projDir//'/Ux.'//runName//'.ascii.dat')
+         open(unit=101,file=projDir//'/x.'//trim(runName)//'.ascii.dat')
+         open(unit=201,file=projDir//'/vx.'//trim(runName)//'.ascii.dat')
+         open(unit=301,file=projDir//'/Ux.'//trim(runName)//'.ascii.dat')
          IF (D2) THEN
-            open(unit=102,file=projDir//'/y.'//runName//'.ascii.dat')
-            open(unit=202,file=projDir//'/vy.'//runName//'.ascii.dat')
-            open(unit=302,file=projDir//'/Uy.'//runName//'.ascii.dat')
+            open(unit=102,file=projDir//'/y.'//trim(runName)//'.ascii.dat')
+            open(unit=202,file=projDir//'/vy.'//trim(runName)//'.ascii.dat')
+            open(unit=302,file=projDir//'/Uy.'//trim(runName)//'.ascii.dat')
          ENDIF
       ELSE
-         open(unit=101,file=projDir//'/x.'//runName//'.dat',form='unformatted')
-         open(unit=201,file=projDir//'/vx.'//runName//'.dat',form='unformatted')
-         open(unit=301,file=projDir//'/Ux.'//runName//'.dat',form='unformatted')
+         open(unit=101,file=projDir//'/x.'//trim(runName)//'.dat',form='unformatted')
+         open(unit=201,file=projDir//'/vx.'//trim(runName)//'.dat',form='unformatted')
+         open(unit=301,file=projDir//'/Ux.'//trim(runName)//'.dat',form='unformatted')
          IF (D2) THEN
-            open(unit=111,file=projDir//'/xsep.'//runName//'.dat',form='unformatted')
-            open(unit=112,file=projDir//'/ysep.'//runName//'.dat',form='unformatted')
-            open(unit=102,file=projDir//'/y.'//runName//'.dat',form='unformatted')
-            open(unit=202,file=projDir//'/vy.'//runName//'.dat',form='unformatted')
-            open(unit=302,file=projDir//'/Uy.'//runName//'.dat',form='unformatted')
+            open(unit=111,file=projDir//'/xsep.'//trim(runName)//'.dat',form='unformatted')
+            open(unit=112,file=projDir//'/ysep.'//trim(runName)//'.dat',form='unformatted')
+            open(unit=102,file=projDir//'/y.'//trim(runName)//'.dat',form='unformatted')
+            open(unit=202,file=projDir//'/vy.'//trim(runName)//'.dat',form='unformatted')
+            open(unit=302,file=projDir//'/Uy.'//trim(runName)//'.dat',form='unformatted')
          ENDIF
       END IF
     END SUBROUTINE openFiles
