@@ -13,6 +13,7 @@ program cFK
    INTEGER, DIMENSION(8) :: timeArray
    INTEGER :: tstep,i,run,clock,startClock,myerr
    INTEGER :: iter
+   REAL :: elapsedMins
    REAL(KIND=BR) :: CM,myrand
    REAL(KIND=BR) :: C1,C2,maxpt,zeropt,maxF,angle,phaseShift
    CHARACTER(LEN=2) :: printingWidthRealsAsChar
@@ -40,9 +41,6 @@ program cFK
    write(NinCharForm,'(I3)') N
    write(LinCharForm,'(I3)') channelWL
 
-   CALL SYSTEM_CLOCK(clock)
-   startClock=clock
-   write(startClockChar,'(I10)') startClock
 
    open(unit=100, file='sweep.in')
    open(unit=101, file='eigen.in')
@@ -128,18 +126,14 @@ program cFK
 ! Iterate over parameter list in sweep.in
 !
 SWEEP: do run=1,size(ens)
+      CALL SYSTEM_CLOCK(clock)
+      startClock=clock
+      write(startClockChar,'(I10)') startClock
+
       running=(/ens(run),k(run),h(run),eta(run),Temp(run),bgH(run),G(run)/)
       if (ALL(running == 0_BR)) CYCLE
       ! CURRENTLY, files corresponding to unused run numbers are not reset 
       ! so programs which access this data may be accessing old data
-      write(runNumberChar,'(I0.4)') run
-      write(kChar,'(E8.2)') k(run)
-      write(hChar,'(E8.2)') h(run)
-      write(Tchar,'(E8.2)') Temp(run)
-      write(etaChar,'(E8.2)') eta(run)
-      write(Gchar,'(E8.2)') G(run)
-      write(runtimechar,'(E8.2)') T
-      write(ensChar,'(I0.2)') INT(ens(run))
 
       CALL openFiles()
       IF (RUNTESTS) THEN
@@ -223,16 +217,20 @@ SWEEP: do run=1,size(ens)
   
         runsRan=runsRan+1
         lastrun=running
+        
+        CALL SYSTEM_CLOCK(clock)
+        elapsedMins = real(clock-startClock)/1.0e3/60.0
+        write(999,*) T*1.0e9/elapsedMins,' nanoseconds per minute'
+        print*,T*1.0e9/elapsedMins,' nanoseconds per minute'
+        !CALL system("beep -f 500 -n -f 600 -n -f 700 -n -f 800 -n -f 900 -n -f 1000")
+        write(999,*) 'DONE'
+        print*,'DONE'
+
         CALL closeFiles()
     END IF
 
+
 end do SWEEP
-
-
-CALL SYSTEM_CLOCK(clock)
-write(999,*) T*runsRan*0.513e-12*1e9/((clock-startClock)/1e3/60),'nanoseconds per minute'
-!CALL system("beep -f 500 -n -f 600 -n -f 700 -n -f 800 -n -f 900 -n -f 1000")
-write(999,*) 'DONE'
 
 !
 ! Subroutines
@@ -242,6 +240,14 @@ CONTAINS
     SUBROUTINE openFiles()
     CHARACTER(LEN=900) :: runName
     CHARACTER(LEN=25) :: arg1
+    write(runNumberChar,'(I0.4)') run
+    write(kChar,'(E8.2)') k(run)
+    write(hChar,'(E8.2)') h(run)
+    write(Tchar,'(E8.2)') Temp(run)
+    write(etaChar,'(E8.2)') eta(run)
+    write(Gchar,'(E8.2)') G(run)
+    write(runtimechar,'(E8.2)') T
+    write(ensChar,'(I0.2)') INT(ens(run))
     
     runName=ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//&
             '_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
@@ -252,9 +258,9 @@ CONTAINS
     endif
     
 
-      open(unit=3854,file=projDir//'/units.'//trim(runName)//'.dat')
-      open(unit=1010,file=projDir//'/events.'//trim(runName)//'.dat')
-      open(unit=999,file=projDir//'/log.'//trim(runName)//'.dat')
+      open(unit=3854,file=projDir//'/units.'//trim(runName)//'.ascii.dat')
+      open(unit=1010,file=projDir//'/events.'//trim(runName)//'.ascii.dat')
+      open(unit=999,file=projDir//'/log.'//trim(runName)//'.ascii.dat')
       IF (ASCIIFORMAT) THEN
          open(unit=101,file=projDir//'/x.'//trim(runName)//'.ascii.dat')
          open(unit=201,file=projDir//'/vx.'//trim(runName)//'.ascii.dat')
@@ -286,7 +292,7 @@ CONTAINS
         close(202)
         close(302)
         close(unit=1010)
-        close(unit=999)
+        ! NOTE: 999 needs to stay open until end
     END SUBROUTINE closeFiles
 
     FUNCTION currentTemp(tstep,coolDownSteps,eqThermalStrength,eqTemp) RESULT(scaledThermal)
