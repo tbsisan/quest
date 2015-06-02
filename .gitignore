@@ -7,10 +7,6 @@
 *.forquest.f90
 *~
 cFK/questbatches/**
-cFK/ifort/**
-cFK/gfort/**
-cFK/g95/**
-cFK/f90/**
 workIdeas
 changes
 worklog
