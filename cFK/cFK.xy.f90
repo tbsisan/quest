@@ -42,7 +42,7 @@ program cFK
    write(LinCharForm,'(I3)') channelWL
 
 
-   open(unit=100, file='sweep.in')
+   open(unit=100, file='paramList.in')
    open(unit=101, file='eigen.in')
    open(unit=3,file='collisions.dat')
    open(unit=4,file='RandomT.dat')
@@ -126,7 +126,7 @@ program cFK
       clockScale=real(clockRate)
 
 !
-! Iterate over parameter list in sweep.in
+! Iterate over parameter list in paramList.in
 !
 SWEEP: do run=1,size(ens)
       CALL SYSTEM_CLOCK(clock)

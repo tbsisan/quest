@@ -44,8 +44,14 @@ f90/WallMod.o : WallMod.f90
 gfort.out : cFK.xy.f90 gfort/cFKdata.o gfort/RNG.o gfort/dataTypes.o 
 	gfortran $(GNUOPTIM) gfort/cFKdata.o gfort/RNG.o gfort/dataTypes.o gfort/WallMod.o cFK.xy.f90 -Igfort -Jgfort -o gfort.out
 
+gfort.batch.out : cFK.xy.batch.f90 gfort/cFKdata.batch.o gfort/RNG.o gfort/dataTypes.o 
+	gfortran $(GNUOPTIM) gfort/cFKdata.batch.o gfort/RNG.o gfort/dataTypes.o gfort/WallMod.o cFK.xy.batch.f90 -Igfort -Jgfort -o gfort.batch.out
+
 gfort/cFKdata.o : gfort/dataTypes.o cFKdata.xy.base.f90
 	gfortran $(GNUOPTIM) -c cFKdata.xy.base.f90 -Jgfort -Igfort -o gfort/cFKdata.o
+
+gfort/cFKdata.batch.o : gfort/dataTypes.o cFKdata.xy.batch.f90
+	gfortran $(GNUOPTIM) -c cFKdata.xy.batch.f90 -Jgfort -Igfort -o gfort/cFKdata.batch.o
 
 gfort/RNG.o : gfort/WallMod.o gfort/cFKdata.o RNG.f90
 	gfortran $(GNUOPTIM) -c RNG.f90 -Jgfort -o gfort/RNG.o
@@ -62,17 +68,17 @@ ifort.out : cFK.xy.f90 ifort/cFKdata.o ifort/RNG.o ifort/dataTypes.o
 	ifort $(INTOPTIM) ifort/cFKdata.o ifort/RNG.o ifort/dataTypes.o ifort/WallMod.o cFK.xy.f90 -Iifort -module ifort -o ifort.out
 	@echo "Turn on warnings if you want them, currently suppressed with -w compiler flag"
 
-ifort.forquest.out : cFK.xy.forquest.f90 ifort/cFKdata.forquest.o ifort/RNG.o ifort/dataTypes.o 
-	ifort $(INTOPTIM) ifort/cFKdata.forquest.o ifort/RNG.o ifort/dataTypes.o ifort/WallMod.o cFK.xy.forquest.f90 -Iifort -module ifort -o ifort.forquest.out
+ifort.batch.out : cFK.xy.batch.f90 ifort/cFKdata.batch.o ifort/RNG.o ifort/dataTypes.o 
+	ifort $(INTOPTIM) ifort/cFKdata.batch.o ifort/RNG.o ifort/dataTypes.o ifort/WallMod.o cFK.xy.batch.f90 -Iifort -module ifort -o ifort.batch.out
 	@echo "Turn on warnings if you want them, currently suppressed with -w compiler flag"
 
 ifort/cFKdata.o : ifort/dataTypes.o cFKdata.xy.base.f90
 	ifort $(INTOPTIM) -c cFKdata.xy.base.f90 -Iifort -module ifort -o ifort/cFKdata.o
 
-ifort/cFKdata.forquest.o : ifort/dataTypes.o cFKdata.xy.forquest.f90
-	ifort $(INTOPTIM) -c cFKdata.xy.forquest.f90 -Iifort -module ifort -o ifort/cFKdata.forquest.o
+ifort/cFKdata.batch.o : ifort/dataTypes.o cFKdata.xy.batch.f90
+	ifort $(INTOPTIM) -c cFKdata.xy.batch.f90 -Iifort -module ifort -o ifort/cFKdata.batch.o
 
-ifort/RNG.o : ifort/WallMod.o ifort/cFKdata.forquest.o RNG.f90
+ifort/RNG.o : ifort/WallMod.o ifort/cFKdata.batch.o RNG.f90
 	ifort $(INTOPTIM) -c RNG.f90 -module ifort -o ifort/RNG.o
 
 ifort/dataTypes.o : dataTypes.f90
