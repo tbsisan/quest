@@ -1,5 +1,5 @@
-G95OPTIM=-O5 -ffast-math -ftrace=full -fbounds-check #-Wall
-SUNOPTIM=-O5 -fast -ftrap=underflow #-ftrap=overflow, -ftrap=underflow, etc, to check for type of floating point error
+G95OPTIM=-O5 -ffast-math -fbounds-check # -ftrace=full -Wall
+SUNOPTIM=-O5 -fast #-ftrap=overflow, -ftrap=underflow, etc, to check for type of floating point error
 GNUOPTIM=-Ofast -fno-range-check
 INTOPTIM=-O3 -W0
 

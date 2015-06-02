@@ -13,7 +13,8 @@ program cFK
    INTEGER, DIMENSION(8) :: timeArray
    INTEGER :: tstep,i,run,clock,startClock,myerr
    INTEGER :: iter
-   REAL :: elapsedMins
+   INTEGER :: clockRate, clockMax
+   REAL :: clockScale, elapsedMins, runningTime=0.0
    REAL(KIND=BR) :: CM,myrand
    REAL(KIND=BR) :: C1,C2,maxpt,zeropt,maxF,angle,phaseShift
    CHARACTER(LEN=2) :: printingWidthRealsAsChar
@@ -121,6 +122,9 @@ program cFK
       !testTemp
 
       ! Test for INITRANDOMX, INITRANDOMY
+      CALL SYSTEM_CLOCK(count_rate=clockRate)
+      CALL SYSTEM_CLOCK(count_max=clockMax)
+      clockScale=real(clockRate)
 
 !
 ! Iterate over parameter list in sweep.in
@@ -129,6 +133,7 @@ SWEEP: do run=1,size(ens)
       CALL SYSTEM_CLOCK(clock)
       startClock=clock
       write(startClockChar,'(I10)') startClock
+      ! CALL startTimer()
 
       running=(/ens(run),k(run),h(run),eta(run),Temp(run),bgH(run),G(run)/)
       if (ALL(running == 0_BR)) CYCLE
@@ -219,9 +224,11 @@ SWEEP: do run=1,size(ens)
         lastrun=running
         
         CALL SYSTEM_CLOCK(clock)
-        elapsedMins = real(clock-startClock)/1.0e3/60.0
+        elapsedMins = real(clock-startClock)/clockScale/60.0
         write(999,*) T*1.0e9/elapsedMins,' nanoseconds per minute'
         print*,T*1.0e9/elapsedMins,' nanoseconds per minute'
+        !runningTime=runningTime+elapsedTime()
+        !print*,'Elapsed time: ', runningTime
         !CALL system("beep -f 500 -n -f 600 -n -f 700 -n -f 800 -n -f 900 -n -f 1000")
         write(999,*) 'DONE'
         print*,'DONE'
