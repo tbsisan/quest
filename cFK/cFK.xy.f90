@@ -17,13 +17,12 @@ program cFK
    REAL :: clockScale, elapsedMins, runningTime=0.0
    REAL(KIND=BR) :: CM,myrand
    REAL(KIND=BR) :: C1,C2,maxpt,zeropt,maxF,angle,phaseShift
-   CHARACTER(LEN=2) :: printingWidthRealsAsChar
-   CHARACTER(LEN=5) :: formatReal
-   CHARACTER(LEN=3) :: NinCharForm,LinCharForm
-   CHARACTER(LEN=1) :: ans
+   CHARACTER(LEN=1) :: eqtChar,ans
+   CHARACTER(LEN=2) :: ensChar,printingWidthRealsAsChar
+   CHARACTER(LEN=3) :: StartTchar,NinCharForm,LinCharForm
    CHARACTER(LEN=4) :: runNumberChar
+   CHARACTER(LEN=5) :: formatReal
    CHARACTER(LEN=8) :: kChar,hChar,Gchar,Tchar,etaChar,runtimechar
-   CHARACTER(LEN=2) :: ensChar
    CHARACTER(LEN=10) :: startClockChar
    REAL(KIND=BR), DIMENSION(size(Temp)) :: kbT, thermalStrength
    REAL(KIND=BR) :: scaledThermal
@@ -254,13 +253,16 @@ CONTAINS
     write(etaChar,'(E8.2)') eta(run)
     write(Gchar,'(E8.2)') G(run)
     write(runtimechar,'(E8.2)') T
+    write(eqtChar,'(I0.1)') int(real(coolDownSteps)/1.0e6)
+    write(startTchar,'(I0.3)') Tstart
     write(ensChar,'(I0.2)') INT(ens(run))
     
-    runName=ensChar//'_L'//LinCharForm//'_N'//NinCharForm//'_k'//kChar//&
-            '_h'//hChar//'_T'//Tchar//'_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
+    runName=ensChar//'_eqt'//eqtChar//'_Ti'//startTchar//'_L'//trim(adjustl(LinCharForm))//&
+            '_N'//trim(adjustl(NinCharForm))//'_k'//kChar//'_h'//hChar//'_T'//Tchar//&
+            '_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
 
     CALL getarg(1, arg1)
-    if (LEN(arg1) .gt. 0) then
+    if (LEN(trim(arg1)) .gt. 0) then
         runName=trim(runName)//'.'//trim(arg1)
     endif
     
