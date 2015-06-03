@@ -28,8 +28,8 @@ sub log10 {
 }
 
 # set to zero to change values with divvyProcs.sh
-my $kstart=1.0e1; #(4,4) 47, (5,5) 28.9, polymer 14
-my $kend=1.0e1;
+my $kstart=0.0e1; #(4,4) 47, (5,5) 28.9, polymer 14
+my $kend=0.0e1;
 my $knum=1;
 my @k=logspace($kstart,$kend,$knum);
 my $hstart=1.53e-21; #(4,4) 1.21e-21, (5,5) 5.53e-23
@@ -44,8 +44,8 @@ my $etastart=1.0e9;
 my $etaend=1.0e9;
 my $etanum=1;
 my @eta=logspace($etastart,$etaend,$etanum);
-my $Tstart=1.0e0;
-my $Tend=1.0e0;
+my $Tstart=1.0e1;
+my $Tend=1.0e1;
 my $Tnum=1;
 my @T=logspace($Tstart,$Tend,$Tnum);
 my $Gstart=0; #1.0e-15; #0.00625e-12; #1e-14;

@@ -1,22 +1,23 @@
 #!/bin/bash
 # note: a function exe() to echo and execute commands is defined and exported in ~/.bashrc
+
 if command -v module >/dev/null 2>&1; then
     module load intel
 fi
+
 if [ -z $1 ]; then
     compiler="ifort"
 else
     compiler=$1
 fi
 
-define_parameters() {
-    Nlist=$( seq 60 30 200 ); export Nlist
+set_parameters() {
     Nlist=$( seq 90 1 90 ); export Nlist
-    eqtimes="1e6 2e6"; export eqtimes
+    eqtimes="8e6"; export eqtimes
     eqList=($eqtimes); export eqList
-    startTlist=$( seq 300 100 300 ); export startTlist
-    enslist=$( seq 1 1 1 ); export enslist
-    klist="10"; export klist
+    startTlist=$( seq 600 100 600 ); export startTlist
+    enslist=$( seq 1 1 5 ); export enslist
+    klist="25"; export klist
     Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
     Flist="0"; export Flist
     Flist=($Flist);
@@ -30,7 +31,7 @@ make_cFKdata() {
 }
 
 make_cFK() {
-    sed "s/paramList.in/paramList.ens${ensi}.k${ki}.F${Fi}.in/" <cFK.xy.f90 >cFK.xy.batch.f90
+    sed "s/paramList.in/params\/paramList.ens${ensi}.k${ki}.F${Fi}.in/" <cFK.xy.f90 >cFK.xy.batch.f90
 }
 
 recompile() {
@@ -48,7 +49,7 @@ make_paramList.in() {
     # the -r is for extended regex.  If you trap matches with (), refer back with \\1, \\2, etc
     sed -r "/k = [0.e+ ]*\$/ s/ 0.00e\+00/ ${ki}/g" <paramList.ens.in >paramList.k.in
     sed -r "/G = [0.e+ ]*\$/ s/ 0.00e\+00/ ${Fi}/g" <paramList.k.in >paramList.batch.in
-    cp paramList.batch.in paramList.ens${ensi}.k${ki}.F${Fi}.in
+    cp paramList.batch.in params/paramList.ens${ensi}.k${ki}.F${Fi}.in
 }
 
 launch_jobs() {
@@ -62,7 +63,7 @@ launch_jobs() {
     fi
 }
 
-define_parameters
+set_parameters
 ./paramList.pl
 
 for eqti in ${eqList[@]}

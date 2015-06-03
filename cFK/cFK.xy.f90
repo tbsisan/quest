@@ -21,7 +21,7 @@ program cFK
    CHARACTER(LEN=2) :: ensChar,printingWidthRealsAsChar
    CHARACTER(LEN=3) :: StartTchar,NinCharForm,LinCharForm
    CHARACTER(LEN=4) :: runNumberChar
-   CHARACTER(LEN=5) :: formatReal
+   CHARACTER(LEN=6) :: formatReal
    CHARACTER(LEN=8) :: kChar,hChar,Gchar,Tchar,etaChar,runtimechar
    CHARACTER(LEN=10) :: startClockChar
    REAL(KIND=BR), DIMENSION(size(Temp)) :: kbT, thermalStrength
@@ -37,7 +37,7 @@ program cFK
    tstep=0
    CM=Lc/two
    write(printingWidthRealsAsChar,'(I2)') printingWidthReals
-   formatReal='E'//printingWidthRealsAsChar//'.4'
+   formatReal='ES'//printingWidthRealsAsChar//'.4'
    write(NinCharForm,'(I3)') N
    write(LinCharForm,'(I3)') channelWL
 

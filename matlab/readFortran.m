@@ -15,8 +15,8 @@ rowLength=fread(fid, 1, 'int32'); % length of row in bytes, the filepointer is n
 timeSteps=fileInfo(1).bytes/(rowLength+8); % the bytes for a row is rowLength+2*size(int32)
 
 %frewind(fid); %set file pointer back to start of file
-numbersPerRow=rowLength/4+2;
-fort=zeros(rowLength/4+2,timeSteps);
+numbersPerRow=round(rowLength/4)+2
+fort=zeros(numbersPerRow,timeSteps);
 
 % Read from number 2 on current record up to and including the first number on the next record
 fort=fread(fid,[rowLength/4+2,timeSteps],'float32'); 
