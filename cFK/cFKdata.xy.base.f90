@@ -53,11 +53,17 @@ INTEGER, PARAMETER :: INFINITECHAIN=1, CATERPILLARCHAIN=2
 INTEGER, PARAMETER :: INFINITECOORD=1, CHANNELCOORD=2
 INTEGER, PARAMETER :: SPRINGMODEL=1, RIGIDBARS=2, ONEPARTICLE=3, NONLINEAR=4
 INTEGER, PARAMETER :: EULER=1, RUNGEKUTTA=2, PREDICTOR=3, SDEVERLET=4, VVERLET=5, EULERM=6
+CHARACTER(LEN=35), DIMENSION(6) :: INTEGRATORstr = [character(len=35) :: &
+        "Euler", "Runge-Kutta 4", "Predictor-Corrector", "Stochastic Verlet", "Velocity Verlet", &
+        "Euler-Maruyama (Stochastic)"]
 INTEGER, PARAMETER :: IDENTICALREPLACEMENT=1, IMMEDIATE=2, ACTIVATIONENERGY=3
 INTEGER, PARAMETER :: UNIFORMLINE=0, IMPINGER=1, SHIFT1Y=2, HELIX=3
 INTEGER, PARAMETER :: TWOKINKS=4, ONEBREATHER=5
 INTEGER, PARAMETER :: NOBG=1, ENDCHANNEL2=2, WHOLECHANNEL5=3
 INTEGER, PARAMETER :: ZIG=1, RU=2, BOX=3, AHRENS=4, POLAR=5, WALLACE=6, GRAND=7, SCILAB=8, VACUUM=9
+CHARACTER(LEN=25), DIMENSION(9) :: GRNGstring = [character(len=25) :: &
+        "Ziggurat", "Ratio of Uniforms", "Box-Muller", "Ahrens-Dieter", "Polar Rejection", "Wallace-Brent", &
+        "Alg. 488 Comm. ACM", "Ahrens-Dieter Scilab", "Vacuum = 0.0"]
 ! VACUUM 9.8
 ! ZIG 12.9, WALLACE 12.2
 ! BOX 20.5, AHRENS 20.7, SCILAB 21, POLAR 23
@@ -69,6 +75,9 @@ INTEGER, PARAMETER :: ZIG=1, RU=2, BOX=3, AHRENS=4, POLAR=5, WALLACE=6, GRAND=7,
       ! KISS:          130   86    62               78                             93
 		      !7.7/4   11/6  8.4  7.8
 INTEGER, PARAMETER :: BUILTIN=1, KISS=2, TWIST=3, SHIFT=4, RAN2=5, RAN3=6, COMB88=7, MLAGFIB=8
+CHARACTER(LEN=40), DIMENSION(9) :: URNGstring = [character(len=40) :: &
+        "Builtin", "KISS", "Mersenne Twister", "3-shift shift-register", "Knuth Ran2 recursive+shuffle", &
+        "Knuth ran3 subtractive lagged fib", "R4_UNI L'Ecuyer", "Multiplicative Lagged Fib"]
 !
 !  The Control Parameters are Set to the Following:
 !

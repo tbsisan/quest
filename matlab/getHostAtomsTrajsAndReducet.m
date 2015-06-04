@@ -30,22 +30,8 @@ xyzM=reshape(xyzs',3,atomsPerMolecule,atomCoords/3/atomsPerMolecule,timeSteps);
 %
 timeReductionStr='Reducing time data using strategy: %s';
 originalTimes=timeParams.framePeriodns*[0:1:timeSteps-1];
-if (neededTimeSteps > 1 && neededTimeSteps < timeSteps)
-    timeArray = round(linspace( 1, timeSteps, neededTimeSteps));
-    display(sprintf(timeReductionStr,'absolute number of steps'));
-    display(sprintf('\toriginal steps: %i, new steps: %i',timeSteps,neededTimeSteps));
-elseif (neededTimeSteps <= 1 && neededTimeSteps > 0)
-    newSteps = round(timeSteps*neededTimeSteps);
-    timeArray = round( linspace( 1, timeSteps, newSteps ) );
-    display(sprintf(timeReductionStr,'fraction of total number of steps'));
-    display(sprintf('\toriginal steps: %i, new steps: %i',timeSteps,newSteps));
-else
-    timeArray = 1:1:timeSteps;
-    display(sprintf(timeReductionStr,'Using all data'));
-    display(sprintf('\toriginal steps: %i',timeSteps));
-end
-reducedTimes=originalTimes(timeArray);
-reducedXyzs = squeeze(xyzM(:,1,:,timeArray));
+[ reducedTimes, timeIndexes ] = reduceTimes( originalTimes, neededTimeSteps );
+reducedXyzs = squeeze(xyzM(:,1,:,timeIndexes));
 display(sprintf('\treduced data size: %i,%i,%i',size(reducedXyzs,1),size(reducedXyzs,2),size(reducedXyzs,3)));
 
 end

@@ -140,6 +140,8 @@ SWEEP: do run=1,size(ens)
       ! so programs which access this data may be accessing old data
 
       CALL openFiles()
+      CALL logParams()
+
       IF (RUNTESTS) THEN
 
         CALL initState()
@@ -164,16 +166,6 @@ SWEEP: do run=1,size(ens)
         !	 CYCLE
         !END IF
       
-        write(999,*) 'thermalStren:',thermalStrength(run)
-        write(999,*) 'ens:',ens(run)
-        write(999,*) 'h:',h(run)
-        write(999,*) 'G:',G(run)
-        write(999,*) 'k:',k(run)
-        write(999,*) 'eta:',eta(run)
-        write(999,*) 'iter:',iter
-        soundSpeed=sqrt(k(run)*oneOverM(run))*WL
-        write(999,*) 'sound Speed (m/s):',soundSpeed
-        print*, 'ens:',ensChar
   
   !
   ! State Initialization
@@ -243,6 +235,38 @@ end do SWEEP
 !
 
 CONTAINS
+SUBROUTINE logParams()
+        write(999,*) 'thermalStren:',thermalStrength(run)
+        write(999,*) 'ens:',ens(run)
+        write(999,*) 'h:',h(run)
+        write(999,*) 'G:',G(run)
+        write(999,*) 'k:',k(run)
+        write(999,*) 'eta:',eta(run)
+        write(999,*) 'Total steps:',steps
+        write(999,*) 'Total time (s):',T
+        write(999,*) 'eq steps:',coolDownSteps
+        write(999,*) 'Temp start:',Tstart
+        write(999,*) 'Temp eq:',Temp(run)
+        write(999,*) 'WL:', WL
+        write(999,*) 'WLperN:', WLperN
+        write(999,*) 'ax:',ax
+        write(999,*) 'System width L:',L
+        write(999,*) 'System length units:',channelWL
+        write(999,*) 'particles N:',N
+        write(999,*) 'iter:',iter
+        soundSpeed=sqrt(k(run)*oneOverM(run))*WL
+        write(999,*) 'sound Speed (m/s):',soundSpeed
+        write(999,*) 'INITRANDOMX:', INITRANDOMX
+        write(999,*) 'STOCHASTICS:', STOCHASTICS
+        write(999,*) 'REPEATABLE:', REPEATABLE
+        write(999,*) 'WRITESTATEWAIT:', WRITESTATEWAIT
+        write(999,*) 'ASCIIFORMAT:', ASCIIFORMAT
+        write(999,*) 'GRNG:', GRNGstring(GRNG)
+        write(999,*) 'URNG:', URNGstring(URNG)
+        write(999,*) 'INTEGRATOR:', INTEGRATORstr(INTEGRATOR)
+        print*, 'ens:',ensChar
+END SUBROUTINE logParams
+
     SUBROUTINE openFiles()
     CHARACTER(LEN=900) :: runName
     CHARACTER(LEN=25) :: arg1
@@ -384,7 +408,6 @@ CONTAINS
       y=1.0_BR
       vy=0.0_BR
       vx=0.0_BR
-      write(999,*) 'System width:',L
       write(999,*) 'starting xs: from within initState() before random',x(1:9)
       write(999,*) 'starting vxs:fromwithininitState() before random',vx(1:10)
       vMean=sqrt(kb*300.0*oneOverM(run))

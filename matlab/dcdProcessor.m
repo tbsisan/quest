@@ -8,7 +8,7 @@
 %
 dcdParameters; 
 
-[ dcdPruned ]   = pruneDcdList( dcds,dcdPruneStrings ); % Prune the list according to patterns
+[ dcdPruned ]   = pruneFileList( dcds,dcdPruneStrings ); % Prune the list according to patterns
 clear savedData;
 savedData(length(dcdPruned)) = struct(); % Initialize empty structure array to hold saved data
 
