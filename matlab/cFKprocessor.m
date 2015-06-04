@@ -42,6 +42,7 @@ for cFKi=startfile:endfile
     %     hostAtomsXyzs=sort(hostAtomsXyzs,2); %TODO: this is a temporary space holder, it's pseudocode
     % end
         
+    cFKaxes = figuregrid(4,1);
     %
     % Modules for extra data processing.
     % External module scripts import data into the moduleData structure
