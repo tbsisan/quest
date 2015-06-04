@@ -1,10 +1,12 @@
 function fighandle=figuregrid(datalength1,varargin)
 
-gh=0.03; gw=0.03; um=0.03; lom=0.02; lm=0.03; rm=0.01;
+gh=0.05; gw=0.03; um=0.05; lom=0.02; lm=0.05; rm=0.01;
+gh=0.04; gw=0.04; um=0.05; lom=0.06; lm=0.06; rm=0.03;
 
 if length(varargin)>0
     datalength2=varargin{1};
     hx=figure;
+    % fighandle=tight_subplot(datalength1,datalength2,gh,um,lm,0);
     fighandle=tight_subplot(datalength1,datalength2,[gh gw],[lom um],[lm rm],0);
 else
     subplots=datalength1;

@@ -14,16 +14,16 @@ setAvailableModules;
 %
 cFKsettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
                         'shortTimeSteps', 100 );
-cFKflags    =       {   '~useLastcFK', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
+cFKflags    = flags(   '~useLastcFK', 'plotPosition' ); % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
-dataToSave  = { 'reducedXs', 'reducedTimes' }; % Save this data for each dcd file processed
+dataToSave  = flags( 'reducedXs', 'reducedTimes' ); % Save this data for each dcd file processed
 
-moduleList  = { 'trackReservoirs' }; % List of optional data processing options. Full list in makeAvailableModules:
-for module=moduleList; if availableModules~=module; error([ 'Module ' cell2mat(module) ' not available' ]); end; end
+moduleList  = flags( 'trackReservoirs' ); % List of optional data processing options. Full list in makeAvailableModules:
+% for module=moduleList.cell; if availableModules~=module; error([ 'Module ' cell2mat(module) ' not available' ]); end; end
 
-pruneStrings=      { 'aaaaaaa',  ...
+pruneStrings= flags( 'aaaaaaa',  ...
                     'replaceMeWithAStringToMatchAdcdFileNameForExclusion',  ...
-                    '9999999' }; % dcd files matching these pattern strings will be excluded from processing
+                    '9999999' ); % dcd files matching these pattern strings will be excluded from processing
 
 if cFKflags ~= 'useLastDcd'
     cFKs     = dir( [paths.projectStor '/' cFKpattern] ); % Just process the last dcd with: dcds = [1];

@@ -20,14 +20,15 @@ for cFKi=startfile:endfile
     % if dcdFlags ~= 'useLastDcd' || ~exist( 'xyzs', 'var' );
 
     cFKfullFile = [paths.dataPath '/' cFKpruned{cFKi}];
-    cFKlogFile = regexprep(cFKfullFile,'\/x\.','/log.');
+    cFKfiles    = getcFKfiles( cFKfullFile );
     
-    [ cFKdata ]                                                 = getcFKdata( cFKlogFile );
+    [ cFKdata ]                                                 = getcFKdata( cFKfiles.log );
 
     % 
     % Read in the data in the dcd file
     %
-    [ xs, ts, sol, solo, fn ] = readFortran( cFKfullFile );
+    [ xs, ts, sol, solo, fn ]   = readFortran( cFKfiles.x, 1.228e-10 );
+    [ Uxs, ts, sol, solo, fn ]  = readFortran( cFKfiles.Ux, 1 );
     
     %
     % Process the xyz data
@@ -42,7 +43,10 @@ for cFKi=startfile:endfile
     %     hostAtomsXyzs=sort(hostAtomsXyzs,2); %TODO: this is a temporary space holder, it's pseudocode
     % end
         
-    cFKaxes = figuregrid(4,1);
+    if 0
+        cFKaxes = figuregrid(4,1);
+    end
+    
     %
     % Modules for extra data processing.
     % External module scripts import data into the moduleData structure

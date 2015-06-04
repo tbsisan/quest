@@ -1,4 +1,4 @@
-function [ fort, ts, sol, solo, fullFile ] = readFortran( dataFile, lambda, tstep )
+function [ fort, ts, sol, solo, fullFile ] = readFortran( dataFile, lambda )
 % Read in Fortran binary data written with unformatted output type.
 % Column 1 contains the time step, the rest of columns correspond to each particle.  
 

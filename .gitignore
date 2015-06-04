@@ -6,6 +6,7 @@
 *.log
 *.forquest.f90
 *~
+**/@mycell.tgz
 cFK/questbatches/**
 workIdeas
 changes
