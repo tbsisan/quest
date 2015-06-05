@@ -16,8 +16,8 @@ set_parameters() {
     eqtimes="8e6"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 600 100 600 ); export startTlist
-    enslist=$( seq 1 1 5 ); export enslist
-    klist="25"; export klist
+    enslist=$( seq 1 1 6 ); export enslist
+    klist="80"; export klist
     Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
     Flist="0"; export Flist
     Flist=($Flist);

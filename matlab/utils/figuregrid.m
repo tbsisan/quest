@@ -1,7 +1,7 @@
 function fighandle=figuregrid(datalength1,varargin)
 
 gh=0.05; gw=0.03; um=0.05; lom=0.02; lm=0.05; rm=0.01;
-gh=0.04; gw=0.04; um=0.05; lom=0.06; lm=0.06; rm=0.03;
+gh=0.09; gw=0.05; um=0.08; lom=0.09; lm=0.10; rm=0.06;
 
 if length(varargin)>0
     datalength2=varargin{1};

@@ -75,7 +75,7 @@ CHARACTER(LEN=25), DIMENSION(9) :: GRNGstring = [character(len=25) :: &
       ! KISS:          130   86    62               78                             93
 		      !7.7/4   11/6  8.4  7.8
 INTEGER, PARAMETER :: BUILTIN=1, KISS=2, TWIST=3, SHIFT=4, RAN2=5, RAN3=6, COMB88=7, MLAGFIB=8
-CHARACTER(LEN=40), DIMENSION(9) :: URNGstring = [character(len=40) :: &
+CHARACTER(LEN=40), DIMENSION(8) :: URNGstring = [character(len=40) :: &
         "Builtin", "KISS", "Mersenne Twister", "3-shift shift-register", "Knuth Ran2 recursive+shuffle", &
         "Knuth ran3 subtractive lagged fib", "R4_UNI L'Ecuyer", "Multiplicative Lagged Fib"]
 !

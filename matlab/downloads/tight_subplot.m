@@ -1,4 +1,4 @@
-function ha = tight_subplot(Nh, Nw, gap, marg_h, marg_w, square)
+function ha = tight_subplot(Nh, Nw, gap, marg_h, marg_w, square);
 
 % tight_subplot creates "subplot" axes with adjustable gaps and margins
 %
@@ -44,7 +44,7 @@ axw = (1-sum(marg_w)-(Nw-1)*gap(2))/Nw;
 
 if (square)
 axh=min([axh axw]);
-axw=axh
+axw=axh;
 end
 
 py = 1-marg_h(2)-axh; 
@@ -56,7 +56,6 @@ for ih = 1:Nh
     
     for ix = 1:Nw
         ii = ii+1;
-        [px py axw axh]
         ha(ii) = axes('Units','normalized', ...
             'Position',[px py axw axh], ...
             'XTickLabel','', ...
