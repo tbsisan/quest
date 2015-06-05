@@ -29,3 +29,7 @@ pruneStrings= { 'aaaaaaa',  ...
 if ~amember(cFKflags,'useLastDcd') 
     cFKs     = dir( [paths.projectStor '/' cFKpattern] ); % Just process the last dcd with: dcds = [1];
 end
+
+global angstrom isOctave;
+angstrom=char(197);
+isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;

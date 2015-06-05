@@ -15,7 +15,7 @@ REAL(KIND=BR), PARAMETER :: pi       =3.141592653589793238462643383_BR
 REAL(KIND=BR), PARAMETER :: tworoot3 =0.288675134594812882254574390_BR
 REAL(KIND=BR), PARAMETER :: iota =1.0e-80_BR
 REAL(KIND=BR), PARAMETER :: kb=1.3806488e-23
-INTEGER, PARAMETER :: N=90, Nsim=90, channelWL=120
+INTEGER, PARAMETER :: N=300, Nsim=300, channelWL=380
 REAL(KIND=BR), PARAMETER :: WL=2.456e-10 !the wavelength between waters in the units used
 REAL(KIND=BR), PARAMETER :: WLperN=2.0 !should be integer but math uses reals
 REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
@@ -35,7 +35,7 @@ INTEGER, PARAMETER :: coolDownSteps=0, Tstart=0
 
 LOGICAL :: D2 = .false. !TWO DIMENSIONS?
 REAL(KIND=BR), DIMENSION(NSim) :: x,y,vx,vy,xTotal,a_old
-REAL(KIND=BR):: KEx,KEy,PEx,PEy= 0_BR
+REAL(KIND=BR):: KEx,KEy,PEx,PEy,hE= 0_BR
 REAL(KIND=BR), PARAMETER :: ySpringScale = 0_BR
 REAL(KIND=BR), DIMENSION(NSim) :: impingerX,impingerV
 CHARACTER(LEN=1), DIMENSION(N) :: label='L'

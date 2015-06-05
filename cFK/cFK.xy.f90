@@ -357,12 +357,14 @@ END SUBROUTINE logParams
    SUBROUTINE Energy(tstep)
       INTEGER, INTENT(IN) :: tstep
       REAL(KIND=BR), DIMENSION(NSim) :: rdiffx,ldiffx,rdiffy,ldiffy
+      REAL(KIND=BR), PARAMETER :: phaseFactor = 2*pi*WLperN/WL
       CALL rightLeft(x,rdiffx,ldiffx)
       CALL upDown(y,rdiffy,ldiffy)
       !CALL findWrapPt(rdiffx)
       !CALL fixWrapPtDiff(rdiffx)
       PEx = sum(onehalf*k(run)*(rdiffx-ax)**2)
       PEy = sum(onehalf*k(run)*rdiffy**2)
+      hE  = sum( h(run)*sin( phaseFactor*x ) )
       KEx = sum(onehalf*M(run)*vx**2)
       KEy = sum(onehalf*M(run)*vy**2)
       !write(999,*) "Time Step:",tstep
@@ -1664,20 +1666,20 @@ END SUBROUTINE logParams
       IF (ASCIIFORMAT) THEN
          IF (WRITEX) write(101,'(E12.4,'//NinCharForm//formatReal//')') tstep*dt,x
          IF (WRITEV) write(201,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vx
-         IF (WRITEU) write(301,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEx,PEx
+         IF (WRITEU) write(301,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEx,PEx,hE
          IF (D2) THEN
             IF (WRITEX) write(102,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,y
             IF (WRITEV) write(202,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,vy
-            IF (WRITEU) write(302,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEy,PEy
+            IF (WRITEU) write(302,'(F12.4,'//NinCharForm//formatReal//')') tstep*dt,KEy,PEy,0.0
          ENDIF
       ELSE
          IF (WRITEX) write(101) REAL(tstep*dt,KIND=SMREAL),REAL(x,KIND=SMREAL)
          IF (WRITEV) write(201) REAL(tstep*dt,KIND=SMREAL),REAL(vx,KIND=SMREAL)
-         IF (WRITEU) write(301) REAL(tstep*dt,KIND=SMREAL),REAL(KEx,KIND=SMREAL),REAL(PEx,KIND=SMREAL)
+         IF (WRITEU) write(301) REAL(tstep*dt,KIND=SMREAL),REAL(KEx,KIND=SMREAL),REAL(PEx,KIND=SMREAL),REAL(hE,KIND=SMREAL)
          IF (D2) THEN
             IF (WRITEX) write(102) REAL(tstep*dt,KIND=SMREAL),REAL(y,KIND=SMREAL)
             IF (WRITEV) write(202) REAL(tstep*dt,KIND=SMREAL),REAL(vy,KIND=SMREAL)
-            IF (WRITEU) write(302) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL)
+            IF (WRITEU) write(302) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL),0.0
          ENDIF
       END IF
       !write(999,*) vx

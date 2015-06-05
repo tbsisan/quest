@@ -16,17 +16,7 @@ savedData(length(cFKpruned)) = struct(); % Initialize empty structure array to h
 startfile=1;
 endfile=length(cFKpruned);
 ensList=cell(1,endfile-startfile);
-if 1
-    rowsOfAxes=3; %endfile-startfile
-    colsOfAxes=2; %endfile-startfile
-    %xAxes = figuregrid(rowsOfAxes,1);
-    %tempAxes = figuregrid(rowsOfAxes,1);
-    figure('Position',[100 100 1000 800]);
-    tempAxes = subplot(rowsOfAxes,colsOfAxes,1);
-    xAxes = subplot(rowsOfAxes,colsOfAxes,3);
-    widthAxes = subplot(rowsOfAxes,colsOfAxes,5);
-    solAxes = subplot(rowsOfAxes,colsOfAxes,[2,6]);
-end
+[ fh, cFKaxes ] = cFKfigure(1200,1200)
 
 for cFKi=startfile:endfile
      
@@ -58,31 +48,30 @@ for cFKi=startfile:endfile
     %     hostAtomsXyzs=sort(hostAtomsXyzs,2); %TODO: this is a temporary space holder, it's pseudocode
     % end
         
-    if 1
-        % axes(tempAxes(min(cFKi,length(tempAxes))));
-        axes(tempAxes);
-        plot(ts,Uxs(:,1)/1.38e-23/90*2,':'); hold on;
-        title('Temperature'); ylabel('T (K)');
-        if (cFKi==endfile) legend(ensList); end
+    labelFigs=(cFKi==endfile);
 
-        %axes(xAxes(min(cFKi,length(xAxes))));
-        axes(xAxes);
-        plot(ts,xs(:,1)); hold on;
-        title('Position of particle 1'); ylabel('x (m)');
+    axes(cFKaxes.temp); hold on;
+    cFKplot(ts*1e9, Uxs(:,1)/1.38e-23/cFKsimParams.N*2, cFKi, 1, ':', 'Temperature', '', 'T(K)', ensList, labelFigs);
 
-        axes(widthAxes);
-        plot(ts,xs(:,end)-xs(:,1),':'); hold on;
-        if (cFKi==endfile) horplot( (cFKsimParams.N-1)*cFKsimParams.a, '--'); end
-        title('Chain Length'); xlabel('time (s)'); ylabel('length (m)');
+    axes(cFKaxes.energy);hold on;
+    hE = cFKsimParams.h * (sin(xs*2*pi/(cFKsimParams.WL/2))+1);
+    Eratio=Uxs(:,2)./sum(hE,2);
+    cFKplot(ts*1e9, Eratio, cFKi, 1, '', 'Energy ratio: E_{spring}/E_h', '', 'Ratio', '', labelFigs);
+    horizontalLine(Eratio(end),'--', getaNiceColor(cFKi)); 
 
-        %axes(solAxes(min(cFKi,length(solAxes))));
-        axes(solAxes);
-        plot(sol(end,:)); hold on;
-        title('Soliton at end of cooling'); xlabel('particle i'); ylabel('u_i');
-        cFKparamStr = evalc('cFKsimParams');
-        if (cFKi==endfile) text(0.05,0.8,cFKparamStr,'Units','normalized'); end
+    axes(cFKaxes.x1);hold on;
+    cFKplot(ts*1e9, xs(:,1)*1e10, cFKi, 1, '', 'Position of particle 1', '', ['x (' angstrom ')'], '', labelFigs);
+
+    axes(cFKaxes.chainwidth); hold on;
+    cFKplot(ts*1e9, (xs(:,end)-xs(:,1))*1e10, cFKi, 1, ':', 'Chain Length','time (ns)', ['length (' angstrom ')'], '', labelFigs);
+    colorLinePlot(0,(xs(1,end)-xs(1,1))*1e10,1,1,'o');
+    if (cFKi==endfile) 
+        horizontalLine( (cFKsimParams.N-1)*cFKsimParams.a*1e10, '--', getaNiceColor(1)); 
     end
-    
+
+    axes(cFKaxes.sol); hold on;
+    cFKplot(1:length(sol(end,:)), sol(end,:)*1e10, cFKi, 2, '', 'Soliton at end of cooling', 'particle i', ['u_i (' angstrom ')'], '', labelFigs);
+
     %
     % Modules for extra data processing.
     % External module scripts import data into the moduleData structure
@@ -111,3 +100,14 @@ for cFKi=startfile:endfile
     end
     
 end
+if (isOctave)
+    % shrink fonts
+    FS = findall(fh,'-property','FontSize');
+    for i=1:length(FS)
+        fsi=get(FS(i),'FontSize');
+        set(FS(i),'FontSize',round(fsi*0.7));
+    end
+end
+text(-0.5,1.05,'cFK Finite Chain Results','Units','normalized','FontSize',15,'FontWeight','bold')
+text(1,1,'a','Units','normalized');
+text(0.05,0.8,sprintf(cFKsimParams.allStr),'Units','normalized'); 
