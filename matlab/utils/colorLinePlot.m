@@ -1,31 +1,25 @@
 function col=colorLinePlot(x,y,explicitColor,linewidth,varargin)
+% Plot a line or scatter plot with a nice color.
+% X-axis if empty will default to plotting y versus integers 1:length(y).
+% ExplicitColor is an integer from 1 to 32, or zero if not specifying directly.
+% If explicitColor is zero (technically ~>0), color will come from calling getaNiceColor(n)
     
-if (length(varargin)==0)
-    % used to have two get childrens, but the count was messing up  for the second plot
-    % childs=(get(get(gca,'Children'),'Children'));
-    childs=((get(gca,'Children')));
-    c=size(childs,1)+1;
+c = getaNiceColor();
+if (explicitColor>0)
+    c=getaNiceColor(explicitColor);
+end
+
+if nargin==0
     style='-';
-elseif (length(varargin)==1)
-    %c=varargin(1);
-    childs=((get(gca,'Children')));
-    c=size(childs,1)+1;
+elseif nargin==1
     style=varargin{1};
 else 
-    warn('too many args');
+    warn(['WARNING: TOO MANY ARGS to ' mfilename]);
 end
-if (explicitColor>0)
-    c=explicitColor;
-end
-%if (~ishold)
-%   c=1; 
-%end
-if (c>32) c=c-32; end
+
 if (isempty(x))
-    plot(y,style,'Color',getaNiceColor(c),'LineWidth',linewidth);
-    %plot(y,'Color',mycolors(c,:),'LineWidth',2);
+    plot(y,style,'Color',c,'LineWidth',linewidth);
 else
-    plot(x,y,style,'Color',getaNiceColor(c),'LineWidth',linewidth);
-    %plot(x,y,'Color',mycolors(c,:),'LineWidth',2);
+    plot(x,y,style,'Color',c,'LineWidth',linewidth);
 end
-col=getaNiceColor(c);
+col=c;

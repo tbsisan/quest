@@ -1,9 +1,21 @@
-function verticalLine(x,spec,varargin)
+function verticalLine(x,spec,explicitColor,varargin)
+
 ax=axis;
+yLimits=[ax(3) ax(4)];
 hold on
-for bari=1:length(x)
-    col=plot([x(bari) x(bari)],[ax(3) ax(4)],spec);
+
+if explicitColor==0
+    explicitColor=getaNiceColor();
 end
+
+lineWidth=1; 
+
+for linei=1:length(x)
+    xi=x(linei);
+    colorLinePlot([xi xi], yLimits, explicitColor, lineWidth, spec)
+    explicitColor=getaNiceolor();
+end
+
 if ~isempty(varargin)
     y=varargin{1}*ax(4);
     txt=varargin{2};

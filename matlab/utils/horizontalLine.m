@@ -1,13 +1,25 @@
-function horizontalLine(y,spec,color,varargin)
+function horizontalLine(y,spec,explicitColor,varargin)
+% Plot a horizontal line, of type specified in lineSpec, spec.
+
+% Get limits of x-axis so we know x-axis extent of a horizontal line.
 ax=axis;
-hold on
-for bari=1:length(y)
-    yi=y(bari);
-    %col=cplot([ax(1) ax(2)],[yi yi]);
-    col=plot([ax(1) ax(2)],[yi yi],spec,'Color',color);
+xLimits=[ax(1) ax(2)];
+hold on;
+
+if explicitColor==0
+    explicitColor=getaNiceColor();
 end
+
+lineWidth=1; 
+
+for linei=1:length(y)
+    yi=y(linei);
+    colorLinePlot(xLimits, [yi yi], explicitColor, lineWidth, spec)
+end
+
+%Old stuff for annotations.
 if ~isempty(varargin)
-    y=varargin{1}*ax(4);
+    x=varargin{1}*ax(1);
     txt=varargin{2};
     if (strcmp(varargin{3},'r'))
         text(x,y,{['\leftarrow',txt],num2str(x)},'BackgroundColor',1-(1-col)*0.5,'HorizontalAlignment','left','Margin',1e-6);

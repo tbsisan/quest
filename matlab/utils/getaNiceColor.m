@@ -1,4 +1,8 @@
-function [ rgb ] = getaNiceColor( n )
+function [ rgb ] = getaNiceColor( varargin )
+% Get a color that is different from other colors (generally for plotting).
+% The list of rgb values below is in an order where colors plotted should be 
+% roughly maximally distinct from previous colors for best visibility.
+% I found this color list  online somewhere, perhaps in an mfile cplot.m.
 rgbs=[...
     0         0    1.0000; ...% 1
     1.0000         0         0; ...% 2
@@ -33,11 +37,26 @@ rgbs=[...
     0.2414         0    0.1034; ...% 31
     0.9310    1.0000    0.6897; ...% 32
 ]; 
+if nargin==0
+    if length(get(0,'CurrentFigure'))>0
+        childPlots=get(gca,'Children');
+        numPlots=size(childPlots,1);
+        n=numPlots+1;
+    else
+        n=1;
+    end
+elseif nargin==1
+    n=varargin{1};
+else
+    display(['Too many arguments to ' mfilename]);
+end
+
 if (n > 32)
-    n=32;
-    warn('COLOR INDEX OUT OF RANGE');
+    n=n-32;
+    warn(['COLOR INDEX OUT OF RANGE in ' mfilename]);
 elseif (n<1)
     n=1;
-    warn('COLOR INDEX OUT OF RANGE');
+    warn(['COLOR INDEX OUT OF RANGE in ' mfilename]);
 end
+
 rgb = rgbs( n,: );
