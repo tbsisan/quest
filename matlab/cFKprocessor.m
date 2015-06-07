@@ -8,32 +8,31 @@
 %
 cFKparameters; 
 
-[ cFKpruned ]   = pruneFileList( cFKs, pruneStrings ); % Prune the list according to patterns
 clear savedData;
 savedData(length(cFKpruned)) = struct(); % Initialize empty structure array to hold saved data
 
-
 startfile=1;
 endfile=length(cFKpruned);
-ensList=cell(1,endfile-startfile);
-[ fh, cFKaxes ] = cFKfigure(1200,1200)
+runList=cell(1,endfile-startfile);
+
+[ fh, cFKaxes ] = cFKfigure(1000,800)
 
 for cFKi=startfile:endfile
      
     % if dcdFlags == 'useLastDcd' && dcdi>1; display(sprintf('skipping dcd %i',dcdi)); continue; end
     % if dcdFlags ~= 'useLastDcd' || ~exist( 'xyzs', 'var' );
 
-    cFKfullFile = [paths.projectStor '/' cFKpruned{cFKi}];
+    cFKfullFile = [ paths.projectStor '/' cFKpruned{cFKi} ];
     cFKfiles    = getcFKfiles( cFKfullFile );
     
-    [ cFKsimParams ]                                                 = getcFKsimParams( cFKfiles.log );
-    ensList{cFKi} = cFKsimParams.ensStr;
+    [ cFKsimParams ]    = getcFKsimParams( cFKfiles.log );
+    runList{cFKi}       = cFKsimParams.ensStr;
 
     % 
     % Read in the data in the dcd file
     %
-    [ Uxs, ts, sol, solo, fn ]  = readFortran( cFKfiles.Ux, 1 );
-    [ xs, ts, sol, solo, fn ]   = readFortran( cFKfiles.x, 1.228e-10 );
+    [ Uxs,  ~,   ~,    ~,  ~ ]  = readFortran( cFKfiles.Ux, 1 );
+    [  xs, ts, sol, solo, fn ]  = readFortran( cFKfiles.x, 1.228e-10 );
     
     %
     % Process the xyz data
@@ -51,12 +50,12 @@ for cFKi=startfile:endfile
     labelFigs=(cFKi==endfile);
 
     axes(cFKaxes.temp); hold on;
-    cFKplot(ts*1e9, Uxs(:,1)/1.38e-23/cFKsimParams.N*2, cFKi, 1, ':', 'Temperature', '', 'T(K)', ensList, labelFigs);
+    cFKplot(ts*1e9, Uxs(:,1)/1.38e-23/cFKsimParams.N*2, cFKi, 1, ':', 'Temperature', '', 'T(K)', runList, labelFigs);
 
     axes(cFKaxes.energy);hold on;
     hE = cFKsimParams.h * (sin(xs*2*pi/(cFKsimParams.WL/2))+1);
-    Eratio=Uxs(:,2)./sum(hE,2);
-    cFKplot(ts*1e9, Eratio, cFKi, 1, '', 'Energy ratio: E_{spring}/E_h', '', 'Ratio', '', labelFigs);
+    Eratio=sum(hE,2)./Uxs(:,2);
+    cFKplot(ts*1e9, Eratio, cFKi, 1, '', 'Energy ratio: E_h/E_{spring}', '', 'Ratio', '', labelFigs);
     horizontalLine(Eratio(end),'--', getaNiceColor(cFKi)); 
 
     axes(cFKaxes.x1);hold on;
@@ -71,6 +70,10 @@ for cFKi=startfile:endfile
 
     axes(cFKaxes.sol); hold on;
     cFKplot(1:length(sol(end,:)), sol(end,:)*1e10, cFKi, 2, '', 'Soliton at end of cooling', 'particle i', ['u_i (' angstrom ')'], '', labelFigs);
+    if (cFKi==1)
+        text(0.05,0.8,sprintf(cFKsimParams.allStr),'Units','normalized'); 
+        text(-0.5,1.05,'cFK Finite Chain Results','Units','normalized','FontSize',15,'FontWeight','bold')
+    end
 
     %
     % Modules for extra data processing.
@@ -108,6 +111,6 @@ if (isOctave)
         set(FS(i),'FontSize',round(fsi*0.7));
     end
 end
-text(-0.5,1.05,'cFK Finite Chain Results','Units','normalized','FontSize',15,'FontWeight','bold')
-text(1,1,'a','Units','normalized');
-text(0.05,0.8,sprintf(cFKsimParams.allStr),'Units','normalized'); 
+%text(0.05,0.8,sprintf(cFKsimParams.allStr),'Units','normalized'); 
+%text(-0.5,1.05,'cFK Finite Chain Results','Units','normalized','FontSize',15,'FontWeight','bold')
+%text(1,1,'a','Units','normalized');

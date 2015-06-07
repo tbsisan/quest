@@ -12,20 +12,22 @@ else
 fi
 
 set_parameters() {
-    Nlist=$( seq 300 1 300 ); export Nlist
+    Nlist=$( seq 50 1 50 ); export Nlist
+    L=100; export Nlist
     eqtimes="8e6"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 600 100 600 ); export startTlist
-    enslist=$( seq 1 1 6 ); export enslist
+    enslist=$( seq 21 1 40 ); export enslist
     klist="20 25 30 40 50 60 80 120"; export klist
+    klist="30"; export klist
     Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
     Flist="0"; export Flist
     Flist=($Flist);
 }
 
 make_cFKdata() {
-    sed "s/ N=\([0-9]\{2,\}\), Nsim=\([0-9]\{2,\}\), channelWL=/ N=$Ni, Nsim=$Ni, channelWL=/" <cFKdata.xy.base.f90 >cFKdata.xy.N.f90
-    # sed "s/ N=\([0-9]\{2,\}\), Nsim=\([0-9]\{2,\}\), channelWL=\([0-9]\{2,\}\)/ N=$Ni, Nsim=$Ni, channelWL=$Ni/" <cFKdata.xy.base.f90 >cFKdata.xy.batch.f90
+    #sed "s/ N=\([0-9]\{2,\}\), Nsim=\([0-9]\{2,\}\), channelWL=/ N=$Ni, Nsim=$Ni, channelWL=/" <cFKdata.xy.base.f90 >cFKdata.xy.N.f90
+    sed "s/ N=\([0-9]\{2,\}\), Nsim=\([0-9]\{2,\}\), channelWL=\([0-9]\{2,\}\)/ N=$Ni, Nsim=$Ni, channelWL=$L/" <cFKdata.xy.base.f90 >cFKdata.xy.N.f90
     sed "s/coolDownSteps=0/coolDownSteps=$eqti/" <cFKdata.xy.N.f90 >cFKdata.xy.eqt.f90
     sed "s/Tstart=0/Tstart=$Ti/" <cFKdata.xy.eqt.f90 >cFKdata.xy.batch.f90
 }
@@ -57,7 +59,7 @@ launch_jobs() {
         questruncmd=questbatches/runeq${eqti}.Tst${Ti}.N${Ni}.ens${ensi}.k${ki}.F${Fi}.sh
         sed "s/ifort.out/$fortexe/" <questbatch.sh >$questruncmd
         chmod 755 $questruncmd
-        exe msub -N eq${eqti}Tst${Ti}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:07:30 -joe -V -o seeout.log $questruncmd
+        exe msub -N eq${eqti}Tst${Ti}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:02:30 -joe -V -o seeout.log $questruncmd
     else
         exe ./questbatches/$fortexe
     fi

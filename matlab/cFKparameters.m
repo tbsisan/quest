@@ -1,8 +1,16 @@
+% Some global variables.
+global angstrom isOctave;
+isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+%angstrom='{\AA}';
+angstrom=char(197);
+
 %
 % Set dcd parameters before processing with dcdProcessor.m
 %
 setPaths;
 setAvailableModules;
+
+% cFKpattern need to be set before running cFKprocessor.  Here is an example:
 % cFKpattern  = '/cnt4*nm66*spe4*ens*run1*langevin*.dcd';
 
 
@@ -14,22 +22,23 @@ setAvailableModules;
 %
 cFKsettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
                         'shortTimeSteps', 100 );
-cFKflags    = {   '~useLastcFK', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
+cFKflags    = { '~useLastcFK', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
 dataToSave  = { 'reducedXs', 'reducedTimes', 'sol' }; % Save this data for each dcd file processed
 
 moduleList  = { 'trackReservoirs' }; % List of optional data processing options. Full list in makeAvailableModules:
-% for module=moduleList.cell; if availableModules~=module; error([ 'Module ' cell2mat(module) ' not available' ]); end; end
+if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleList is not in availableModules' ]); end
 
-pruneStrings= { 'aaaaaaa',  ...
-                    'replaceMeWithAStringToMatchAdcdFileNameForExclusion',  ...
-                    '9999999' }; % dcd files matching these pattern strings will be excluded from processing
-
-% This is where the list of files to process is obtained.
-if ~amember(cFKflags,'useLastDcd') 
-    cFKs     = dir( [paths.projectStor '/' cFKpattern] ); % Just process the last dcd with: dcds = [1];
+% This is where the list of files to process is obtained. It is later processed with keepPatterns and prunePatterns.
+if ~amember(cFKflags,'useLastcFK') 
+    cFKs    = dir( [paths.projectStor '/' cFKpattern] );
 end
 
-global angstrom isOctave;
-angstrom=char(197);
-isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+keepPatterns    = { '.+' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'
+prunePatterns   = { 'aaaaaaa',  ...
+                    'replaceMeWithaPatternToMatchAFileNameForExclusion',  ...
+                    'x.[01]',  ...
+                    'x.20',  ...
+                    '9999999' }; % Files matching these pattern strings will be excluded from processing.
+[ cFKpruned ]   = pruneFileList( cFKs, keepPatterns, prunePatterns ); % Prune the list according to patterns
+
