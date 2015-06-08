@@ -32,7 +32,7 @@ if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleL
 
 % This is where the list of files to process is obtained. The list pruned below according to keepPatterns and prunePatterns.
 if ~amember(cFKflags,'useLastcFK') 
-    cFKs    = dir( [paths.projectStor '/' cFKpattern] );
+    cFKs    = getFileList( paths, cFKpattern );
 end
 
 keepPatterns    = { '.+' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'
