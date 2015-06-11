@@ -61,6 +61,14 @@ for cFKi=startfile:endfile
         moduleData.solitons.N(cFKi) = cFKsimParams.N;
     end
 
+    if amember(moduleList, 'measureMotion')
+        comxs = mean(xs,2);
+        totalDist = comxs(end) - comxs(1);
+        maxDist = max(comxs) - comxs(1);
+        moduleData.displacement.total(cFKi)=totalDist;
+        moduleData.displacement.max(cFKi)=maxDist;
+    end
+
     %
     % Modules for extra data processing.
     % External module scripts import data into the moduleData structure
