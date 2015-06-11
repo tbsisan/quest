@@ -21,7 +21,8 @@ end
 
 keepAndNotPrune = onesToKeepLogical & ~onesToPruneLogical;
 prunedFiles = infiles(keepAndNotPrune);
-prunedNames = {prunedFiles.name}
+prunedNames = {prunedFiles.name};
+prunedNames'
 
 
 end

@@ -8,14 +8,16 @@
 %
 cFKparameters; 
 
-clear savedData;
+clear savedData moduleData;
 savedData(length(cFKpruned)) = struct(); % Initialize empty structure array to hold saved data
 
 startfile=1;
 endfile=length(cFKpruned);
 runList=cell(1,endfile-startfile);
 
-[ fh, cFKaxes ] = cFKfigure(1000,800)
+if amember(moduleList, 'plotOverview')
+    [ fh, cFKaxes ] = cFKfigure(1000,800)
+end
 
 for cFKi=startfile:endfile
      
@@ -55,6 +57,8 @@ for cFKi=startfile:endfile
     if amember(moduleList, 'countSolitons')
         numSolitons = (sol(end,end)-sol(end,1))/(cFKsimParams.WL/cFKsimParams.WLperN);
         numSolitonInt = round(numSolitons);
+        moduleData.solitons.num(cFKi) = numSolitons;
+        moduleData.solitons.N(cFKi) = cFKsimParams.N;
     end
 
     %
@@ -65,8 +69,6 @@ for cFKi=startfile:endfile
         % [ hostAtomsFullXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
         fftSettings = struct( 'smoothingWindow', 15 );
         fftFlags = { 'plotOn' };
-        % oneAtomX=squeeze(hostAtomsFullXyzs(1,1,:));
-        % oneAtomZ=squeeze(hostAtomsFullXyzs(3,1,:));
         [ moduleData(cFKi).ffts ] = computeFFT( fftSettings, fftFlags, ts, xs ); 
         % moduleData(1).ffts.hostAtomsZ.smoothPower is the smoothed fft power of hostAtomsZ
         % clear hostAtomsFullXyzs fullTimes hostAtomsX hostAtomsZ;
@@ -85,6 +87,7 @@ for cFKi=startfile:endfile
     end
     
 end
+
 if (isOctave)
     % shrink fonts
     FS = findall(fh,'-property','FontSize');

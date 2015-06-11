@@ -23,7 +23,7 @@ setAvailableModules;
 %
 cFKsettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
                         'shortTimeSteps', 100 );
-cFKflags    = { '~useLastcFK', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
+cFKflags    = { '~useLastcFK', '~hideFigs', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
 dataToSave  = { 'reducedXs', 'reducedTimes', 'sol', 'numSolitons'}; % Save this data for each dcd file processed
 
@@ -35,7 +35,7 @@ if ~amember(cFKflags,'useLastcFK')
     cFKs    = getFileList( paths, cFKpattern );
 end
 
-keepPatterns    = { '.+' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'
+keepPatterns    = { 'x\.0[1-3].*N[12]00' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'
 prunePatterns   = { 'aaaaaaa',  ...
                     'replaceMeWithaPatternToMatchAFileNameForExclusion',  ...
                     '9999999' }; % Files matching these pattern strings will be excluded from processing.

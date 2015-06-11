@@ -1,10 +1,12 @@
-function [ fh, cFKaxes ] = cFKfigure( w, h )
+function [ fh, cFKaxes ] = cFKfigure( w, h, cFKflags )
     rowsOfAxes=4; %endfile-startfile
     colsOfAxes=2; %endfile-startfile
     %xAxes = figuregrid(rowsOfAxes,1);
     %tempAxes = figuregrid(rowsOfAxes,1);
     fh=figure();
-    set(fh,'Visible','off');
+    if amember(cFKflags,'hideFigs')
+        set(fh,'Visible','off');
+    end
     set(fh,'Position',[0 0 w h]);
     % set(fh,'Visible','off');
     cFKaxes.temp = subplot(rowsOfAxes,colsOfAxes,1);
