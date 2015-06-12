@@ -27,15 +27,15 @@ cFKflags    = { '~useLastcFK', '~hideFigs', 'plotPosition' }; % a ~ prepended to
 
 dataToSave  = { 'reducedXs', 'reducedTimes', 'sol', 'numSolitons'}; % Save this data for each dcd file processed
 
-moduleList  = { 'countSolitons' }; % List of optional data processing options. Full list in makeAvailableModules:
-if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleList is not in availableModules' ]); end
+moduleList  = { 'plotOverview','countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
+%if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleList is not in availableModules' ]); end
 
 % This is where the list of files to process is obtained. The list pruned below according to keepPatterns and prunePatterns.
 if ~amember(cFKflags,'useLastcFK') 
     cFKs    = getFileList( paths, cFKpattern );
 end
 
-keepPatterns    = { 'x\.0[1-3].*N[12]00' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'
+keepPatterns    = { '.+' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'
 prunePatterns   = { 'aaaaaaa',  ...
                     'replaceMeWithaPatternToMatchAFileNameForExclusion',  ...
                     '9999999' }; % Files matching these pattern strings will be excluded from processing.

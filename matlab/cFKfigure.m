@@ -7,7 +7,7 @@ function [ fh, cFKaxes ] = cFKfigure( w, h, cFKflags )
     if amember(cFKflags,'hideFigs')
         set(fh,'Visible','off');
     end
-    set(fh,'Position',[0 0 w h]);
+    set(fh,'Position',[10 10 w h]);
     % set(fh,'Visible','off');
     cFKaxes.temp = subplot(rowsOfAxes,colsOfAxes,1);
     cFKaxes.energy = subplot(rowsOfAxes,colsOfAxes,3)

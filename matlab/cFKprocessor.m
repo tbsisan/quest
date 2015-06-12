@@ -8,15 +8,17 @@
 %
 cFKparameters; 
 
-clear savedData moduleData;
+clear savedData moduleData runList;
 savedData(length(cFKpruned)) = struct(); % Initialize empty structure array to hold saved data
 
 startfile=1;
 endfile=length(cFKpruned);
-runList=cell(1,endfile-startfile);
+%runList=cell(1,endfile-startfile);
+%runList{1}='';
+runList{endfile-startfile}='';
 
 if amember(moduleList, 'plotOverview')
-    [ fh, cFKaxes ] = cFKfigure(1000,800)
+    [ fh, cFKaxes ] = cFKfigure(800,600,cFKflags)
 end
 
 for cFKi=startfile:endfile
@@ -28,7 +30,8 @@ for cFKi=startfile:endfile
     cFKfiles    = getcFKfiles( cFKfullFile );
     
     [ cFKsimParams ]    = getcFKsimParams( cFKfiles.log );
-    runList{cFKi}       = cFKsimParams.ensStr;
+    % runList{cFKi}       = sprintf('%.1e',cFKsimParams.ensStr);
+    runList{cFKi}       = sprintf('%.1e',cFKsimParams.kbar);
 
     % 
     % Read in the data in the dcd file
@@ -51,7 +54,7 @@ for cFKi=startfile:endfile
         
     if amember(moduleList, 'plotOverview')
         labelFigs=(cFKi==endfile);
-        cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList, labelFigs)
+        cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList, labelFigs);
     end
 
     if amember(moduleList, 'countSolitons')
@@ -59,14 +62,18 @@ for cFKi=startfile:endfile
         numSolitonInt = round(numSolitons);
         moduleData.solitons.num(cFKi) = numSolitons;
         moduleData.solitons.N(cFKi) = cFKsimParams.N;
+        moduleData.solitons.L(cFKi) = cFKsimParams.L;
     end
 
     if amember(moduleList, 'measureMotion')
         comxs = mean(xs,2);
         totalDist = comxs(end) - comxs(1);
         maxDist = max(comxs) - comxs(1);
+        widths = squeeze(xs(:,end)-xs(:,1));
         moduleData.displacement.total(cFKi)=totalDist;
-        moduleData.displacement.max(cFKi)=maxDist;
+        moduleData.displacement.maxx(cFKi)=maxDist;
+        moduleData.displacement.width(cFKi)=widths;
+        moduleData.displacement.t=ts;
     end
 
     %
@@ -77,7 +84,7 @@ for cFKi=startfile:endfile
         % [ hostAtomsFullXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
         fftSettings = struct( 'smoothingWindow', 15 );
         fftFlags = { 'plotOn' };
-        [ moduleData(cFKi).ffts ] = computeFFT( fftSettings, fftFlags, ts, xs ); 
+        [ moduleData.ffts(cFKi) ] = computeFFT( fftSettings, fftFlags, ts, xs ); 
         % moduleData(1).ffts.hostAtomsZ.smoothPower is the smoothed fft power of hostAtomsZ
         % clear hostAtomsFullXyzs fullTimes hostAtomsX hostAtomsZ;
     end

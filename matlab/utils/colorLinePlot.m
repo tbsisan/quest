@@ -9,12 +9,12 @@ if (explicitColor>0)
     c=getaNiceColor(explicitColor);
 end
 
-if nargin==0
+if length(varargin)==0
     style='-';
-elseif nargin==1
+elseif length(varargin)==1
     style=varargin{1};
 else 
-    warn(['WARNING: TOO MANY ARGS to ' mfilename]);
+    disp(['WARNING: TOO MANY ARGS to ' mfilename]);
 end
 
 if (isempty(x))

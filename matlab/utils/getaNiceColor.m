@@ -1,4 +1,4 @@
-function [ rgb ] = getaNiceColor( varargin )
+function [ rgb ] = getaNiceColor( varargin );
 % Get a color that is different from other colors (generally for plotting).
 % The list of rgb values below is in an order where colors plotted should be 
 % roughly maximally distinct from previous colors for best visibility.
@@ -52,11 +52,14 @@ else
 end
 
 if (n > 32)
-    n=n-32;
-    warn(['COLOR INDEX OUT OF RANGE in ' mfilename]);
+    n=mod(n,31)+1;
+    disp(['COLOR INDEX OUT OF RANGE in ' mfilename]);
+    rgb=(rgbs(n,:)+rgbs(n+1,:))/2;
 elseif (n<1)
     n=1;
-    warn(['COLOR INDEX OUT OF RANGE in ' mfilename]);
+    disp(['COLOR INDEX OUT OF RANGE in ' mfilename]);
+    rgb = rgbs( n,: );
+else
+    rgb = rgbs( n,: );
 end
 
-rgb = rgbs( n,: );

@@ -1,4 +1,4 @@
-function [ a ] = cFKplot( x, y, color, w, lineSpec, subTitle, subx, suby, subLegend, label )
+function cFKplot( x, y, color, w, lineSpec, subTitle, subx, suby, subLegend, label );
 
 colorLinePlot(x,y,color,w,lineSpec);
 if (label)

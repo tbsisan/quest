@@ -14,7 +14,7 @@ lineWidth=1;
 
 for linei=1:length(y)
     yi=y(linei);
-    colorLinePlot(xLimits, [yi yi], explicitColor, lineWidth, spec)
+    colorLinePlot(xLimits, [yi yi], explicitColor, lineWidth, spec);
 end
 
 %Old stuff for annotations.
