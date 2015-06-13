@@ -1,6 +1,10 @@
 function [ cFKparams ] = getcFKsimParams( logfile )
 global angstrom;
 
+[~, fnnodat, ~] = fileparts( logfile );
+fnnolog = regexprep(fnnodat,'^log.','');
+cFKparams.fn = regexprep(fnnolog,'.ascii$','');
+
 [~,hStr]=system(['awk "/ h:/ {print \$2; exit}" <' logfile]);
 cFKparams.h=str2num(hStr);
 
@@ -44,6 +48,8 @@ cFKparams.simSeconds=str2num(totalTime);
 [~,ens]=system(['awk "/ ens:/ {print \$2; exit}" <' logfile]);
 cFKparams.ens=int16(str2num(ens));
 cFKparams.ensStr=['run ' num2str(cFKparams.ens)];
+
+cFKparams.lambda=cFKparams.WL/cFKparams.WLperN;
 
 cFKparams.kbar=(cFKparams.WL/cFKparams.WLperN/2/pi)^2*cFKparams.k/cFKparams.h;
 c=cFKparams;

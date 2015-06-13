@@ -13,9 +13,9 @@ savedData(length(cFKpruned)) = struct(); % Initialize empty structure array to h
 
 startfile=1;
 endfile=length(cFKpruned);
-%runList=cell(1,endfile-startfile);
+runList=cell(1,endfile-startfile+1);
 %runList{1}='';
-runList{endfile-startfile}='';
+%runList{endfile-startfile}='';
 
 if amember(moduleList, 'plotOverview')
     [ fh, cFKaxes ] = cFKfigure(800,600,cFKflags)
@@ -38,19 +38,20 @@ for cFKi=startfile:endfile
     %
     [ Uxs,  ~,   ~,    ~,  ~ ]  = readFortran( cFKfiles.Ux, 1 );
     [  xs, ts, sol, solo, fn ]  = readFortran( cFKfiles.x, 1.228e-10 );
+    [ reduced, reducedIndexes ] = cFKreduceVars( xs, Uxs, ts, cFKsettings );
     
     %
-    % Process the xyz data
+    % Modules
     %
-    [ reducedTimes, timeIndexes ] = reduceTimes( ts, cFKsettings.shortTimeSteps );
-    [ reducedXs ] = xs( timeIndexes, : );
 
-    % TODO: unwrap the z coordinates using the PBCs
-
-    % Sort trajectories on z-coordinate if requested
-    % if {dcdSettings.sortTrajectory} == 'sortz'
-    %     hostAtomsXyzs=sort(hostAtomsXyzs,2); %TODO: this is a temporary space holder, it's pseudocode
-    % end
+    if amember(moduleList,'animate')
+        solsRaw=mod(reduced.xs,cFKsimParams.lambda);
+        sols=unbreakSol(solsRaw,cFKsimParams.lambda);
+        particles=1:size(xs,2);
+        ui=bsxfun(@minus,reduced.xs,particles*cFKsimParams.lambda+reduced.xs(1,1));
+        reduced.temps = reduced.Uxs/1.38e-23/cFKsimParams.N*2;
+        [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, ui, reduced.temps, cFKsimParams, paths );
+    end
         
     if amember(moduleList, 'plotOverview')
         labelFigs=(cFKi==endfile);
@@ -76,10 +77,6 @@ for cFKi=startfile:endfile
         moduleData.displacement.t=ts;
     end
 
-    %
-    % Modules for extra data processing.
-    % External module scripts import data into the moduleData structure
-    %
     if amember(moduleList,'fft')
         % [ hostAtomsFullXyzs, fullTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, 0 ); % 3d (spatial dim, atom, timestep)
         fftSettings = struct( 'smoothingWindow', 15 );

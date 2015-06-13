@@ -1,4 +1,4 @@
-function col=colorLinePlot(x,y,explicitColor,linewidth,varargin)
+function [ plotHandle ]=colorLinePlot(x,y,explicitColor,linewidth,varargin)
 % Plot a line or scatter plot with a nice color.
 % X-axis if empty will default to plotting y versus integers 1:length(y).
 % ExplicitColor is an integer from 1 to 32, or zero if not specifying directly.
@@ -18,8 +18,7 @@ else
 end
 
 if (isempty(x))
-    plot(y,style,'Color',c,'LineWidth',linewidth);
+    plotHandle = plot(y,style,'Color',c,'LineWidth',linewidth);
 else
-    plot(x,y,style,'Color',c,'LineWidth',linewidth);
+    plotHandle = plot(x,y,style,'Color',c,'LineWidth',linewidth);
 end
-col=c;

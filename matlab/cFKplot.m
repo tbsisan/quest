@@ -1,6 +1,6 @@
-function cFKplot( x, y, color, w, lineSpec, subTitle, subx, suby, subLegend, label );
+function [ plotHandle ] = cFKplot( x, y, color, w, lineSpec, subTitle, subx, suby, subLegend, label );
 
-colorLinePlot(x,y,color,w,lineSpec);
+[ plotHandle ] = colorLinePlot(x,y,color,w,lineSpec);
 if (label)
     title(subTitle);
     xlabel(subx, 'FontSize', 14);

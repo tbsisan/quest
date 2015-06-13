@@ -22,12 +22,12 @@ setAvailableModules;
 % A list of possible flags is in flags.m (TODO)
 %
 cFKsettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
-                        'shortTimeSteps', 100 );
+                        'shortTimeSteps', 0,        'cropTimes', [12.7/30.0 13.4/30.0] );
 cFKflags    = { '~useLastcFK', '~hideFigs', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
-dataToSave  = { 'reducedXs', 'reducedTimes', 'sol', 'numSolitons'}; % Save this data for each dcd file processed
+dataToSave  = { 'reduced', 'sol' }; % Save this data for each dcd file processed
 
-moduleList  = { 'plotOverview','countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
+moduleList  = { 'animate', '~plotOverview','~countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
 %if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleList is not in availableModules' ]); end
 
 % This is where the list of files to process is obtained. The list pruned below according to keepPatterns and prunePatterns.

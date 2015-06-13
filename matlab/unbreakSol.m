@@ -15,7 +15,7 @@ for i=1:size(solM,1)
         soldiff=diff(sol);
         numsolbreaks=sum(abs(soldiff)>lambda/2);
     end
-    sol=sol-min(sol);
+    % sol=sol-min(sol);
     solM(i,:)=sol;
 end
 

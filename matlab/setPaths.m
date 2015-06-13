@@ -8,5 +8,6 @@ paths.projectStor = [ paths.storage '/' paths.projectName ];
 paths.remoteStor  = [ 'tbs246@quest.it.northwestern.edu:' paths.projectStor ];
 paths.remoteStor  = [ ];
 paths.dcdPath     = [ paths.projectStor '/namdState' ];
+paths.movieStor   = [ paths.projectStor '/movies' ];
 addpath(genpath([paths.home paths.scriptPath]));
 paths
