@@ -39,7 +39,7 @@ for dcdi=startfile:endfile
     %
     % Process the xyz data
     %
-    [ hostAtomsXyzs, reducedTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, dcdSettings.shortTimeSteps ); % 3d (spatial dim, atom, timestep)
+    [ hostAtomsXyzs, reducedTimes ] = getHostAtomsTrajsAndReducet( xyzs, timeParams, atomsPerFluidMol, dcdSettings.sliceTimes ); % 3d (spatial dim, atom, timestep)
     [ oneAtomXyzs ] = reduceToSingleTrajectory( hostAtomsXyzs, dcdSettings.oneAtomStrategy );
 
     % TODO: unwrap the z coordinates using the PBCs

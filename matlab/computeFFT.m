@@ -42,7 +42,7 @@ for datai=1:numDataArrays
     powern=2*abs(Y(end:-1:NFFT/2+1));
     powern(end+1)=0;
     data.(dataName).power=(power+powern)/2;
-    [sgP,~] = savitzy( 2, settings.smoothingWindow, data.(dataName).power, 1 );
+    [sgP,~] = savitzyGolaySmoothing( 2, settings.smoothingWindow, data.(dataName).power, 1 );
     sgP(end+1:fftLength)=0;
     data.(dataName).name=dataName; % TODO: This is probably not necessary any more
     data.(dataName).smoothPower=sgP;
@@ -51,9 +51,6 @@ for datai=1:numDataArrays
         display(sprintf('\t\tPlotting data: freq size: %i, power size: %i, smooth power size: %i',fftLength,length(data.(dataName).power),length(data.(dataName).smoothPower)));
         plot(   data.(dataName).freqs/1000, data.(dataName).power,'b', ...
                 data.(dataName).freqs/1000, data.(dataName).smoothPower,'g');
-        xlabel('freq (1/ps)');
-        ylabel('power');
-        legend('raw data','smoothed data');
-        title(dataName);
+        labelFig(dataName, 'freq (1/ps)', 'power', 'raw data','smoothed data');
     end
 end

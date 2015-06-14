@@ -43,8 +43,7 @@ for dcdi=1:length(dcdPruned)
 	plot(bonds_v_time);
     horplot(1.53,'--');
     [ ~, bondName, ~ ] = fileparts( bondDataFullFile );
-	title(strrep(bondName,'_','\_'));
-    ylabel('bond lengths')
+    labelFig(bondName,'','bond lengths',{});
 	subplot(3,1,2);
 	plot(angles_v_time);
     horplot(113.6,'--'); horplot(115.0,'--');
@@ -59,9 +58,7 @@ for dcdi=1:length(dcdPruned)
     figure;
     hist(cooledRs(:),20);
     [ ~, rName, ~ ] = fileparts( rDataFullFile );
-	title(strrep(rName,'_','\_'));
-    xlabel('R (angstrom)');
-    ylabel('Histogram of radial positions of polymer atoms');
+    labelFig(rName,['R (' angstrom ')'], 'Histogram of radial positions of polymer atoms',{});
 
     % Plot dihedral angle m+1 versus dihedral angle m
     figure;
@@ -73,9 +70,7 @@ for dcdi=1:length(dcdPruned)
     dihedralData2=dihedralData(shortTimeArray,2:end);
     plot(dihedralData1,dihedralData2,'o');
     [ ~, dihedralName, ~ ] = fileparts( dihedralDataFullFile );
-	title(strrep(dihedralName,'_','\_'));
-    xlabel('dihedral angle i');
-    ylabel('dihedral angle i+1');
+    labelFig(dihedralName,'dihedral angle i','dihedral angle i+1',{});
     horplot(180,'--');
     vertplot(180,'--');
 

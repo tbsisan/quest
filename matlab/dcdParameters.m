@@ -13,7 +13,7 @@ setAvailableModules;
 % A list of possible flags is in flags.m (TODO)
 %
 dcdSettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
-                        'shortTimeSteps', 100 );
+                        'sliceTimes', 100 );
 dcdFlags    =       {   '~useLastDcd', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
 dataToSave  = { 'oneAtomZs' }; % Save this data for each dcd file processed

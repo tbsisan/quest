@@ -1,8 +1,8 @@
-function [ fort, ts, sol, solo, fullFile ] = readFortran( dataFile, lambda )
+function [ var, ts, ui, fullFile ] = readFortran( dataFile, lambda )
 % Read in Fortran binary data written with unformatted output type.
 % Column 1 contains the time step, the rest of columns correspond to each particle.  
 
-[ projDir,~,~ ] = fileparts(dataFile);
+[ projDir, ~, ~ ] = fileparts(dataFile);
 fileInfo = dir(dataFile);
 fullFile = [projDir '/' fileInfo(1).name];
 disp(sprintf('about to open %s',fullFile));
@@ -28,10 +28,17 @@ ts=fort(1,:);
 % variable ends with two int32 record length indicators
 fort=fort(1:end-2,:); % Throw out the 2 int32's enclosing each record
 fort=fort(2:end,:); %strip off time data
-fort=fort'; % return so each row is a time step
+var=fort'; % return so each row is a time step
 
-solSteps = round(linspace(1,size(fort,1),100));
-solo=mod(fort(solSteps,:),lambda);
-sol=unbreakSol(solo,lambda);
+if (lambda>0)
+    ui=solitonTransform(var,lambda);
+else
+    ui=0;
+end
+
+% Old way
+%solo=mod(fort(solSteps,:),lambda);
+%sol=unbreakSol(solo,lambda);
+
 end
 

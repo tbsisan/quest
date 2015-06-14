@@ -22,7 +22,7 @@ setAvailableModules;
 % A list of possible flags is in flags.m (TODO)
 %
 cFKsettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
-                        'shortTimeSteps', 0,        'cropTimes', [12.7/30.0 13.4/30.0] );
+                        'sliceTimes', 0,        'cropTimes', [12.7/30.0 13.4/30.0] );
 cFKflags    = { '~useLastcFK', '~hideFigs', 'plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
 dataToSave  = { 'reduced', 'sol' }; % Save this data for each dcd file processed
@@ -32,7 +32,7 @@ moduleList  = { 'animate', '~plotOverview','~countSolitons','~measureMotion' }; 
 
 % This is where the list of files to process is obtained. The list pruned below according to keepPatterns and prunePatterns.
 if ~amember(cFKflags,'useLastcFK') 
-    cFKs    = getFileList( paths, cFKpattern );
+    cFKs    = filesMatchingPattern( paths, cFKpattern );
 end
 
 keepPatterns    = { '.+' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'

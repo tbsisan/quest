@@ -36,26 +36,23 @@ for cFKi=startfile:endfile
     % 
     % Read in the data in the dcd file
     %
-    [ Uxs,  ~,   ~,    ~,  ~ ]  = readFortran( cFKfiles.Ux, 1 );
-    [  xs, ts, sol, solo, fn ]  = readFortran( cFKfiles.x, 1.228e-10 );
-    [ reduced, reducedIndexes ] = cFKreduceVars( xs, Uxs, ts, cFKsettings );
+    [ Uxs,  ~,  ~,  ~ ]  = readFortran( cFKfiles.Ux, 0 );
+    [  xs, ts, ui, fn ]  = readFortran( cFKfiles.x, cFKsimParams.lambda );
+    [ reduced, reducedIndexes ] = cFKreduceVars( xs, ui, Uxs, ts, cFKsettings );
     
     %
     % Modules
     %
 
     if amember(moduleList,'animate')
-        solsRaw=mod(reduced.xs,cFKsimParams.lambda);
-        sols=unbreakSol(solsRaw,cFKsimParams.lambda);
         particles=1:size(xs,2);
-        ui=bsxfun(@minus,reduced.xs,particles*cFKsimParams.lambda+reduced.xs(1,1));
         reduced.temps = reduced.Uxs/1.38e-23/cFKsimParams.N*2;
-        [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, ui, reduced.temps, cFKsimParams, paths );
+        [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, reduced.ui, reduced.temps, cFKsimParams, paths );
     end
         
     if amember(moduleList, 'plotOverview')
         labelFigs=(cFKi==endfile);
-        cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList, labelFigs);
+        cFKplotOverview(ts, xs, Uxs, ui, cFKsimParams, cFKaxes, cFKi, runList, labelFigs);
     end
 
     if amember(moduleList, 'countSolitons')

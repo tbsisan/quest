@@ -26,14 +26,13 @@ if isfield(settings,'plot')
 
     figure;
     plot(r.times(1:end),r.topCount(1:end)+r.btmCount(1:end));
-    gussy(settings.plot,tlabel,'Total Water in Reservoirs');
+    labelFig(settings.plot,tlabel,'Total Water in Reservoirs',{});
 
     figure;
     plot(r.times(1:end),r.topCount(1:end));
     hold on;
     plot(r.times(1:end),r.btmCount(1:end),'r');
-    gussy(settings.plot, tlabel, 'Water in top and bottom reservoirs');
-    legend('top','bottom');
+    labelFig(settings.plot, tlabel, 'Water in top and bottom reservoirs',{'top','bottom'});
 
     figure;
     netQ =(r.topCount-r.btmCount)/2;
@@ -49,14 +48,14 @@ if isfield(settings,'plot')
     [ diffNetQsm, ~ ] = savitzyGolaySmoothing( 2, settings.smoothingWindow, diff(netQsm), 1 );
     diffNetQsm(end:length(r.times))=0;
     plot(r.times,netQsm,'r');
-    gussy(settings.plot, tlabel, 'Net Flow Estimate');
+    labelFig(settings.plot, tlabel, 'Net Flow Estimate',{});
     legend('avg diff of top and btm reservoirs',sprintf('smoothed and used for passage \nby distance a: Q=%3.2f/ns',flux));
 
     figure;
     plot(r.times,QdotSm);
     hold on;
     plot(r.times,diffNetQsm,'r');
-    gussy(settings.plot, tlabel, 'Derivative of net Flow');
+    labelFig(settings.plot, tlabel, 'Derivative of net Flow',{});
     legend( 'savitzy Golay derivative','diff of sG' );
 
     figure;
@@ -83,7 +82,7 @@ if isfield(settings,'plot')
     plot(r.times,Qrate,'r');
     meanQrate = mean( Qrate );
     horplot( meanQrate, 'g--' );
-    gussy(settings.plot, tlabel, 'chain hops per ns');
+    labelFig(settings.plot, tlabel, 'chain hops per ns',{});
     legend( sprintf('smoothing Window: %i',settings.smoothingWindow), 'raw Qrate', sprintf('average when excluding \nimmediate backflow and \nrequire flow at both ends: %3.2f/ns',meanQrate) );
 end
 
