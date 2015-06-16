@@ -18,15 +18,17 @@ set_parameters() {
     # Compiled into executables
     Nlist=$( seq 56 50 56 ); export Nlist
     Nlist="56 112 225 450 900";
-    L=250; export Nlist
-    eqtimes="8e6"; export eqtimes
+    Nlist="300";
+    L=350; export Nlist
+    eqtimes="5e6"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 500 100 500 ); export startTlist
 
     # Read from paramList.in file
-    enslist=$( seq 0 1 0 ); export enslist
+    enslist=$( seq 0 1 9 ); export enslist
     klist="20 25 30 40 50 60 80 120"; export klist
     klist="1 2 4 8 16 32 64 128"; export klist
+    klist="30"; export klist
     Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
     Flist="0"; export Flist
     Flist=($Flist);
@@ -69,7 +71,7 @@ launch_jobs() {
         questruncmd=questbatches/run.$customRun.sh
         sed "s/ifort.out/$fortexe/" <questbatch.sh >$questruncmd
         chmod 755 $questruncmd
-        exe msub -N r${myrand}eq${eqti}Tst${Ti}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=08:00:00 -joe -V -o seeout.log $questruncmd
+        exe msub -N r${myrand}eq${eqti}Tst${Ti}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:30:00 -joe -V -o seeout.log $questruncmd
     else
         exe ./questbatches/$fortexe
     fi

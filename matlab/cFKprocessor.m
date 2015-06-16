@@ -18,7 +18,10 @@ runList=cell(1,endfile-startfile+1);
 %runList{endfile-startfile}='';
 
 if amember(moduleList, 'plotOverview')
-    [ fh, cFKaxes ] = cFKfigure(800,600,cFKflags)
+    [ fh, cFKoverviewAxes ] = cFKoverviewFigure(900,700,cFKflags)
+end
+if amember(moduleList, 'energyVsTime')
+    [ fh, cFKenergyAxes ] = cFKenergyFigure(900,700,cFKflags)
 end
 
 for cFKi=startfile:endfile
@@ -30,8 +33,9 @@ for cFKi=startfile:endfile
     cFKfiles    = getcFKfiles( cFKfullFile );
     
     [ cFKsimParams ]    = getcFKsimParams( cFKfiles.log );
+    runList{cFKi}       = cFKsimParams.ensStr;
+    % runList{cFKi}       = sprintf('%.1e',cFKsimParams.kbar);
     % runList{cFKi}       = sprintf('%.1e',cFKsimParams.ensStr);
-    runList{cFKi}       = sprintf('%.1e',cFKsimParams.kbar);
 
     % 
     % Read in the data in the dcd file
@@ -43,20 +47,26 @@ for cFKi=startfile:endfile
     %
     % Modules
     %
+    if amember(moduleList,'energyVsTime')
+        labelFigs=(cFKi==endfile);
+        E_Ks = reduced.Uxs/1.38e-23/cFKsimParams.N*2;
+        hE = cFKsimParams.h * (cos(reduced.xs*2*pi/(cFKsimParams.lambda))+1) / 1.38e-23 / cFKsimParams.N *2;
+        numSolitons = (reduced.ui(:,end)-reduced.ui(:,1))/(cFKsimParams.lambda);
+        cFKplotEnergies( reduced.ts, E_Ks, hE, numSolitons, cFKenergyAxes, cFKi, cFKsimParams, runList, labelFigs );
+    end
 
     if amember(moduleList,'animate')
-        particles=1:size(xs,2);
-        reduced.temps = reduced.Uxs/1.38e-23/cFKsimParams.N*2;
-        [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, reduced.ui, reduced.temps, cFKsimParams, paths );
+        reduced.temps = reduced.Uxs(:,1)/1.38e-23/cFKsimParams.N*2;
+        [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, reduced.ui, reduced.temps, cFKsimParams, cFKflags, paths );
     end
         
     if amember(moduleList, 'plotOverview')
         labelFigs=(cFKi==endfile);
-        cFKplotOverview(ts, xs, Uxs, ui, cFKsimParams, cFKaxes, cFKi, runList, labelFigs);
+        cFKplotOverview(ts, xs, Uxs, ui, cFKsimParams, cFKoverviewAxes, cFKi, runList, labelFigs);
     end
 
     if amember(moduleList, 'countSolitons')
-        numSolitons = (sol(end,end)-sol(end,1))/(cFKsimParams.WL/cFKsimParams.WLperN);
+        numSolitons = (ui(end,end)-ui(end,1))/(cFKsimParams.lambda);
         numSolitonInt = round(numSolitons);
         moduleData.solitons.num(cFKi) = numSolitons;
         moduleData.solitons.N(cFKi) = cFKsimParams.N;

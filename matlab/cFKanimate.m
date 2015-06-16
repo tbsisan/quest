@@ -1,4 +1,4 @@
-function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, paths )
+function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, cFKflags, paths )
     global angstrom;
     blue = 1; thin = 1;
     an.title = sprintf('u_i during a portion of %.1f ns cFK polymer sim',cFKsimParams.simSeconds*1e9);
@@ -8,6 +8,8 @@ function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, p
     an.labelflag = 1;
     sols = sols *1e10;
     particles = 1:size(sols,2);
+    [ fh ] = launchFigure( cFKflags );
+    set(fh,'Position',[10 10 800 600]);
     axis([1 particles(end) min(sols(:)) max(sols(:,end))]);
     axis manual; hold all;
     [ plotHandle ] = cFKplot( particles, sols(1,:), blue, thin, '.', an.title, an.xlabel, an.ylabel, an.legend, an.labelflag );
@@ -32,10 +34,11 @@ function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, p
 
                                     } );
         drawnow;
-        % pause(0.1);
+        pause(0.1);
         cFKmovie(t) = getframe(gca,rect);
         writeVideo(writerObj,cFKmovie(t));
     end
     close(writerObj);
+    close(fh);
 
 end

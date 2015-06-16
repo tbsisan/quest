@@ -4,7 +4,7 @@ function [SG0, SG1] = savitzyGolaySmoothing(N,W,y,dx)
 % N = 2;                 % Order of polynomial fit
 % W = 15;                % Window length
 % the first (W-1)/2 returned will be zero
-% the returned array does not include the last (W+1)/2 points
+% the returned array does not include estimates for the last (W+1)/2 points, instead using the last calculated to fill the array
 % if fitting a triplicate, you want datapoints (length(y)+1):(2*length(y))
 [b,g] = sgolay(N,W);   % Calculate S-G coefficients
 HalfWin  = ((W+1)/2) -1;
@@ -15,5 +15,7 @@ for n = (W+1)/2:length(y)-(W+1)/2,
   % 1st differential
   SG1(n) =   dot(g(:,2), y(n - HalfWin: n + HalfWin));
 end
+SG0(end+1:length(y))=SG0(end);
+SG1(end+1:length(y))=SG1(end);
 % dx=1; % x axis data sep
 SG1=SG1/dx;

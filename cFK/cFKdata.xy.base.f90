@@ -18,6 +18,7 @@ REAL(KIND=BR), PARAMETER :: kb=1.3806488e-23
 INTEGER, PARAMETER :: N=50, Nsim=50, channelWL=150
 REAL(KIND=BR), PARAMETER :: WL=2.456e-10 !the wavelength between waters in the units used
 REAL(KIND=BR), PARAMETER :: WLperN=2.0 !should be integer but math uses reals
+!REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: L=WL*real(channelWL,KIND=BR), Lc=a*(N-1)
 REAL(KIND=BR), PARAMETER :: ax=a!L/real(Nsim,KIND=BR)!*REAL(channelWL)/REAL(Nsim)
@@ -28,7 +29,7 @@ REAL(KIND=BR), PARAMETER :: Ly=WL
 !REAL(KIND=BR), PARAMETER :: Lsim=2.0_BR*pi*real(WLsim,KIND=BR), LcSim=a*(Nsim-1)
 REAL(KIND=BR), PARAMETER :: eps = 10.0_BR**INT(-PRECISION(L)+5.0_BR)
 
-REAL, PARAMETER :: T=30.0e-9, dt=2.0*1.0000e-15
+REAL, PARAMETER :: T=50.0e-9, dt=2.0*1.0000e-15
 INTEGER, PARAMETER :: steps=T/dt
 INTEGER, PARAMETER :: Gwait=1e0
 INTEGER, PARAMETER :: coolDownSteps=0, Tstart=0

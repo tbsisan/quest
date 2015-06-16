@@ -23,6 +23,7 @@ program cFK
    CHARACTER(LEN=4) :: runNumberChar
    CHARACTER(LEN=6) :: formatReal
    CHARACTER(LEN=8) :: kChar,hChar,Gchar,Tchar,etaChar,runtimechar
+   CHARACTER(LEN=8) :: axChar
    CHARACTER(LEN=10) :: startClockChar
    REAL(KIND=BR), DIMENSION(size(Temp)) :: kbT, thermalStrength
    REAL(KIND=BR) :: scaledThermal
@@ -271,18 +272,19 @@ END SUBROUTINE logParams
     CHARACTER(LEN=900) :: runName
     CHARACTER(LEN=25) :: arg1
     write(runNumberChar,'(I0.4)') run
-    write(kChar,'(E8.2)') k(run)
-    write(hChar,'(E8.2)') h(run)
-    write(Tchar,'(E8.2)') Temp(run)
-    write(etaChar,'(E8.2)') eta(run)
-    write(Gchar,'(E8.2)') G(run)
-    write(runtimechar,'(E8.2)') T
+    write(kChar,'(ES8.2)') k(run)
+    write(hChar,'(ES8.2)') h(run)
+    write(Tchar,'(ES8.2)') Temp(run)
+    write(etaChar,'(ES8.2)') eta(run)
+    write(Gchar,'(ES8.2)') G(run)
+    write(runtimechar,'(ES8.2)') T
+    write(axChar,'(ES8.2)') ax/WL*WLperN 
     write(eqtChar,'(I0.1)') int(real(coolDownSteps)/1.0e6)
     write(startTchar,'(I0.3)') Tstart
     write(ensChar,'(I0.2)') INT(ens(run))
     
     runName=ensChar//'_eqt'//eqtChar//'_Ti'//startTchar//'_L'//trim(adjustl(LinCharForm))//&
-            '_N'//trim(adjustl(NinCharForm))//'_k'//kChar//'_h'//hChar//'_T'//Tchar//&
+            '_N'//trim(adjustl(NinCharForm))//'_a'//axChar//'_k'//kChar//'_h'//hChar//'_T'//Tchar//&
             '_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
 
     CALL getarg(1, arg1)

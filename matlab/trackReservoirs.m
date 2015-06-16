@@ -40,13 +40,14 @@ if isfield(settings,'plot')
     plot(r.times,netQ);
     hold on;
     [ netQsm, QdotSm ] = savitzyGolaySmoothing( 2, settings.smoothingWindow, netQ, 1 );
-    netQsm(end+1:length(r.times))=netQsm(end);
+    disp('WARNING UNTESTED CHANGES DUE TO CHANGES in savitzyGolaySmoothing return value');
+    %netQsm(end+1:length(r.times))=netQsm(end);
     integerFluxEventsr=sum(abs(diff(round(netQsm))))
     integerFluxEventsc=sum(abs(diff(ceil(netQsm))))
     flux=(integerFluxEventsr+integerFluxEventsc)/r.times(end)/2
-    QdotSm(end+1:length(r.times))=0;
+    %QdotSm(end+1:length(r.times))=0;
     [ diffNetQsm, ~ ] = savitzyGolaySmoothing( 2, settings.smoothingWindow, diff(netQsm), 1 );
-    diffNetQsm(end:length(r.times))=0;
+    %diffNetQsm(end:length(r.times))=0;
     plot(r.times,netQsm,'r');
     labelFig(settings.plot, tlabel, 'Net Flow Estimate',{});
     legend('avg diff of top and btm reservoirs',sprintf('smoothed and used for passage \nby distance a: Q=%3.2f/ns',flux));
@@ -76,7 +77,7 @@ if isfield(settings,'plot')
     Qrate = abs( Qrate );
     Qrate(end+1)=Qrate(end);
     [ QrateSm, ~ ] = savitzyGolaySmoothing( 2, settings.smoothingWindow, Qrate, 1 );
-    QrateSm(end+1:length(r.times))=0;
+    % QrateSm(end+1:length(r.times))=0;
     plot(r.times,QrateSm);
     hold on;
     plot(r.times,Qrate,'r');
