@@ -15,10 +15,30 @@ function cFKplotEnergies( ts, E_Ks, hE, numSolitons, cFKaxes, cFKi, cFKsimParams
     cFKplot(ts*1e9, hEsmooth, cFKi, 1, '-', '', '', 'Substrate (K)', {}, labelFigs);
     axes(cFKaxes.total);
     hold on;
-    cFKplot(ts*1e9, sum(E_Ks,2), cFKi, 1, '-', '', '', 'Total (K)', {}, labelFigs);
+    TE=E_Ks(:,1)+E_Ks(:,2)+sum(hE,2);
+    cFKplot(ts*1e9, TE, cFKi, 1, '-', '', '', 'Total (K)', {}, labelFigs);
     axes(cFKaxes.solitons);
     hold on;
     cFKplot(ts*1e9, numSolitons, cFKi, 1, '-', '', 'time (ns)', '# solitons', {}, labelFigs);
-    axis tight;
-
+    tighty(cFKaxes.solitons);
+    if (labelFigs)
+        axes(cFKaxes.kinetic);
+        text(1.05,0.2,sprintf(cFKsimParams.allStr),'Units','normalized'); 
+    end
 end
+
+function tightx(ax)
+    axes(ax)
+    loose = axis;
+    axis tight;
+    tight = axis;
+    axis([ tight(1) tight(2) loose(3) loose(4) ]);
+end
+function tighty(ax)
+    axes(ax)
+    loose = axis;
+    axis tight;
+    tight = axis;
+    axis([ loose(1) loose(2) tight(3) tight(4) ]);
+end
+    
