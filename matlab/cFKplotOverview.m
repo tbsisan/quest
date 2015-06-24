@@ -13,7 +13,7 @@ function cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList,
     horizontalLine(Eratio(end),'--', cFKi); 
 
     axes(cFKaxes.x1);hold on;
-    cFKplot(ts*1e9, xs(:,1)*1e10, cFKi, 1, '', 'Position of particle 1', '', ['x (' angstrom ')'], '', labelFigs);
+    cFKplot(ts*1e9, xs(:,end)*1e10, cFKi, 1, '', 'Position of particle 1', '', ['x (' angstrom ')'], '', labelFigs);
 
     axes(cFKaxes.chainwidth); hold on;
     cFKplot(ts*1e9, (xs(:,end)-xs(:,1))*1e10, cFKi, 1, ':', 'Chain Length','time (ns)', ['length (' angstrom ')'], '', labelFigs);

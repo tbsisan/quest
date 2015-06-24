@@ -31,6 +31,7 @@ program cFK
    INTEGER :: runsRan=0
    REAL(KIND=BR), DIMENSION(N) :: eigen
    REAL(KIND=BR) :: sigma, soundSpeed
+   REAL(KIND=BR) :: trapCenter=0
 
    namelist /cFKconstants/ ens,k,eta,h,Temp,bgH,G,M
    namelist /xInit/ eigen
@@ -171,6 +172,11 @@ SWEEP: do run=1,size(ens)
   !
   ! State Initialization
   !
+        scaledThermal=thermalStrength(run)
+        sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
+        scaledThermal=currentTemp(tstep,coolDownSteps,thermalStrength(run),Temp(run))
+        sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
+
         Q=0
         R=0
         lastwrap=N
@@ -257,6 +263,9 @@ SUBROUTINE logParams()
         write(999,*) 'iter:',iter
         soundSpeed=sqrt(k(run)*oneOverM(run))*WL
         write(999,*) 'sound Speed (m/s):',soundSpeed
+        write(999,*) 'positioningOn',positioningOn
+        write(999,*) 'positioningOff',positioningOff
+        write(999,*) 'POSITIONING',POSITIONING
         write(999,*) 'INITRANDOMX:', INITRANDOMX
         write(999,*) 'STOCHASTICS:', STOCHASTICS
         write(999,*) 'REPEATABLE:', REPEATABLE
@@ -406,15 +415,16 @@ END SUBROUTINE logParams
       IF (CHAINBC .ne. CATERPILLARCHAIN) THEN
         particleSep=L/REAL(N,KIND=BR)
       ELSE
-        particleSep=a
+        !particleSep=a
+        particleSep=WL/WLperN
       END IF
-      x=x*particleSep+particleSep/8.0
+      x=x*particleSep
       y=1.0_BR
       vy=0.0_BR
       vx=0.0_BR
       write(999,*) 'starting xs: from within initState() before random',x(1:9)
       write(999,*) 'starting vxs:fromwithininitState() before random',vx(1:10)
-      vMean=sqrt(kb*300.0*oneOverM(run))
+      vMean=sqrt(kb*Tstart*oneOverM(run))
       SELECT CASE(ICS)
          CASE (UNIFORMLINE)
             ! TBS: the below was +(L-chainL)/2.0
@@ -608,6 +618,16 @@ END SUBROUTINE logParams
       END SELECT
 
       IF (COORDBC .eq. CHANNELCOORD) xTotal=xTotal+dx
+
+      IF (tstep .eq. positioningOn) trapCenter = x(N)
+      IF (tstep .eq. positioningOn) write(999,*) 'trapCenter:',trapCenter
+
+      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff) THEN
+        SELECT CASE (POSITIONING)
+          CASE (LASTTRAP)
+            trapCenter = trapCenter + positioningdx
+        END SELECT
+      ENDIF
 
       IF (INTERACTIONMODEL .eq. RIGIDBARS) THEN
          ! I don't need the below anymore because now every particle is guaranteed to move the same amount
@@ -937,7 +957,7 @@ END SUBROUTINE logParams
       REAL(KIND=BR), INTENT(IN), DIMENSION(NSim) :: rSub
       REAL(KIND=BR), INTENT(IN), OPTIONAL, DIMENSION(NSim) :: vSub
       REAL(KIND=BR), INTENT(IN), OPTIONAL, DIMENSION(N) :: Ft
-      REAL(KIND=BR) :: phaseFactor
+      REAL(KIND=BR) :: phaseFactor, Ftrap
       REAL(KIND=BR), DIMENSION(NSim) :: cFKa
       REAL(KIND=BR), DIMENSION(NSim) :: Ftube, Fwash, Fbg=0.0_BR, Ffric, FG=0_BR
       REAL(KIND=BR), DIMENSION(NSim) :: yPhase,xPhase
@@ -1013,6 +1033,16 @@ END SUBROUTINE logParams
             !end if
             cFKa = oneOverM(run)*(Fnear + Fwash + Ffric + FtSub + Fbg + Ftube + FG)
       END SELECT
+
+      IF (tstep .gt. positioningOn .and. (tstep .lt. positioningOff .or. KEEPON) ) THEN
+        SELECT CASE (POSITIONING)
+            CASE (LASTTRAP)
+                Ftrap = -kTrap * (x(N)-trapCenter)
+                cFKa(N) = cFKa(N) + oneOverM(run) * Ftrap
+        END SELECT
+      END IF
+      IF (tstep .eq. positioningOn+1) write(999,*) 'trapCenter:',trapCenter
+      IF (tstep .eq. positioningOn+1) write(999,*) 'Ftrap:',Ftrap
 
       IF (outputForces) THEN
          write(999,*) 'tstep:',tstep

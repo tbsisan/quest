@@ -19,7 +19,8 @@ INTEGER, PARAMETER :: N=50, Nsim=50, channelWL=150
 REAL(KIND=BR), PARAMETER :: WL=2.456e-10 !the wavelength between waters in the units used
 REAL(KIND=BR), PARAMETER :: WLperN=2.0 !should be integer but math uses reals
 !REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
-REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
+REAL(KIND=BR), PARAMETER :: aPercent=1.05
+REAL(KIND=BR), PARAMETER :: a=aPercent*WL/WLperN!*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: L=WL*real(channelWL,KIND=BR), Lc=a*(N-1)
 REAL(KIND=BR), PARAMETER :: ax=a!L/real(Nsim,KIND=BR)!*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: ay=WL/2.0!*REAL(channelWL)/REAL(Nsim)
@@ -29,10 +30,14 @@ REAL(KIND=BR), PARAMETER :: Ly=WL
 !REAL(KIND=BR), PARAMETER :: Lsim=2.0_BR*pi*real(WLsim,KIND=BR), LcSim=a*(Nsim-1)
 REAL(KIND=BR), PARAMETER :: eps = 10.0_BR**INT(-PRECISION(L)+5.0_BR)
 
-REAL, PARAMETER :: T=50.0e-9, dt=2.0*1.0000e-15
+REAL, PARAMETER :: T=5.0e-9, dt=2.0*1.0000e-15
 INTEGER, PARAMETER :: steps=T/dt
 INTEGER, PARAMETER :: Gwait=1e0
 INTEGER, PARAMETER :: coolDownSteps=0, Tstart=0
+INTEGER, PARAMETER :: positioningOn=1e6, positioningDuration=1e6
+INTEGER, PARAMETER :: positioningOff=positioningOn+positioningDuration
+REAL(KIND=BR), PARAMETER :: positioningMove=WL/WLperN, positioningdx = positioningMove /REAL(positioningDuration)
+REAL(KIND=BR), PARAMETER :: kTrap=0
 
 LOGICAL :: D2 = .false. !TWO DIMENSIONS?
 REAL(KIND=BR), DIMENSION(NSim) :: x,y,vx,vy,xTotal,a_old
@@ -79,6 +84,7 @@ INTEGER, PARAMETER :: BUILTIN=1, KISS=2, TWIST=3, SHIFT=4, RAN2=5, RAN3=6, COMB8
 CHARACTER(LEN=40), DIMENSION(8) :: URNGstring = [character(len=40) :: &
         "Builtin", "KISS", "Mersenne Twister", "3-shift shift-register", "Knuth Ran2 recursive+shuffle", &
         "Knuth ran3 subtractive lagged fib", "R4_UNI L'Ecuyer", "Multiplicative Lagged Fib"]
+INTEGER, PARAMETER :: NOPOS=0, FIRSTPOS=1, LASTPOS=2, FIRSTTRAP=3, LASTTRAP=4
 !
 !  The Control Parameters are Set to the Following:
 !
@@ -91,6 +97,7 @@ INTEGER, PARAMETER :: INTEGRATOR = EULERM
 INTEGER, PARAMETER :: REPLACEMENTMETHOD = IDENTICALREPLACEMENT
 ! need to add sanity checks for boundary forces (channelBCs?)
 INTEGER, PARAMETER :: BGTYPE = NOBG
+INTEGER, PARAMETER :: POSITIONING = LASTTRAP
 
 
 ! Random Number Generators
@@ -99,6 +106,7 @@ INTEGER, PARAMETER :: URNG = KISS
 
 INTEGER, PARAMETER :: printingWidthReals=12
 
+LOGICAL, PARAMETER :: KEEPON=.true.
 LOGICAL, PARAMETER :: INITRANDOMX=.false., INITRANDOMY=.false.
 LOGICAL, PARAMETER :: STOCHASTICS=.true., REPEATABLE=.false.
 LOGICAL, PARAMETER :: HARDCOLLISIONS=.false., COLLISIONREPORTING=.false., CHECKBLOWTHROUGH=.false.

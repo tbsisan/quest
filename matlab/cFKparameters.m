@@ -2,6 +2,7 @@
 global angstrom isOctave;
 isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
 angstrom=char(197);
+if (isOctave) angstrom='AA'; end
 %angstrom='{\AA}'; % Older versions of matlab would need something like this.
 
 %
@@ -27,7 +28,7 @@ cFKflags    = { '~useLastcFK', '~hideFigs', '~plotPosition' }; % a ~ prepended t
 
 dataToSave  = { 'reduced', 'ui', 'cFKsimParams' }; % Save this data for each dcd file processed
 
-moduleList  = { 'energyVsTime','~animate', 'plotOverview','~countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
+moduleList  = { '~energyVsTime','~animate', 'plotOverview','~countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
 %if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleList is not in availableModules' ]); end
 
 % This is where the list of files to process is obtained. The list pruned below according to keepPatterns and prunePatterns.

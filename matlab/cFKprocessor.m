@@ -107,8 +107,9 @@ for cFKi=startfile:endfile
     
 end
 
-if (isOctave)
+if (0) %isOctave)
     % shrink fonts
+    pause(2);
     FS = findall(fh,'-property','FontSize');
     for i=1:length(FS)
         fsi=get(FS(i),'FontSize');
