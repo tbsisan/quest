@@ -5,6 +5,7 @@ IMPLICIT NONE
 INTEGER :: mod, floor
 SAVE
 CHARACTER(LEN=*), PARAMETER :: projDir='/projects/p20200/cFK/polymer'
+CHARACTER(LEN=*), PARAMETER :: runID=''
 REAL(KIND=BR), PARAMETER :: zero=0.0_BR
 REAL(KIND=BR), PARAMETER :: onehalf=0.5_BR, one=1.0_BR, threehalf=1.5_BR, two=2.0_BR
 REAL(KIND=BR), PARAMETER :: onethird =0.33333333333333333333333333333333_BR 
@@ -17,9 +18,10 @@ REAL(KIND=BR), PARAMETER :: iota =1.0e-80_BR
 REAL(KIND=BR), PARAMETER :: kb=1.3806488e-23
 INTEGER, PARAMETER :: N=50, Nsim=50, channelWL=150
 REAL(KIND=BR), PARAMETER :: WL=2.456e-10 !the wavelength between waters in the units used
-REAL(KIND=BR), PARAMETER :: WLperN=2.0 !should be integer but math uses reals
+REAL(KIND=BR), PARAMETER :: WLperN=2.0 !should be integer but use real for easier math
 !REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
-REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
+REAL, PARAMETER :: aPercent=0
+REAL(KIND=BR), PARAMETER :: a=aPercent*WL/WLperN!*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: L=WL*real(channelWL,KIND=BR), Lc=a*(N-1)
 REAL(KIND=BR), PARAMETER :: ax=a!L/real(Nsim,KIND=BR)!*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: ay=WL/2.0!*REAL(channelWL)/REAL(Nsim)
@@ -29,10 +31,15 @@ REAL(KIND=BR), PARAMETER :: Ly=WL
 !REAL(KIND=BR), PARAMETER :: Lsim=2.0_BR*pi*real(WLsim,KIND=BR), LcSim=a*(Nsim-1)
 REAL(KIND=BR), PARAMETER :: eps = 10.0_BR**INT(-PRECISION(L)+5.0_BR)
 
-REAL, PARAMETER :: T=50.0e-9, dt=2.0*1.0000e-15
+REAL, PARAMETER :: T=10.0e-9, dt=2.0*1.0000e-15
 INTEGER, PARAMETER :: steps=T/dt
-INTEGER, PARAMETER :: Gwait=1e0
+INTEGER, PARAMETER :: Gwait=1e0, Gramp=1e6
 INTEGER, PARAMETER :: coolDownSteps=0, Tstart=0
+INTEGER, PARAMETER :: positioningDuration = 3e6, positioningOn=1e6
+INTEGER, PARAMETER :: positioningOff = positioningOn+positioningDuration
+REAL, PARAMETER :: positioningMove = WL/WLperN
+REAL, PARAMETER :: positioningdx = positioningMove / real(positioningDuration)
+REAL, PARAMETER :: kTrap = 0
 
 LOGICAL :: D2 = .false. !TWO DIMENSIONS?
 REAL(KIND=BR), DIMENSION(NSim) :: x,y,vx,vy,xTotal,a_old
@@ -79,11 +86,14 @@ INTEGER, PARAMETER :: BUILTIN=1, KISS=2, TWIST=3, SHIFT=4, RAN2=5, RAN3=6, COMB8
 CHARACTER(LEN=40), DIMENSION(8) :: URNGstring = [character(len=40) :: &
         "Builtin", "KISS", "Mersenne Twister", "3-shift shift-register", "Knuth Ran2 recursive+shuffle", &
         "Knuth ran3 subtractive lagged fib", "R4_UNI L'Ecuyer", "Multiplicative Lagged Fib"]
+INTEGER, PARAMETER :: ALLATOM=1, LASTATOM=2, FIRSTATOM=3, LASTTRAP=4
 !
 !  The Control Parameters are Set to the Following:
 !
 LOGICAL, PARAMETER :: RUNTESTS = .FALSE.
-INTEGER, PARAMETER :: ICS = UNIFORMLINE
+INTEGER, PARAMETER :: FORCEAPPLY = 0
+INTEGER, PARAMETER :: POSITIONING = LASTTRAP
+INTEGER, PARAMETER :: ICS = TWOKINKS
 INTEGER, PARAMETER :: INTERACTIONMODEL = SPRINGMODEL
 INTEGER, PARAMETER :: CHAINBC = CATERPILLARCHAIN
 INTEGER, PARAMETER :: COORDBC = INFINITECOORD

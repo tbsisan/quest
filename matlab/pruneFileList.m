@@ -7,7 +7,7 @@ prunedNames={};
 
 onesToKeepLogical=logical(ones(1,length(infiles)));
 onesToPruneLogical=logical(zeros(1,length(infiles)));
-
+if (length(infiles)>0)
 for keepi=1:length(keepPatterns)
     onesToKeep = regexp( {infiles.name}, keepPatterns{keepi} );
     % eg: { [1] [1] [] [] [1] }, for an infiles array that is five elements, where three of them match the current keepPattern
@@ -17,6 +17,7 @@ end
 for prunei=1:length(prunePatterns)
     onesToPrune = regexp( {infiles.name}, prunePatterns{prunei} );
     onesToPruneLogical = onesToPruneLogical | logical( cellfun( 'length', onesToPrune ) );
+end
 end
 
 keepAndNotPrune = onesToKeepLogical & ~onesToPruneLogical;

@@ -4,9 +4,10 @@ function [ plotHandle ]=colorLinePlot(x,y,explicitColor,linewidth,varargin)
 % ExplicitColor is an integer from 1 to 32, or zero if not specifying directly.
 % If explicitColor is zero (technically ~>0), color will come from calling getaNiceColor(n)
     
-c = getaNiceColor();
 if (explicitColor>0)
     c=getaNiceColor(explicitColor);
+else
+    c = getaNiceColor();
 end
 
 if length(varargin)==0

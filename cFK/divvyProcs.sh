@@ -16,21 +16,34 @@ fi
 
 set_parameters() {
     # Compiled into executables
+    solList=$( seq 0 1 0 );
     Nlist=$( seq 56 50 56 ); export Nlist
     Nlist="56 112 225 450 900";
     Nlist="300";
     L=350; export Nlist
-    eqtimes="5e6"; export eqtimes
+    eqtimes="1e5"; export eqtimes
     eqList=($eqtimes); export eqList
-    startTlist=$( seq 500 100 500 ); export startTlist
+    startTlist=$( seq 10 1 10 ); export startTlist
+    aList="0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99";
+    aList="1.00 1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09"; export aList
+    aList="1.10 1.12 1.14 1.16 1.18 1.20 1.22 1.25"; export aList
+    aList="1.01 1.03 1.05 1.07 1.09 1.10 1.12 1.14 1.16 1.18 1.20 1.22 1.23 1.24 1.25 "; export aList
+    aList="1.06 1.065 1.07 1.075 1.08 1.085 1.09 1.095 1.10 1.105"; export aList
+    aList="1.01 1.02 1.03 1.04 1.045 1.05 1.055 1.06 1.065 1.07 1.075 1.08 1.085 1.09 1.095"; export aList
+    aList="1.05";
+    aList="0.98 0.96 0.95";
+    aList="1.02 1.04 1.05";
+    kTrapList="32";
 
     # Read from paramList.in file
-    enslist=$( seq 0 1 9 ); export enslist
+    enslist=$( seq 4 1 9 ); export enslist
     klist="20 25 30 40 50 60 80 120"; export klist
-    klist="1 2 4 8 16 32 64 128"; export klist
-    klist="30"; export klist
+    klist="2 4 8 16 32 64 128"; export klist
+    klist="32"; export klist
     Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
-    Flist="0"; export Flist
+    Flist="1.00e-11 1.82e-11 3.31e-11 6.03e-11 1.10e-10 2.00e-10 4.00e-10";
+    Flist="2.01e-10"; export Flist
+    Flist="0.00e+00";
     Flist=($Flist);
 }
 
@@ -39,11 +52,15 @@ make_cFKdata_precompile() {
     Li=$(($Ni+50))
     sed "s/ N=\([0-9]\{2,\}\), Nsim=\([0-9]\{2,\}\), channelWL=\([0-9]\{2,\}\)/ N=$Ni, Nsim=$Ni, channelWL=$Li/" <cFKdata.xy.base.f90 >cFKdata.xy.N.f90
     sed "s/coolDownSteps=0/coolDownSteps=$eqti/" <cFKdata.xy.N.f90 >cFKdata.xy.eqt.f90
-    sed "s/Tstart=0/Tstart=$Ti/" <cFKdata.xy.eqt.f90 >cFKdata.xy.batch.f90
+    sed "s/Tstart=0/Tstart=$Ti/" <cFKdata.xy.eqt.f90 >cFKdata.xy.T.f90
+    sed "s/runID=''/runID='$runID'/" <cFKdata.xy.T.f90 >cFKdata.xy.ID.f90
+    sed "s/aPercent=0/aPercent=$ai/" <cFKdata.xy.ID.f90 >cFKdata.xy.a.f90
+    sed "s/kTrap = 0/kTrap = $kTrapi/" <cFKdata.xy.a.f90 >cFKdata.xy.batch.f90
 }
 
 make_cFK_precompile() {
-    sed "s/paramList.in/params\/paramList.$customRun.in/" <cFK.xy.f90 >cFK.xy.batch.f90
+    sed "s/paramList.in/params\/paramList.$customRun.in/" <cFK.xy.f90 >cFK.xy.params.f90
+    sed "s/numSols = 0/numSols = $soli/" <cFK.xy.params.f90 >cFK.xy.batch.f90
 }
 
 recompile() {
@@ -71,7 +88,7 @@ launch_jobs() {
         questruncmd=questbatches/run.$customRun.sh
         sed "s/ifort.out/$fortexe/" <questbatch.sh >$questruncmd
         chmod 755 $questruncmd
-        exe msub -N r${myrand}eq${eqti}Tst${Ti}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:30:00 -joe -V -o seeout.log $questruncmd
+        exe msub -N r${myrand}ID${runID}kTr${kTrapi}a${ai}eq${eqti}Tst${Ti}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:05:00 -joe -V -o seeout.log $questruncmd
     else
         exe ./questbatches/$fortexe
     fi
@@ -80,6 +97,12 @@ launch_jobs() {
 set_parameters
 ./paramList.pl
 
+for kTrapi in $kTrapList
+do
+for soli in $solList
+do
+for ai in $aList
+do
 for eqti in ${eqList[@]}
 do
 for Ti in $startTlist
@@ -93,11 +116,12 @@ do
 for Fi in ${Flist[@]}
 do
     myrand=$(getRandomInt);
-    echo "$eqti, $Ti, $Ni, $ensi, $ki, $Fi, $myrand";
-    customRun=r${myrand}.eq${eqti}.Tst${Ti}.N${Ni}.ens$ensi.k${ki}.F${Fi}
+    runID="sol$soli"; export runID
+    echo "kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, Ti$Ti, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
+    customRun=r${myrand}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${Ti}.N${Ni}.ens$ensi.k${ki}.F${Fi}
     #INTEGER, PARAMETER :: N=208, Nsim=208,  channelWL=200
-    cFKdataChanges=$(( ${#eqList[@]} * ${#startTlist[@]} * ${#Nlist[@]} ))
-    cFKchanges=${#Flist[@]}
+    cFKdataChanges=$(( ${#eqList[@]} * ${#startTlist[@]} * ${#Nlist[@]} * ${#aList[@]} * ${#kTrapList[@]} ))
+    cFKchanges=$(( ${#Flist[@]} * ${#solList[@]} ))
     make_cFKdata_precompile
     make_cFK_precompile
     fortexe=${compiler}.$customRun.out
@@ -109,6 +133,9 @@ do
     fi
     make_paramList.in
     launch_jobs
+done
+done
+done
 done
 done
 done

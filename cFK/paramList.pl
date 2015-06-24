@@ -14,7 +14,7 @@ sub logspace{
   my @logVals = (0)x$num;
   my $den = $num;
   if ($end != 0) {
-    if ($num == 1) {$den=2};
+    if ($num == 1) {$den=2}
     my $spacing = ( log10($end) - log10($start) )/($den-1);
     my @exponents = map {log10($start) + $_*$spacing} (0 .. ($num-1));
     # print "exponents: @exponents";
@@ -28,8 +28,8 @@ sub log10 {
 }
 
 # set to zero to change values with divvyProcs.sh
-my $kstart=30.0e0; #(4,4) 47, (5,5) 28.9, polymer 14
-my $kend=30.0e0;
+my $kstart=0.0e0; #(4,4) 47, (5,5) 28.9, polymer 14
+my $kend=0.0e0;
 my $knum=1;
 my @k=logspace($kstart,$kend,$knum);
 my $hstart=1.53e-21; #(4,4) 1.21e-21, (5,5) 5.53e-23
@@ -40,16 +40,16 @@ my $bgstart=0;
 my $bgend=0;
 my $bgnum=1;
 my @bg=logspace($bgstart,$bgend,$bgnum);
-my $etastart=1.0e9;
-my $etaend=1.0e9;
+my $etastart=3.0e10;
+my $etaend=3.0e10;
 my $etanum=1;
 my @eta=logspace($etastart,$etaend,$etanum);
-my $Tstart=4.0e1;
-my $Tend=1.0e2;
-my $Tnum=6;
+my $Tstart=8.0e1;
+my $Tend=8.0e1;
+my $Tnum=1;
 my @T=logspace($Tstart,$Tend,$Tnum);
-my $Gstart=0; #1.0e-15; #0.00625e-12; #1e-14;
-my $Gend=0; #1.0e-13; #4e-14;
+my $Gstart=0.00e+00; #1.0e-15; #0.00625e-12; #1e-14;
+my $Gend=0.00e+00; #1.0e-13; #4e-14;
 my $Gnum=1;
 my @G=logspace($Gstart,$Gend,$Gnum);
 my $Mstart=3e-26;

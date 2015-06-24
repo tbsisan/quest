@@ -52,8 +52,10 @@ else
 end
 
 if (n > 32)
-    n=mod(n,31)+1;
     disp(['COLOR INDEX OUT OF RANGE in ' mfilename]);
+    disp(['old color ' num2str(n)]);
+    n=mod(n,31)+1;
+    disp(['new color ' num2str(n)]);
     rgb=(rgbs(n,:)+rgbs(n+1,:))/2;
 elseif (n<1)
     n=1;

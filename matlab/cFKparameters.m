@@ -9,6 +9,7 @@ angstrom=char(197);
 %
 setPaths;
 setAvailableModules;
+if ~exist('cFKpattern'); cFKpattern='asdfasdf'; end
 
 % cFKpattern need to be set before running cFKprocessor.  The pattern is searched in paths.projStor.
 % Here is an example pattern:
@@ -22,12 +23,12 @@ setAvailableModules;
 % A list of possible flags is in flags.m (TODO)
 %
 cFKsettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
-                        'sliceTimes', 1,        'cropTimes', [10.0/30.0 30.0/30.0] );
-cFKflags    = { '~useLastcFK', '~hideFigs', '~plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
+                        'sliceTimes', 1.0,        'cropTimes', [7.8/10.0 8.2/10.0] );
+cFKflags    = { '~useLastcFK', 'doFigs', '~hideFigs', '~plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
 dataToSave  = { 'reduced', 'ui', 'cFKsimParams' }; % Save this data for each dcd file processed
 
-moduleList  = { 'energyVsTime','~animate', 'plotOverview','~countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
+moduleList  = { '~energyVsTime', 'animate', 'plotOverview','~countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
 %if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleList is not in availableModules' ]); end
 
 % This is where the list of files to process is obtained. The list pruned below according to keepPatterns and prunePatterns.
@@ -37,6 +38,7 @@ end
 
 keepPatterns    = { '.+' }; % Only keep files that match ALL keep patterns. To not filter based on this, use '.+'
 prunePatterns   = { 'aaaaaaa',  ...
+                    '_a1.00', ...
                     'replaceMeWithaPatternToMatchAFileNameForExclusion',  ...
                     '9999999' }; % Files matching these pattern strings will be excluded from processing.
 [ cFKpruned ]   = pruneFileList( cFKs, keepPatterns, prunePatterns ); % Prune the list according to patterns

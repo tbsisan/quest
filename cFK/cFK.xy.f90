@@ -23,10 +23,12 @@ program cFK
    CHARACTER(LEN=4) :: runNumberChar
    CHARACTER(LEN=6) :: formatReal
    CHARACTER(LEN=8) :: kChar,hChar,Gchar,Tchar,etaChar,runtimechar
-   CHARACTER(LEN=8) :: axChar
+   CHARACTER(LEN=9) :: axChar
    CHARACTER(LEN=10) :: startClockChar
    REAL(KIND=BR), DIMENSION(size(Temp)) :: kbT, thermalStrength
    REAL(KIND=BR) :: scaledThermal
+   REAL(KIND=BR) :: Gcurrent=0.0
+   REAL(KIND=BR) :: trapCenter=0.0
    REAL(KIND=BR), DIMENSION(7) :: lastrun, running
    INTEGER :: runsRan=0
    REAL(KIND=BR), DIMENSION(N) :: eigen
@@ -206,6 +208,11 @@ SWEEP: do run=1,size(ens)
              scaledThermal=currentTemp(tstep,coolDownSteps,thermalStrength(run),Temp(run))
              sigma=sqrt(dt)*oneOverM(run)*scaledThermal ! For stochastic integrators
            END IF
+           IF ( (tstep == 1 .or. mod(tstep,100)==0) .and. &
+                (tstep <= (Gramp+Gwait) .and. tstep > Gwait) ) THEN
+               Gcurrent= (real(tstep)-real(Gwait))/real(Gramp) * G(run)
+           END IF
+           
            CALL advanceState()  
         end do
         CALL Energy(steps)
@@ -240,11 +247,12 @@ SUBROUTINE logParams()
         write(999,*) 'thermalStren:',thermalStrength(run)
         write(999,*) 'ens:',ens(run)
         write(999,*) 'h:',h(run)
-        write(999,*) 'G:',G(run)
         write(999,*) 'k:',k(run)
         write(999,*) 'eta:',eta(run)
         write(999,*) 'Total steps:',steps
         write(999,*) 'Total time (s):',T
+        write(999,*) 'G:',G(run)
+        write(999,*) 'Gramp:',Gramp
         write(999,*) 'eq steps:',coolDownSteps
         write(999,*) 'Temp start:',Tstart
         write(999,*) 'Temp eq:',Temp(run)
@@ -255,6 +263,9 @@ SUBROUTINE logParams()
         write(999,*) 'System length units:',channelWL
         write(999,*) 'particles N:',N
         write(999,*) 'iter:',iter
+        write(999,*) 'positioningdx', positioningdx
+        write(999,*) 'positioningOn', positioningOn
+        write(999,*) 'positioningMove', positioningMove
         soundSpeed=sqrt(k(run)*oneOverM(run))*WL
         write(999,*) 'sound Speed (m/s):',soundSpeed
         write(999,*) 'INITRANDOMX:', INITRANDOMX
@@ -278,12 +289,12 @@ END SUBROUTINE logParams
     write(etaChar,'(ES8.2)') eta(run)
     write(Gchar,'(ES8.2)') G(run)
     write(runtimechar,'(ES8.2)') T
-    write(axChar,'(ES8.2)') ax/WL*WLperN 
+    write(axChar,'(ES9.3)') ax/WL*WLperN 
     write(eqtChar,'(I0.1)') int(real(coolDownSteps)/1.0e6)
     write(startTchar,'(I0.3)') Tstart
     write(ensChar,'(I0.2)') INT(ens(run))
     
-    runName=ensChar//'_eqt'//eqtChar//'_Ti'//startTchar//'_L'//trim(adjustl(LinCharForm))//&
+    runName=runID//'_'//ensChar//'_eqt'//eqtChar//'_Ti'//startTchar//'_L'//trim(adjustl(LinCharForm))//&
             '_N'//trim(adjustl(NinCharForm))//'_a'//axChar//'_k'//kChar//'_h'//hChar//'_T'//Tchar//&
             '_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
 
@@ -366,7 +377,7 @@ END SUBROUTINE logParams
       !CALL fixWrapPtDiff(rdiffx)
       PEx = sum(onehalf*k(run)*(rdiffx-ax)**2)
       PEy = sum(onehalf*k(run)*rdiffy**2)
-      hE  = sum( h(run)*sin( phaseFactor*x ) )
+      hE  = sum( h(run)*(cos( phaseFactor*x )+1) )
       KEx = sum(onehalf*M(run)*vx**2)
       KEy = sum(onehalf*M(run)*vy**2)
       !write(999,*) "Time Step:",tstep
@@ -397,10 +408,10 @@ END SUBROUTINE logParams
 
 
    SUBROUTINE initState()
-      REAL(KIND=BR) :: chainL, particleSep, center1, center2, width, vMean
+      REAL(KIND=BR) :: solSpacing, chainL, particleSep, center1, center2, width, vMean
       REAL(KIND=BR) :: charge=-1.0_BR
       REAL(KIND=BR), DIMENSION(2) :: uv1, uv2
-      INTEGER :: i
+      INTEGER :: i, si, numSols
       chainL=(real(N,KIND=BR)-one)*a
       x=(/ (i,i=0,size(x)-1) /)
       IF (CHAINBC .ne. CATERPILLARCHAIN) THEN
@@ -423,20 +434,35 @@ END SUBROUTINE logParams
                vx(i)=vMean*(1+handleRandom())
             ENDDO
          CASE (TWOKINKS)
-            center1=15.0_BR
-            center2=30.0_BR
-            width=8.0_BR
-            SELECT CASE(N)
+             ! units appear to be particle number
+            numSols = 0;
+            solSpacing = real(N)/(real(abs(numSols))+1.0_BR)
+            ! center1=15.0_BR
+            ! center2=30.0_BR
+            width=(WL/WLperN/2/pi)*sqrt(k(run)/h(run))! 8.0_BR
+            SELECT CASE(N) ! for when N differs by 1 from L
                CASE (int(L)+1)
                   charge=1.0_BR
                CASE (int(L)-1)
                   charge=-1.0_BR
+              CASE DEFAULT
+                  charge=-1.0_BR
             END SELECT
+            IF (numSols .lt. 0) THEN
+                charge=1.0
+            ELSE
+                charge=-1.0
+            ENDIF
             DO i=1,N
-               uv1=uv(i,center1,width,0.5_BR)
-               uv2=uv(i,center2,width,0.5_BR)
-               x(i)=-WL/WLperN/2.0_BR+i*WL-charge*uv1(1)-charge*uv2(1)
-               vx(i)=-charge*uv1(2)-charge*uv2(2)
+                x(i)=-WL/WLperN/2.0_BR+i*WL/WLperN
+                vx(i)=0
+            ENDDO
+            DO si=1,abs(numSols)
+            DO i=1,N
+               uv1=uv(i,solSpacing*si,width,0.0_BR)
+               ! commented for numSols code uv2=uv(i,center2,width,0.5_BR)
+               x(i)=x(i)-charge*uv1(1)
+            ENDDO
             ENDDO
          CASE (ONEBREATHER)
             center1=20.0_BR
@@ -606,6 +632,25 @@ END SUBROUTINE logParams
             write(999,*) 'No integrator of that method'
             STOP
       END SELECT
+
+      IF (tstep .eq. positioningOn) THEN
+        trapCenter=x(N)
+        write(999,*) 'set initial trapCenter ',x(N),trapCenter
+      ENDIF
+      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff) THEN
+        SELECT CASE (POSITIONING)
+            CASE (LASTATOM)
+                x(N) =  x(N) + positioningdx
+                ! vx(N) = 0.0
+                dx(N) = positioningdx
+            CASE (FIRSTATOM)
+                x(1) =  x(1) + positioningdx
+                ! vx(N) = 0.0
+                dx(N) = positioningdx
+            CASE (LASTTRAP)
+                trapCenter = trapCenter + positioningdx
+        END SELECT
+      END IF
 
       IF (COORDBC .eq. CHANNELCOORD) xTotal=xTotal+dx
 
@@ -937,12 +982,11 @@ END SUBROUTINE logParams
       REAL(KIND=BR), INTENT(IN), DIMENSION(NSim) :: rSub
       REAL(KIND=BR), INTENT(IN), OPTIONAL, DIMENSION(NSim) :: vSub
       REAL(KIND=BR), INTENT(IN), OPTIONAL, DIMENSION(N) :: Ft
-      REAL(KIND=BR) :: phaseFactor
+      REAL(KIND=BR) :: phaseFactor, Ftrap
       REAL(KIND=BR), DIMENSION(NSim) :: cFKa
       REAL(KIND=BR), DIMENSION(NSim) :: Ftube, Fwash, Fbg=0.0_BR, Ffric, FG=0_BR
       REAL(KIND=BR), DIMENSION(NSim) :: yPhase,xPhase
-      REAL(KIND=BR), DIMENSION(N) :: Fnear
-      REAL(KIND=BR), DIMENSION(N) :: FtSub
+      REAL(KIND=BR), DIMENSION(N) :: Fnear,FtSub
       INTEGER, INTENT(IN) :: currentDim
       LOGICAL :: outputForces=.false.
 
@@ -968,7 +1012,16 @@ END SUBROUTINE logParams
       END IF
 
       !IF (G(run) .ne. 0_BR) FG=G(run)
-      IF (currentDim==1 .and. tstep>Gwait) FG=G(run)
+      IF (currentDim==1 .and. tstep>Gwait .and. tstep<(Gwait+Gramp)) THEN
+          SELECT CASE (FORCEAPPLY)
+            CASE (ALLATOM)
+                FG=Gcurrent
+            CASE (LASTATOM)
+                FG(N)=Gcurrent
+            CASE (FIRSTATOM)
+                FG(1)=Gcurrent
+          END SELECT
+      END IF
       !IF (tstep==200) write(999,*) 'tstep:',tstep,' FG:',FG
 
       IF (BGTYPE .ne. NOBG) THEN
@@ -1012,7 +1065,33 @@ END SUBROUTINE logParams
             !write(999,*) Fnear(6), '+', Fwash(6), '+', Ffric(6), '+', FtSub(6), '+', Fbg(6)
             !end if
             cFKa = oneOverM(run)*(Fnear + Fwash + Ffric + FtSub + Fbg + Ftube + FG)
+            ! REMINDER: Not all integrators calculate Fric and FtSub in this
+            ! subroutine. Calulation is determined by passed parameters.
       END SELECT
+
+      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff .and. mod(tstep,WRITESTATEWAIT)==0) THEN
+          write(999,*) 'tstep:',tstep,'x(N):',x(N),'trapx:',trapCenter
+          write(999,*) 'preMod: cFKa(N) ',cFKa(N)
+      ENDIF
+
+      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff) THEN
+      SELECT CASE (POSITIONING)
+        CASE (LASTATOM)
+            cFKa(N) = oneOverM(run)*FtSub(N)
+            !cFKa(N) = oneOverM(run)*(Fwash + Ffric + FtSub) 
+            !cFKa(N) = 0.0
+        CASE (FIRSTATOM)
+            !cFKa(1) = 0
+        CASE (LASTTRAP)
+            Ftrap = -kTrap*(x(N)-trapCenter)
+            cFKa(N) = cFKa(N) + oneOverM(run)*Ftrap
+      END SELECT
+      ENDIF
+
+      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff .and. mod(tstep,WRITESTATEWAIT)==0) THEN
+        write(999,*) 'postMod: cFKa(N) ',cFKa(N)
+        write(999,*) 'Near:', Fnear(N), '+wash:', Fwash(N), '+fric:', Ffric(1), '+Ft:', FtSub(1), '+Fbg:', Fbg(N), '+trap:', Ftrap
+      ENDIF
 
       IF (outputForces) THEN
          write(999,*) 'tstep:',tstep
@@ -1400,8 +1479,8 @@ END SUBROUTINE logParams
       !   yin = yin + Ly
       !END WHERE
 
-      rdiffSub(1:Nsim-1)=yin(2:)-yin(1:Nsim-1)
-      rdiffSub(Nsim)=yin(1)-yin(Nsim)
+      rdiffSub(1:NSim-1)=yin(2:)-yin(1:NSim-1)
+      rdiffSub(NSim)=yin(1)-yin(NSim)
 
       !wiki example: if (abs(dx) > x_size * 0.5) dx = dx - sign(x_size, dx)
       WHERE (rdiffSub  .gt.  halfSizeY) 
@@ -1684,6 +1763,7 @@ END SUBROUTINE logParams
             IF (WRITEU) write(302) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL),0.0
          ENDIF
       END IF
+      write(999,*) REAL(tstep*dt,KIND=SMREAL),trapCenter,positioningdx,kTrap
       !write(999,*) vx
 
       IF (TIMESUBS) THEN

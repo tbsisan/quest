@@ -20,7 +20,7 @@ function [ fh, cFKaxes ] = cFKenergyFigure( w, h, cFKflags )
 end
 
 function bumpDimension(ax,dim,amnt)
-    rect = get(ax,'Position')
+    rect = get(ax,'Position');
     rect(dim)=rect(dim)*amnt;
     set(ax,'Position',rect);
 end

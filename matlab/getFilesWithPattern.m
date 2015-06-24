@@ -1,5 +1,5 @@
 function [ files ] = getFilesWithPattern( paths, pattern )
-
+files=struct();
 if strfind( paths.remoteStor, '@' )
     %remote files
     disp('Downloading remote files from server (only works for cFK data).');
@@ -15,5 +15,5 @@ else
 end
 
 if length(files)==0
-    error( [ 'No files match pattern: ' localFiles ]);
+    disp( [ 'No files match pattern: ' localFiles ]);
 end

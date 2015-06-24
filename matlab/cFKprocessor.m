@@ -17,12 +17,14 @@ runList=cell(1,endfile-startfile+1);
 %runList{1}='';
 %runList{endfile-startfile}='';
 
-if amember(moduleList, 'plotOverview')
+if amember(moduleList, 'plotOverview') 
     [ fh, cFKoverviewAxes ] = cFKoverviewFigure(900,700,cFKflags)
 end
-if amember(moduleList, 'energyVsTime')
+if amember(moduleList, 'energyVsTime') && amember(cFKflags,'doFigs')
     [ fh, cFKenergyAxes ] = cFKenergyFigure(900,700,cFKflags)
 end
+
+clear numSolitons numSolitonsInt aPercents finalEnergy kValues;
 
 for cFKi=startfile:endfile
      
@@ -34,6 +36,7 @@ for cFKi=startfile:endfile
     
     [ cFKsimParams ]    = getcFKsimParams( cFKfiles.log );
     runList{cFKi}       = cFKsimParams.ensStr;
+    % runList{cFKi}       = sprintf('%.2f',cFKsimParams.kbar);
     % runList{cFKi}       = sprintf('%.1e',cFKsimParams.kbar);
     % runList{cFKi}       = sprintf('%.1e',cFKsimParams.ensStr);
 
@@ -51,8 +54,15 @@ for cFKi=startfile:endfile
         labelFigs=(cFKi==endfile);
         E_Ks = reduced.Uxs/1.38e-23/cFKsimParams.N*2;
         hE = cFKsimParams.h * (cos(reduced.xs*2*pi/(cFKsimParams.lambda))+1) / 1.38e-23 / cFKsimParams.N *2;
-        numSolitons = (reduced.ui(:,end)-reduced.ui(:,1))/(cFKsimParams.lambda);
-        cFKplotEnergies( reduced.ts, E_Ks, hE, numSolitons, cFKenergyAxes, cFKi, cFKsimParams, runList, labelFigs );
+        numSolitons(cFKi) = abs(ui(end,end)-ui(end,1))/(cFKsimParams.lambda);
+        solitonTrack = (reduced.ui(:,end)-reduced.ui(:,1))/(cFKsimParams.lambda);
+        if amember(cFKflags,'doFigs')
+            cFKplotEnergies( reduced.ts, E_Ks, hE, solitonTrack, cFKenergyAxes, cFKi, cFKsimParams, runList, labelFigs );
+        end
+        systemPE = E_Ks(:,2) + sum(hE,2);
+        finalEnergy(cFKi) = systemPE(end);
+        kValues(cFKi) = cFKsimParams.k;
+        aPercents(cFKi) = cFKsimParams.a/cFKsimParams.lambda;
     end
 
     if amember(moduleList,'animate')
@@ -66,9 +76,9 @@ for cFKi=startfile:endfile
     end
 
     if amember(moduleList, 'countSolitons')
-        numSolitons = (ui(end,end)-ui(end,1))/(cFKsimParams.lambda);
-        numSolitonInt = round(numSolitons);
-        moduleData.solitons.num(cFKi) = numSolitons;
+        numSolitons(cFKi) = abs(ui(end,end)-ui(end,1))/(cFKsimParams.lambda);
+        numSolitonInt(cFKi) = round(numSolitons(cFKi));
+        moduleData.solitons.num(cFKi) = numSolitons(cFKi);
         moduleData.solitons.N(cFKi) = cFKsimParams.N;
         moduleData.solitons.L(cFKi) = cFKsimParams.L;
     end
@@ -96,6 +106,7 @@ for cFKi=startfile:endfile
     if amember(moduleList,'makeMovie')
 
     end
+
 
     %
     % Save some data for easier data exploring, after this script is finished

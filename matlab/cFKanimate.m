@@ -34,7 +34,7 @@ function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, c
 
                                     } );
         drawnow;
-        pause(0.1);
+        %pause(0.1);
         cFKmovie(t) = getframe(gca,rect);
         writeVideo(writerObj,cFKmovie(t));
     end

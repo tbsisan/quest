@@ -16,6 +16,8 @@ for n = (W+1)/2:length(y)-(W+1)/2,
   SG1(n) =   dot(g(:,2), y(n - HalfWin: n + HalfWin));
 end
 SG0(end+1:length(y))=SG0(end);
+SG0(1:(W+1)/2-1)=SG0((W+1)/2);
 SG1(end+1:length(y))=SG1(end);
+SG1(1:(W+1)/2-1)=SG1((W+1)/2);
 % dx=1; % x axis data sep
 SG1=SG1/dx;
