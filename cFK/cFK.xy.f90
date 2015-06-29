@@ -46,7 +46,7 @@ program cFK
 
 
    open(unit=100, file='paramList.in')
-   open(unit=101, file='eigen.in')
+   !open(unit=101, file='eigen.in')
    open(unit=3,file='collisions.dat')
    open(unit=4,file='RandomT.dat')
    open(unit=5,file='debug.dat')
@@ -425,13 +425,13 @@ END SUBROUTINE logParams
       vx=0.0_BR
       write(999,*) 'starting xs: from within initState() before random',x(1:9)
       write(999,*) 'starting vxs:fromwithininitState() before random',vx(1:10)
-      vMean=sqrt(kb*300.0*oneOverM(run))
+      vMean=sqrt(kb*Tstart*oneOverM(run))
       SELECT CASE(ICS)
          CASE (UNIFORMLINE)
             ! TBS: the below was +(L-chainL)/2.0
             x=x+(L-chainL)/2.0
             DO i=1,N
-               vx(i)=vMean*(1+handleRandom())
+               vx(i)=vMean*(1+sampleGaussian())
             ENDDO
          CASE (TWOKINKS)
              ! units appear to be particle number
@@ -472,21 +472,21 @@ END SUBROUTINE logParams
                uv1=uv(i,center1,width,0.00_BR)
                uv2=uv(i,center2,width,0.00_BR)
                x(i)=-WL/WLperN/2.0_BR+i*WL-uv1(1)+uv2(1)
-               vx(i)=uv1(2)+uv2(2)+vMean*(1+handleRandom())
+               vx(i)=uv1(2)+uv2(2)+vMean*(1+sampleGaussian())
             ENDDO
          CASE (IMPINGER)
             x=x-0.0_BR
             vx=0.0_BR
             ! i don't understand why a dummy argument i was needed
-            vx=sqrt(kbT(run))*(/ (handleRandom(i), i=1,N) /)
+            vx=sqrt(kbT(run))*(/ (sampleGaussian(i), i=1,N) /)
             vx=0.0_BR
-            !x=x*( (/ (0.1_BR*handleRandom(i), i=1,N) /) + 1.0_BR )
-            !x=x + (/ (0.01_BR*handleRandom(i), i=1,N) /)
+            !x=x*( (/ (0.1_BR*sampleGaussian(i), i=1,N) /) + 1.0_BR )
+            !x=x + (/ (0.01_BR*sampleGaussian(i), i=1,N) /)
             !write(999,*) 'perturbed x',x
             x = x - (x(N)-L) - 1.0
             write(999,*) 'shifted x',x
             !x(1) = 0.0
-            vx(1)=4.0_BR * (1+0.25*handleRandom())
+            vx(1)=4.0_BR * (1+0.25*sampleGaussian())
             write(999,*) 'initial velocities:',vx
             write(999,*) 'initial positions:',x
          CASE (SHIFT1Y)
@@ -499,14 +499,14 @@ END SUBROUTINE logParams
       END SELECT
       IF (INITRANDOMX) THEN
          DO i=1,N
-            x(i)=x(i)*(1.0+0.0002*handleRandom())
-            vx(i)=vx(i)*(1.0+0.0002*handleRandom())
+            x(i)=x(i)*(1.0+0.0002*sampleGaussian())
+            vx(i)=vx(i)*(1.0+0.0002*sampleGaussian())
          END DO
       END IF
       IF (INITRANDOMY) THEN
          DO i=1,N
-            y(i)=y(i)*(1.0+0.01*handleRandom())
-            vy(i)=vy(i)*(1.0+0.01*handleRandom())
+            y(i)=y(i)*(1.0+0.01*sampleGaussian())
+            vy(i)=vy(i)*(1.0+0.01*sampleGaussian())
          END DO
       END IF
       CM = sum(x)/N
@@ -514,7 +514,7 @@ END SUBROUTINE logParams
       label(N/2+1:)='R'
       write(999,*) 'starting xs from within initState() after random:',x(1:9)
       write(999,*) 'starting vxs from within initState() after random:',vx(1:10)
-      CALL writeState()
+      ! CALL writeState()
 
    END SUBROUTINE initState
 !
@@ -637,7 +637,7 @@ END SUBROUTINE logParams
         trapCenter=x(N)
         write(999,*) 'set initial trapCenter ',x(N),trapCenter
       ENDIF
-      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff) THEN
+      IF (POSITIONING .gt. 0 .and. (tstep .gt. positioningOn .and. tstep .lt. positioningOff)) THEN
         SELECT CASE (POSITIONING)
             CASE (LASTATOM)
                 x(N) =  x(N) + positioningdx
@@ -693,11 +693,13 @@ END SUBROUTINE logParams
       uvi(2)=sol_A*velocity*soundSpeed/width_eff*e_x/(1+e_x**2)/2.456e-10
    END FUNCTION uv
 
-   FUNCTION handleRandom(dum1) RESULT(randomVariable)
+   FUNCTION sampleGaussian(dum1) RESULT(randomVariable)
+      ! Return one value sampled from a gaussian distribution with zero mean and
+      ! unit variance.
       REAL(KIND=BR) :: randomVariable
       INTEGER, OPTIONAL :: dum1
       LOGICAL, SAVE :: firstCall=.true.
-      ! if temp is zero, i should just return zeros
+      ! TBS: if temp is zero, i should just return zeros
       IF (firstCall .and. tstep .eq. 1) THEN
          CALL initRNGs()
          firstCall=.false.
@@ -705,7 +707,7 @@ END SUBROUTINE logParams
       randomVariable = gaussianDeviate()
       RETURN
       
-   END FUNCTION handleRandom
+   END FUNCTION sampleGaussian
 !
 !
    FUNCTION Verlet1(currentDim,xSub,vSub) RESULT (dx)
@@ -717,7 +719,7 @@ END SUBROUTINE logParams
       REAL(KIND=BR), SAVE :: dt2 = dt**2
       INTEGER, INTENT(IN) :: currentDim
       IF (STOCHASTICS) THEN
-         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (sampleGaussian(), i=1,N) /)
       END IF
       IF (tstep .eq. 1) THEN
          F(currentDim,1,:)=cFKa(currentDim,xSub,vSub,Ft,rdiffSub1,ldiffSub1)
@@ -746,7 +748,7 @@ END SUBROUTINE logParams
          write(999,*) "WARNING VVERLET HAS NO BLOWTHROUGH DETECTION"
       ENDIF
       IF (STOCHASTICS) THEN
-         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (sampleGaussian(), i=1,N) /)
       END IF
       dx=dt*vSub+onehalf*dt2*F(currentDim,1,:)
       xSub=xSub+dx
@@ -774,8 +776,8 @@ END SUBROUTINE logParams
       LOGICAL :: blowthrough=.false.
       dt32=dt*sqrt(dt)
       IF (STOCHASTICS) THEN
-         Rt(1,:)=(/ (handleRandom(), i=1,N) /)
-         Rt(2,:)=(/ (handleRandom(), i=1,N) /)
+         Rt(1,:)=(/ (sampleGaussian(), i=1,N) /)
+         Rt(2,:)=(/ (sampleGaussian(), i=1,N) /)
       ELSE
          IF (tstep<10) write(999,*) 'using SDE with no temperature!!!!'
       END IF
@@ -819,7 +821,7 @@ END SUBROUTINE logParams
       LOGICAL :: blowthrough
       blowthrough=.false.
       IF (STOCHASTICS) THEN
-         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (sampleGaussian(), i=1,N) /)
       END IF
       dv = dt*cFKa(currentDim,xSub,vSub,Ft,rdiffSub,ldiffSub)
       !F(currentDim,2,:)=cFKa(currentDim,xSub,rdiffSub=rdiffSubSde,ldiffSub=ldiffSubSde)
@@ -856,7 +858,7 @@ END SUBROUTINE logParams
       LOGICAL :: blowthrough=.false.
 
       IF (STOCHASTICS) THEN
-         Rt=(/ (handleRandom(), i=1,N) /)
+         Rt=(/ (sampleGaussian(), i=1,N) /)
       ELSE
          IF (tstep<10) write(999,*) 'using stochastic integrator with no Temp!!!'
       END IF
@@ -897,7 +899,7 @@ END SUBROUTINE logParams
       REAL(KIND=BR), INTENT(INOUT), DIMENSION(NSim) :: xSub,vSub
       INTEGER, INTENT(IN) :: currentDim
       IF (STOCHASTICS) THEN
-         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (sampleGaussian(), i=1,N) /)
       END IF
       dv(currentDim,2,:)=dt*cFKa(currentDim,xSub,vSub,Ft,rdiffSub,ldiffSub)       ! the new a
       vGuess=vSub+threehalf*dv(currentDim,1,:)-onehalf*dv(currentDim,2,:)       ! guess at the new v
@@ -923,7 +925,7 @@ END SUBROUTINE logParams
       blowthrough=.false.
 
       IF (STOCHASTICS) THEN
-         Ft=scaledThermal*(/ (handleRandom(), i=1,N) /)
+         Ft=scaledThermal*(/ (sampleGaussian(), i=1,N) /)
       END IF
       !write(999,*) 'Ft:',Ft(1:5)
       dx(1,:)=dt*vSub
@@ -1069,23 +1071,23 @@ END SUBROUTINE logParams
             ! subroutine. Calulation is determined by passed parameters.
       END SELECT
 
-      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff .and. mod(tstep,WRITESTATEWAIT)==0) THEN
+
+      IF (POSITIONING .gt. 0 .and. (tstep .gt. positioningOn .and. (tstep .lt. positioningOff .or. HOLDON))) THEN
+        IF (mod(tstep,WRITESTATEWAIT)==0) THEN
           write(999,*) 'tstep:',tstep,'x(N):',x(N),'trapx:',trapCenter
           write(999,*) 'preMod: cFKa(N) ',cFKa(N)
-      ENDIF
-
-      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff) THEN
-      SELECT CASE (POSITIONING)
-        CASE (LASTATOM)
+        ENDIF
+        SELECT CASE (POSITIONING)
+          CASE (LASTATOM)
             cFKa(N) = oneOverM(run)*FtSub(N)
             !cFKa(N) = oneOverM(run)*(Fwash + Ffric + FtSub) 
             !cFKa(N) = 0.0
-        CASE (FIRSTATOM)
+          CASE (FIRSTATOM)
             !cFKa(1) = 0
-        CASE (LASTTRAP)
+          CASE (LASTTRAP)
             Ftrap = -kTrap*(x(N)-trapCenter)
             cFKa(N) = cFKa(N) + oneOverM(run)*Ftrap
-      END SELECT
+        END SELECT
       ENDIF
 
       IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff .and. mod(tstep,WRITESTATEWAIT)==0) THEN
@@ -1763,7 +1765,7 @@ END SUBROUTINE logParams
             IF (WRITEU) write(302) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL),0.0
          ENDIF
       END IF
-      write(999,*) REAL(tstep*dt,KIND=SMREAL),trapCenter,positioningdx,kTrap
+      write(999,*) 't',REAL(tstep*dt,KIND=SMREAL),'trapCent',trapCenter,'posdx',positioningdx,'kTr',kTrap
       !write(999,*) vx
 
       IF (TIMESUBS) THEN

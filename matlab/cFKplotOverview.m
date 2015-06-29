@@ -16,10 +16,13 @@ function cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList,
     cFKplot(ts*1e9, xs(:,end)*1e10, cFKi, 1, '', 'Position of particle 1', '', ['x (' angstrom ')'], '', labelFigs);
 
     axes(cFKaxes.chainwidth); hold on;
-    cFKplot(ts*1e9, (xs(:,end)-xs(:,1))*1e10, cFKi, 1, '-', 'Chain Length','time (ns)', ['length (' angstrom ')'], '', labelFigs);
-    colorLinePlot(0,(xs(1,end)-xs(1,1))*1e10,1,1,'o');
+    solWidth=max(sol,[],2)-min(sol,[],2);
+    solWidth=solWidth-solWidth(3);
+    %cFKplot(ts*1e9, (xs(:,end)-xs(:,1))*1e10, cFKi, 1, '-', 'Chain Length','time (ns)', ['length (' angstrom ')'], '', labelFigs);
+    cFKplot(ts*1e9, solWidth*1e10, cFKi, 1, '-', 'Chain Length','time (ns)', ['u_i width (' angstrom ')'], '', labelFigs);
+    %colorLinePlot(0,(xs(1,end)-xs(1,1))*1e10,1,1,'o');
     if (labelFigs) 
-        horizontalLine( (cFKsimParams.N-1)*cFKsimParams.a*1e10, '--', cFKi); 
+        %horizontalLine( (cFKsimParams.N-1)*cFKsimParams.a*1e10, '--', cFKi); 
     end
 
     axes(cFKaxes.sol); hold on;

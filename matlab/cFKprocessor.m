@@ -35,17 +35,18 @@ for cFKi=startfile:endfile
     cFKfiles    = getcFKfiles( cFKfullFile );
     
     [ cFKsimParams ]    = getcFKsimParams( cFKfiles.log );
-    runList{cFKi}       = cFKsimParams.ensStr;
-    % runList{cFKi}       = sprintf('%.2f',cFKsimParams.kbar);
+    %runList{cFKi}       = cFKsimParams.ensStr;
+     %runList{cFKi}       = sprintf('%.2f',cFKsimParams.kbar);
+     runList{cFKi}       = sprintf('%.2f',cFKsimParams.a/cFKsimParams.lambda);
     % runList{cFKi}       = sprintf('%.1e',cFKsimParams.kbar);
     % runList{cFKi}       = sprintf('%.1e',cFKsimParams.ensStr);
 
     % 
     % Read in the data in the dcd file
     %
-    [ Uxs,  ~,  ~,  ~ ]  = readFortran( cFKfiles.Ux, 0 );
+    % [ Uxs,  ~,  ~,  ~ ]  = readFortran( cFKfiles.Ux, 0 );
     [  xs, ts, ui, fn ]  = readFortran( cFKfiles.x, cFKsimParams.lambda );
-    [ reduced, reducedIndexes ] = cFKreduceVars( xs, ui, Uxs, ts, cFKsettings );
+    % [ reduced, reducedIndexes ] = cFKreduceVars( xs, ui, Uxs, ts, cFKsettings );
     
     %
     % Modules
@@ -80,6 +81,8 @@ for cFKi=startfile:endfile
         numSolitonInt(cFKi) = round(numSolitons(cFKi));
         moduleData.solitons.num(cFKi) = numSolitons(cFKi);
         moduleData.solitons.N(cFKi) = cFKsimParams.N;
+        moduleData.solitons.aP(cFKi) = cFKsimParams.a/cFKsimParams.lambda;
+        moduleData.solitons.g(cFKi) = cFKsimParams.kbar;
         moduleData.solitons.L(cFKi) = cFKsimParams.L;
     end
 
