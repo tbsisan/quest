@@ -28,6 +28,7 @@ cFKmovie(length(T)) = struct('cdata',[],'colormap',[]);
 writerObj = VideoWriter([paths.movieStor '/phaseplane' num2str(runinstance) '.avi']);
 writerObj.FrameRate = 1;
 open(writerObj);
+clear saveSolM;
 
 for Ti=1:size(T,1)
     cFKpattern=['x.*Ti000_L250*a1*k*h1.53*T' T(Ti,:) '*n1.00E+10*F0*dat']
@@ -45,13 +46,15 @@ for Ti=1:size(T,1)
     gM = reshape(g,length(unique(g)),length(unique(aP)));
     solM = reshape(numSolitons,length(unique(g)),length(unique(aP)));
     [gMsort, sorti] = sort(gM);
+    solMsort=solM(sorti(:,1),:);
     if Ti==1
-        surf(aPM',gMsort',solM(sorti(:,1),:)')
+        surf(aPM',gMsort',solMsort')
         colorbar;
     else
         axch=get(gca,'Children');
-        set( axch(1), 'Zdata',solM(sorti(:,1),:)');
+        set( axch(1), 'Zdata',solMsort');
     end
+    saveSolM(1:size(solMsort,1),1:size(solMsort,2),Ti)=solMsort;
     hold off;
     %cFKplot( aP(kinkGroundState), g(kinkGroundState), Ti, 1, 'o', '', 'a/lambda', 'g', {}, 0 );
     %cFKplot( aP(~kinkGroundState), g(~kinkGroundState), Ti, 1, '.', '', 'a/lambda', 'g', {}, 0 );
