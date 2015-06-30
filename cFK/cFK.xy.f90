@@ -1085,7 +1085,7 @@ END SUBROUTINE logParams
           CASE (FIRSTATOM)
             !cFKa(1) = 0
           CASE (LASTTRAP)
-            Ftrap = -kTrap*(x(N)-trapCenter)
+            Ftrap = -k(run)*(x(N)-trapCenter)
             cFKa(N) = cFKa(N) + oneOverM(run)*Ftrap
         END SELECT
       ENDIF
@@ -1765,7 +1765,7 @@ END SUBROUTINE logParams
             IF (WRITEU) write(302) REAL(tstep*dt,KIND=SMREAL),REAL(KEy,KIND=SMREAL),REAL(PEy,KIND=SMREAL),0.0
          ENDIF
       END IF
-      write(999,*) 't',REAL(tstep*dt,KIND=SMREAL),'trapCent',trapCenter,'posdx',positioningdx,'kTr',kTrap
+      write(999,*) 't',REAL(tstep*dt,KIND=SMREAL),'trapCent',trapCenter,'posdx',positioningdx,'kTr',k(run)
       !write(999,*) vx
 
       IF (TIMESUBS) THEN

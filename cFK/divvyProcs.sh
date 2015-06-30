@@ -19,13 +19,14 @@ set_parameters() {
     solList=$( seq 0 1 0 );
     Nlist=$( seq 56 50 56 ); export Nlist
     Nlist="56 112 225 450 900";
-    Nlist="200";
-    L=250; export Nlist
+    Nlist="100";
+    L=150; export Nlist
     eqtimes="5e5"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 0 1 0 ); export startTlist
-    Tlist="77"; export Tlist
-    Tlist="77 120 140"; export Tlist
+    Tlist="10 17.8 31.6 56.2 77 100 125"; export Tlist
+    Tlist="10 17.8"; export Tlist
+# Temp = 1 1.77827941003892 3.16227766016838 5.62341325190349 10 17.7827941003892 31.6227766016838 56.2341325190349 100
     aList="0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99";
     aList="1.00 1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09"; export aList
     aList="1.10 1.12 1.14 1.16 1.18 1.20 1.22 1.25"; export aList
@@ -33,10 +34,11 @@ set_parameters() {
     aList="1.06 1.065 1.07 1.075 1.08 1.085 1.09 1.095 1.10 1.105"; export aList
     aList="0.98 0.96 0.95";
     aList="1.01 1.02 1.03 1.04 1.05";
-    aList="1.13 1.14";
     aList="1.16 1.17 1.18 1.19 1.20"; export aList
     aList="1.05";
     aList="1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09 1.1 1.11 1.12 1.13 1.14 1.15 1.16 1.17 1.18 1.19 1.20"; export aList
+    aList="0.95 0.97 0.98 0.99 0.995 1.00 1.005 1.01 1.02 1.03 1.05"
+    aList="1.13 1.14";
     kTrapList="0";
 
     # Read from paramList.in file
@@ -46,7 +48,6 @@ set_parameters() {
     klist="2 4 8 16 32 64 128"; export klist
     klist="2.5 5 10 20"; export klist
     klist="3 6 12 24 48 96"; export klist
-    klist="160 192"
     klist="2 2.5 3 4 5 6 8 10 12 16 20 24 32 48 64 96 128 160 192"
     klist="0"
     Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
@@ -64,7 +65,7 @@ make_cFKdata_precompile() {
     sed "s/Tstart=0/Tstart=$stTi/" <cFKdata.xy.eqt.f90 >cFKdata.xy.T.f90
     sed "s/runID=''/runID='$runID'/" <cFKdata.xy.T.f90 >cFKdata.xy.ID.f90
     sed "s/aPercent=0/aPercent=$ai/" <cFKdata.xy.ID.f90 >cFKdata.xy.a.f90
-    sed "s/kTrap = 0/kTrap = $kTrapi/" <cFKdata.xy.a.f90 >cFKdata.xy.batch.f90
+    sed "s/kTrap = 0/kTrap = $ki/" <cFKdata.xy.a.f90 >cFKdata.xy.batch.f90
 }
 
 make_cFK_precompile() {
@@ -128,9 +129,10 @@ for ki in $klist
 do
 for Fi in ${Flist[@]}
 do
+    stTi=$Ti
     myrand=$(getRandomInt);
     # runID="sol${soli}_mv23"; export runID
-    runID="test"; export runID
+    runID="pull"; export runID
     echo "T$Ti, kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, stTi$stTi, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
     customRun=r${myrand}.T${Ti}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${stTi}.N${Ni}.ens$ensi.k${ki}.F${Fi}
     #INTEGER, PARAMETER :: N=208, Nsim=208,  channelWL=200
