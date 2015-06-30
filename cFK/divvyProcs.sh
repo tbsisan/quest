@@ -16,7 +16,7 @@ fi
 
 set_parameters() {
     # Compiled into executables
-    solList=$( seq 0 1 0 );
+    solList=$( seq 1 1 1 );
     Nlist=$( seq 56 50 56 ); export Nlist
     Nlist="56 112 225 450 900";
     Nlist="100";
@@ -132,7 +132,7 @@ do
     stTi=$Ti
     myrand=$(getRandomInt);
     # runID="sol${soli}_mv23"; export runID
-    runID="pull"; export runID
+    runID="oneSol"; export runID
     echo "T$Ti, kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, stTi$stTi, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
     customRun=r${myrand}.T${Ti}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${stTi}.N${Ni}.ens$ensi.k${ki}.F${Fi}
     #INTEGER, PARAMETER :: N=208, Nsim=208,  channelWL=200

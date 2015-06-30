@@ -433,7 +433,7 @@ END SUBROUTINE logParams
             DO i=1,N
                vx(i)=vMean*(1+sampleGaussian())
             ENDDO
-         CASE (TWOKINKS)
+         CASE (KINKS)
              ! units appear to be particle number
             numSols = 0;
             solSpacing = real(N)/(real(abs(numSols))+1.0_BR)

@@ -8,7 +8,7 @@
 %
 cFKparameters; 
 
-clear savedData moduleData runList;
+clear savedData saveParams moduleData runList;
 savedData(length(cFKpruned)) = struct(); % Initialize empty structure array to hold saved data
 
 startfile=1;
@@ -66,6 +66,11 @@ for cFKi=startfile:endfile
         aPercents(cFKi) = cFKsimParams.a/cFKsimParams.lambda;
     end
 
+    if amember(moduleList,'fitSoliton')
+        [ fitResults, fitErrors, fitMessages ] = fitOneSoliton(xs,cFKsimParams.lambda);
+        solitonFitRmse(cFKi) = fitErrors.rmse;
+    end
+
     if amember(moduleList,'animate')
         reduced.temps = reduced.Uxs(:,1)/1.38e-23/cFKsimParams.N*2;
         [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, reduced.ui, reduced.temps, cFKsimParams, cFKflags, paths );
@@ -118,7 +123,7 @@ for cFKi=startfile:endfile
     for saveIndex=1:length(dataToSave)
         savedData(cFKi).(dataToSave{saveIndex}) = eval( dataToSave{saveIndex} );
     end
-    
+    saveParams(cFKi) = cFKsimParams;
 end
 
 if (isOctave)
