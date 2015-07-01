@@ -3,7 +3,7 @@
 %
 
 %
-% Run the file that sets the parameters:
+% Run cFKparameters, the file that sets the parameters:
 % dcdPath, dcds, dcdSettings, dcdFlags, dataToSave, optionalFunctions, dcdPruneStrings
 %
 cFKparameters; 
@@ -24,7 +24,7 @@ if amember(moduleList, 'energyVsTime') && amember(cFKflags,'doFigs')
     [ fh, cFKenergyAxes ] = cFKenergyFigure(900,700,cFKflags)
 end
 
-clear numSolitons numSolitonsInt aPercents finalEnergy kValues;
+clear solitonGenesis firstEgress numSolitons numSolitonsInt aPercents finalEnergy kValues;
 
 for cFKi=startfile:endfile
      
@@ -44,9 +44,9 @@ for cFKi=startfile:endfile
     % 
     % Read in the data in the dcd file
     %
-    % [ Uxs,  ~,  ~,  ~ ]  = readFortran( cFKfiles.Ux, 0 );
+    [ Uxs,  ~,  ~,  ~ ]  = readFortran( cFKfiles.Ux, 0 );
     [  xs, ts, ui, fn ]  = readFortran( cFKfiles.x, cFKsimParams.lambda );
-    % [ reduced, reducedIndexes ] = cFKreduceVars( xs, ui, Uxs, ts, cFKsettings );
+    [ reduced, reducedIndexes ] = cFKreduceVars( xs, ui, Uxs, ts, cFKsettings );
     
     %
     % Modules
@@ -84,6 +84,12 @@ for cFKi=startfile:endfile
     if amember(moduleList, 'countSolitons')
         numSolitons(cFKi) = abs(ui(end,end)-ui(end,1))/(cFKsimParams.lambda);
         numSolitonInt(cFKi) = round(numSolitons(cFKi));
+        uiBar = ui/(cFKsimParams.lambda);
+        uiInt = round(uiBar);
+        solitonLocations = abs( diff( uiInt, [], 2 ) );
+        numSolitonsFull = sum( solitonLocations, 2 );
+        solitonGenesis(cFKi) = sum(abs( diff( numSolitonsFull ) ));
+        firstEgress(cFKi) = ts(find( numSolitonsFull==0, 1 ));
         moduleData.solitons.num(cFKi) = numSolitons(cFKi);
         moduleData.solitons.N(cFKi) = cFKsimParams.N;
         moduleData.solitons.aP(cFKi) = cFKsimParams.a/cFKsimParams.lambda;

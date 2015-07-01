@@ -11,7 +11,7 @@ T=      [...
        ]; 
 cFKparameters;
 [ fh ] = launchFigure( cFKflags );
-figTitle = 'Controlled exit';
+figTitle = 'Time to zero solitons';
 [ textHandle ] = text( 0.05, 0.95, sprintf('Temp: %.2f (K)',str2num(T(1,:))),'Units','normalized');
 cFKplot( [], [], 1, 1, 'o', figTitle, 'a/lambda', 'g', {}, 1 );
 %set( gca , 'NextPlot' , 'replacechildren' ) ;
@@ -28,7 +28,7 @@ open(writerObj);
 clear saveSolM;
 
 for Ti=1:size(T,1)
-    cFKpattern=['x.*Ti000_L250*a1*k*h1.53*T' T(Ti,:) '*n1.00E+10*F0*dat']
+    cFKpattern=['x.oneSoliton*a*k*h1.53*T' T(Ti,:) '*n5.00E+09*F0*dat']
     cFKprocessor;
     % cFKplot( [], [], 1, 1, 'o', figTitle, 'a/lambda', 'g', {}, 1 );
     %[ textHandle ] = text( 0.05, 0.9, sprintf('Temp: %.2f (K)',str2num(T(Ti,:))),'Units','normalized');

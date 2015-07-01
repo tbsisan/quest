@@ -23,12 +23,12 @@ if ~exist('cFKpattern'); cFKpattern='asdfasdf'; end
 % A list of possible flags is in flags.m (TODO)
 %
 cFKsettings = struct(   'sortTrajectory', 'no',     'oneAtomStrategy', 'trackCOM', ...
-                        'sliceTimes', 0,        'cropTimes', [0.0/10.0 10.0/10.0] );
+                        'sliceTimes', 0,        'cropTimes', [0.0/10.0 1.0/10.0] );
 cFKflags    = { '~useLastcFK', 'doFigs', '~hideFigs', '~plotPosition' }; % a ~ prepended to a flag, or, technically any change to the string, turns it off.
 
 dataToSave  = { 'ui', 'cFKsimParams' }; % Save this data for each dcd file processed
 
-moduleList  = { '~energyVsTime', '~animate', '~plotOverview','countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
+moduleList  = { '~energyVsTime', 'animate', '~plotOverview','countSolitons','~measureMotion' }; % List of optional data processing options. Full list in makeAvailableModules:
 %if ~amember(availableModules, moduleList) error([ 'One of the modules in moduleList is not in availableModules' ]); end
 
 % This is where the list of files to process is obtained. The list pruned below according to keepPatterns and prunePatterns.
@@ -36,7 +36,7 @@ if ~amember(cFKflags,'useLastcFK')
     cFKs    = getFilesWithPattern( paths, cFKpattern );
 end
 
-keepPatterns    = { @or, 'test','phase' }; % Only keep files based on logic infirst cell element. To not filter based on this, use '.+'
+keepPatterns    = { @or, '.+' }; % Only keep files based on logic infirst cell element. To not filter based on this, use '.+'
 prunePatterns   = { @or, 'aaaaaaa',  ...
                     'replaceMeWithaPatternToMatchAFileNameForExclusion',  ...
                     '9999999' }; % Files matching these pattern strings, with logic based on first element, will be excluded from processing.

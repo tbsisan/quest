@@ -431,7 +431,7 @@ END SUBROUTINE logParams
             ! TBS: the below was +(L-chainL)/2.0
             x=x+(L-chainL)/2.0
             DO i=1,N
-               vx(i)=vMean*(1+sampleGaussian())
+               vx(i)=vMean*(1+0.1*sampleGaussian())
             ENDDO
          CASE (KINKS)
              ! units appear to be particle number
@@ -455,7 +455,7 @@ END SUBROUTINE logParams
             ENDIF
             DO i=1,N
                 x(i)=-WL/WLperN/2.0_BR+i*WL/WLperN
-                vx(i)=0
+                vx(i)=vMean*(1+0.1*sampleGaussian())
             ENDDO
             DO si=1,abs(numSols)
             DO i=1,N

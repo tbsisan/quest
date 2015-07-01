@@ -4,6 +4,8 @@ function labelFig(t,x,y,l)
     xlabel(x);
     ylabel(y);
     if length(l)>0
-        legend(l,'FontSize',6);
+        legend(l);
+        copied_legend = findobj(gcf(),'type','axes','Tag','legend');
+        set(copied_legend, 'FontSize', 8);
     end
 end

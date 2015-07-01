@@ -1,5 +1,5 @@
 function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, cFKflags, paths )
-    global angstrom;
+    global isOctave angstrom;
     blue = 1; thin = 1;
     an.title = sprintf('u_i during a portion of %.1f ns cFK polymer sim',cFKsimParams.simSeconds*1e9);
     an.xlabel = 'Particle number';
@@ -16,16 +16,19 @@ function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, c
     [ textHandle ] = text( 0.05, 0.9, sprintf('time: %.2f (ns)',ts(1)),'Units','normalized');
     [ infoHandle ] = text( 0.60, 0.7, sprintf(cFKsimParams.allStr),'Units','normalized');
     ax=gca;
-    ax.Units = 'pixels';
-    pos = ax.Position;
-    ti = ax.TightInset;
+    set(ax,'Units','pixels');
+    %ax.Units = 'pixels';
+    pos = get(ax,'Position');
+    ti = get(ax,'TightInset');
     rect = [-ti(1), -ti(2), pos(3)+ti(1)+ti(3), pos(4)+ti(2)+ti(4)];
 
     cFKmovie(length(ts)) = struct('cdata',[],'colormap',[]);
     % writerObj = VideoWriter('test.avi','Indexed AVI');
-    writerObj = VideoWriter([paths.movieStor '/' cFKsimParams.fn '.avi']);
-    writerObj.FrameRate = 10;
-    open(writerObj);
+    if ~isOctave
+        writerObj = VideoWriter([paths.movieStor '/' cFKsimParams.fn '.avi']);
+        writerObj.FrameRate = 10;
+        open(writerObj);
+    end
     for t=1:length(ts)
         set( plotHandle, 'Ydata', sols(t,:) );
         set( textHandle, 'String',  {   sprintf(    'frame %i / %i', t, length(ts) ); ...
@@ -35,10 +38,14 @@ function [ plotHandle, cFKmovie ] = cFKanimate( ts, sols, temps, cFKsimParams, c
                                     } );
         drawnow;
         %pause(0.1);
-        cFKmovie(t) = getframe(gca,rect);
-        writeVideo(writerObj,cFKmovie(t));
+        ~isOctave && (cFKmovie(t) = getframe(gca,rect));
+        if isOctave
+            pause(0.5);
+        else
+            writeVideo(writerObj,cFKmovie(t));
+        end
     end
-    close(writerObj);
+    ~isOctave && close(writerObj);
     close(fh);
 
 end

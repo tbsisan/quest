@@ -24,8 +24,8 @@ set_parameters() {
     eqtimes="5e5"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 0 1 0 ); export startTlist
-    Tlist="10 17.8 31.6 56.2 77 100 125"; export Tlist
-    Tlist="10 17.8"; export Tlist
+    Tlist="10 17.8 31.6 56.2 77 100"; export Tlist
+    Tlist="10"; export Tlist
 # Temp = 1 1.77827941003892 3.16227766016838 5.62341325190349 10 17.7827941003892 31.6227766016838 56.2341325190349 100
     aList="0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99";
     aList="1.00 1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09"; export aList
@@ -38,7 +38,7 @@ set_parameters() {
     aList="1.05";
     aList="1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09 1.1 1.11 1.12 1.13 1.14 1.15 1.16 1.17 1.18 1.19 1.20"; export aList
     aList="0.95 0.97 0.98 0.99 0.995 1.00 1.005 1.01 1.02 1.03 1.05"
-    aList="1.13 1.14";
+    aList="1.01";
     kTrapList="0";
 
     # Read from paramList.in file
@@ -102,7 +102,7 @@ launch_jobs() {
         echo $questruncmd
         exe msub -N r${myrand}ID${runID}kTr${kTrapi}a${ai}eq${eqti}Tst${stTi}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:30:00 -joe -V -o seeout.log $questruncmd
     else
-        exe ./questbatches/$fortexe
+        exe nice 20 ./questbatches/$fortexe >>fort.log &
     fi
 }
 
@@ -132,7 +132,7 @@ do
     stTi=$Ti
     myrand=$(getRandomInt);
     # runID="sol${soli}_mv23"; export runID
-    runID="oneSol"; export runID
+    runID="oneTest"; export runID
     echo "T$Ti, kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, stTi$stTi, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
     customRun=r${myrand}.T${Ti}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${stTi}.N${Ni}.ens$ensi.k${ki}.F${Fi}
     #INTEGER, PARAMETER :: N=208, Nsim=208,  channelWL=200
@@ -148,7 +148,18 @@ do
         cp ${compiler}.batch.out questbatches/${fortexe}
     fi
     make_paramList.in
-    launch_jobs
+    if command -v msub >/dev/null 2>&1; then
+        launch_jobs
+    else
+        numjobs=$(top -b -n1 | grep gfort | wc -l | tr -d '\n')
+        while ([[ $numjobs>3 ]]); do
+            echo "numjobs:$numjobs"
+            sleep 10
+            numjobs=$(top -b -n1 | grep gfort | wc -l)
+        done
+        sleep 1
+        launch_jobs
+    fi
 done
 done
 done
