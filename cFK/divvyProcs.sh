@@ -4,15 +4,30 @@
 source ../shell/randomInt.sh
 myrand=$(getRandomInt);
 
+# If the module command exists, then we are on Quest, and load the intel compiler.
 if command -v module >/dev/null 2>&1; then
     module load intel
 fi
 
+# If this was run with at least one argument, then it sets the compiler to use. Otherwise assume intel.
 if [ -z $1 ]; then
     compiler="ifort"
 else
     compiler=$1
 fi
+echo "compiler is $compiler"
+
+# If there is a second argument passed, then we won't submit an msub job, in other words we will run on the local processor, even if we are on quest.
+if [ -z $2 ]; then
+    if command -v msub >/dev/null 2>&1; then
+        submitMsub=true
+    else
+        submitMsub=false
+    fi
+else
+    submitMsub=false
+fi
+echo "Will we use msub to submit jobs? $submitMsub"
 
 set_parameters() {
     # Compiled into executables
@@ -24,8 +39,9 @@ set_parameters() {
     eqtimes="5e5"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 0 1 0 ); export startTlist
-    Tlist="10 17.8 31.6 56.2 77 100"; export Tlist
-    Tlist="10"; export Tlist
+    Tlist="5 10 17.8 31.6 56.2 77 100"; export Tlist
+    Tlist="5 10 17.8 31.6"; export Tlist
+    Tlist="56.2 77 100"; export Tlist
 # Temp = 1 1.77827941003892 3.16227766016838 5.62341325190349 10 17.7827941003892 31.6227766016838 56.2341325190349 100
     aList="0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99";
     aList="1.00 1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09"; export aList
@@ -37,8 +53,8 @@ set_parameters() {
     aList="1.16 1.17 1.18 1.19 1.20"; export aList
     aList="1.05";
     aList="1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09 1.1 1.11 1.12 1.13 1.14 1.15 1.16 1.17 1.18 1.19 1.20"; export aList
+    aList="1.01 1.02 1.03";
     aList="0.95 0.97 0.98 0.99 0.995 1.00 1.005 1.01 1.02 1.03 1.05"
-    aList="1.01";
     kTrapList="0";
 
     # Read from paramList.in file
@@ -95,20 +111,22 @@ make_paramList.in() {
 }
 
 launch_jobs() {
-    if command -v msub >/dev/null 2>&1; then
+    if [ "$submitMsub" = true ]; then
         questruncmd=questbatches/run.$customRun.sh
         sed "s/ifort.out/$fortexe/" <questbatch.sh >$questruncmd
         chmod 755 $questruncmd
         echo $questruncmd
         exe msub -N r${myrand}ID${runID}kTr${kTrapi}a${ai}eq${eqti}Tst${stTi}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:30:00 -joe -V -o seeout.log $questruncmd
     else
-        exe nice 20 ./questbatches/$fortexe >>fort.log &
+        # be nice to not bog down the system.
+        exe nice ./questbatches/$fortexe >>fort.log &
     fi
 }
 
 set_parameters
 ./paramList.pl
 
+loopvar=0;
 for kTrapi in $kTrapList
 do
 for soli in $solList
@@ -129,6 +147,7 @@ for ki in $klist
 do
 for Fi in ${Flist[@]}
 do
+    loopvar=$((loopvar+1))
     stTi=$Ti
     myrand=$(getRandomInt);
     # runID="sol${soli}_mv23"; export runID
@@ -148,14 +167,14 @@ do
         cp ${compiler}.batch.out questbatches/${fortexe}
     fi
     make_paramList.in
-    if command -v msub >/dev/null 2>&1; then
+    if [ "$submitMsub" = true ]; then
         launch_jobs
     else
-        numjobs=$(top -b -n1 | grep gfort | wc -l | tr -d '\n')
-        while ([[ $numjobs>3 ]]); do
-            echo "numjobs:$numjobs"
-            sleep 10
-            numjobs=$(top -b -n1 | grep gfort | wc -l)
+        numjobs=$(top -b -n1 | grep fort | wc -l | tr -d '\n')
+        echo "numjobs:$numjobs, submitted jobs:$loopvar"
+        while ([[ $numjobs -gt 8 ]]); do
+            sleep 5
+            numjobs=$(top -b -n1 | grep fort | wc -l)
         done
         sleep 1
         launch_jobs
