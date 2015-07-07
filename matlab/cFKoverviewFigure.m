@@ -3,8 +3,8 @@ function [ fh, cFKaxes ] = cFKoverviewFigure( w, h, cFKflags )
     colsOfAxes=2; %endfile-startfile
     %xAxes = figuregrid(rowsOfAxes,1);
     %tempAxes = figuregrid(rowsOfAxes,1);
-    [ fh ] = launchFigure( cFKflags );
-    set(fh,'Position',[10 10 w h]);
+    [ fh ] = launchFigure( cFKflags,w,h );
+    %set(fh,'Position',[10 10 w h]);
     % set(fh,'Visible','off');
     cFKaxes.temp = subplot(rowsOfAxes,colsOfAxes,1);
     cFKaxes.energy = subplot(rowsOfAxes,colsOfAxes,3)

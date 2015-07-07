@@ -1,0 +1,74 @@
+% Load saved data showing whether solitons formed as function of a and MoveDistance.
+
+a103 = load('ensRawa103.mat');
+a105 = load('ensRawa105.mat');
+a107 = load('ensRawa107.mat');
+a109 = load('ensRawa109.mat');
+a111 = load('ensRawa111.mat');
+a113 = load('ensRawa113.mat');
+a115 = load('ensRawa115.mat');
+
+ensT25a103=a103.ensRawT25a103;
+ensT50a103=a103.ensRawT50a103;
+ensT25a105=a105.ensRawT25a105;
+ensT50a105=a105.ensRawT50a105;
+ensT25a107=a107.ensRawT25a107;
+ensT50a107=a107.ensRawT50a107;
+ensT25a109=a109.ensRawT25a109;
+ensT50a109=a109.ensRawT50a109;
+ensT25a111=a111.ensRawT25a111;
+ensT50a111=a111.ensRawT50a111;
+ensT25a113=a113.ensRawT25a113;
+ensT25a115=a115.ensRawT25a115;
+
+ensT25a103(isnan(ensT25a103))=50e-9;
+ensT50a103(isnan(ensT50a103))=50e-9;
+ensT25a105(isnan(ensT25a105))=50e-9;
+ensT50a105(isnan(ensT50a105))=50e-9;
+ensT25a107(isnan(ensT25a107))=50e-9;
+ensT50a107(isnan(ensT50a107))=50e-9;
+ensT25a109(isnan(ensT25a109))=50e-9;
+ensT50a109(isnan(ensT50a109))=50e-9;
+ensT25a111(isnan(ensT25a111))=50e-9;
+ensT50a111(isnan(ensT50a111))=50e-9;
+ensT25a113(isnan(ensT25a113))=50e-9;
+ensT25a115(isnan(ensT25a115))=50e-9;
+
+figure;
+hold on;
+Ms=[0.5:0.05:0.95];
+plot(Ms,mean(ensT25a103),'o-');
+plot(Ms,mean(ensT50a103),'o--');
+plot(Ms,mean(ensT25a105),'s-');
+plot(Ms,mean(ensT50a105),'s--');
+plot(Ms,mean(ensT25a107),'^-');
+plot(Ms,mean(ensT50a107),'^--');
+plot(Ms,mean(ensT25a109),'*-');
+plot(Ms,mean(ensT50a109),'*--');
+plot(Ms,mean(ensT25a111),'p-');
+plot(Ms,mean(ensT50a111),'p--');
+plot(Ms,mean(ensT25a113),'x-');
+plot(Ms,mean(ensT25a115),'+-');
+xlabel('Move By (lambda)');
+ylabel('time till soliton (s)');
+title({'Average time till soliton over 20 50ns runs,'; 'Movement from 1-2ns, held from 2-50ns'});
+legend({'T25 a1.03', 'T50 a1.03', 'T25 a1.05', 'T50 a1.05', 'T25 a1.07', 'T50 a1.07', 'T25 a1.09', 'T50 a1.09', 'T25 a1.11', 'T50 a1.11', 'T25 a1.13', 'T25 a1.15'});
+
+figure;
+hold on;
+plot(Ms,sum(ensT25a103<50e-9),'o-');
+plot(Ms,sum(ensT50a103<50e-9),'o--');
+plot(Ms,sum(ensT25a105<50e-9),'s-');
+plot(Ms,sum(ensT50a105<50e-9),'s--');
+plot(Ms,sum(ensT25a107<50e-9),'^-');
+plot(Ms,sum(ensT50a107<50e-9),'^--');
+plot(Ms,sum(ensT25a109<50e-9),'*-');
+plot(Ms,sum(ensT50a109<50e-9),'*--');
+plot(Ms,sum(ensT25a111<50e-9),'p-');
+plot(Ms,sum(ensT50a111<50e-9),'p--');
+plot(Ms,sum(ensT25a113<50e-9),'x-');
+plot(Ms,sum(ensT25a115<50e-9),'+-');
+xlabel('Move By (lambda)');
+ylabel('Number runs showing soliton');
+title({'Number out of 20 50ns runs showing soliton,'; 'Movement from 1-2ns, held from 2-50ns'});
+legend({'T25 a1.03', 'T50 a1.03', 'T25 a1.05', 'T50 a1.05', 'T25 a1.07', 'T50 a1.07', 'T25 a1.09', 'T50 a1.09', 'T25 a1.11', 'T50 a1.11', 'T25 a1.13', 'T25 a1.15'});

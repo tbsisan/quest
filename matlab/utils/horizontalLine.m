@@ -1,5 +1,9 @@
 function horizontalLine(y,spec,explicitColor,varargin)
-% Plot a horizontal line, of type specified in lineSpec, spec.
+% Plot a set of horizontal lines, of type specified in lineSpec, spec.
+% function horizontalLine(y,spec,explicitColor,varargin)
+% y can be a vector.
+% set explicitColot to 0 to get next color.
+% varargin: labelLocation (to multiply by left axis), textLabel, 'r' if leftarrow
 
 % Get limits of x-axis so we know x-axis extent of a horizontal line.
 ax=axis;

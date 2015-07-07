@@ -5,6 +5,10 @@ if ( all(size(squeeze(x)) ~= size(squeeze(y))) && all(size(squeeze(x')) ~= size(
     disp(['size x: ' num2str(size(x))]);
     disp(['size y: ' num2str(size(y))]);
 else
+    if (isnumeric(lineSpec))
+        symbolList = {'o','s','^','*','p','x','d','+','.'};
+        lineSpec = [ symbolList{ mod(lineSpec,length(symbolList)) } '-' ];
+    end
     [ plotHandle ] = colorLinePlot(x,y,color,w,lineSpec);
 
     if (label)

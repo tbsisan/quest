@@ -31,17 +31,18 @@ echo "Will we use msub to submit jobs? $submitMsub"
 
 set_parameters() {
     # Compiled into executables
-    solList=$( seq 1 1 1 );
+    solList=$( seq 0 1 0 );
     Nlist=$( seq 56 50 56 ); export Nlist
     Nlist="56 112 225 450 900";
-    Nlist="100";
-    L=150; export Nlist
+    Nlist="60";
+    L=100; export Nlist
     eqtimes="5e5"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 0 1 0 ); export startTlist
     Tlist="5 10 17.8 31.6 56.2 77 100"; export Tlist
     Tlist="5 10 17.8 31.6"; export Tlist
     Tlist="56.2 77 100"; export Tlist
+    Tlist="25"; export Tlist
 # Temp = 1 1.77827941003892 3.16227766016838 5.62341325190349 10 17.7827941003892 31.6227766016838 56.2341325190349 100
     aList="0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99";
     aList="1.00 1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09"; export aList
@@ -51,11 +52,15 @@ set_parameters() {
     aList="0.98 0.96 0.95";
     aList="1.01 1.02 1.03 1.04 1.05";
     aList="1.16 1.17 1.18 1.19 1.20"; export aList
-    aList="1.05";
     aList="1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09 1.1 1.11 1.12 1.13 1.14 1.15 1.16 1.17 1.18 1.19 1.20"; export aList
-    aList="1.01 1.02 1.03";
     aList="0.95 0.97 0.98 0.99 0.995 1.00 1.005 1.01 1.02 1.03 1.05"
-    kTrapList="0";
+    aList="0.94 0.95 0.96 1.04 1.05 1.06";
+    aList="1.03 1.05 1.07";
+    aList="1.005 1.01 1.02 1.03 1.04 1.05";
+    kTrapList="0"; # The trap strength is currently hardcoded to be the interparticle spring constant
+    moveByList="0.90"
+    moveByList="0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95"
+    moveByList="0.65 0.675 0.70 0.725 0.75 0.775 0.80 0.85"
 
     # Read from paramList.in file
     enslist=$( seq 0 1 0 ); export enslist
@@ -81,7 +86,8 @@ make_cFKdata_precompile() {
     sed "s/Tstart=0/Tstart=$stTi/" <cFKdata.xy.eqt.f90 >cFKdata.xy.T.f90
     sed "s/runID=''/runID='$runID'/" <cFKdata.xy.T.f90 >cFKdata.xy.ID.f90
     sed "s/aPercent=0/aPercent=$ai/" <cFKdata.xy.ID.f90 >cFKdata.xy.a.f90
-    sed "s/kTrap = 0/kTrap = $ki/" <cFKdata.xy.a.f90 >cFKdata.xy.batch.f90
+    sed "s/kTrap = 0/kTrap = $ki/" <cFKdata.xy.a.f90 >cFKdata.xy.kTr.f90
+    sed "s/positioningMultiplier = 0.00/positioningMultiplier = $moveByi/" <cFKdata.xy.kTr.f90 >cFKdata.xy.batch.f90
 }
 
 make_cFK_precompile() {
@@ -116,7 +122,7 @@ launch_jobs() {
         sed "s/ifort.out/$fortexe/" <questbatch.sh >$questruncmd
         chmod 755 $questruncmd
         echo $questruncmd
-        exe msub -N r${myrand}ID${runID}kTr${kTrapi}a${ai}eq${eqti}Tst${stTi}N${Ni}E${ensi}k${ki}F${Fi} -l procs=1,walltime=00:30:00 -joe -V -o seeout.log $questruncmd
+        exe msub -N $customRun -l procs=1,walltime=00:20:00 -joe -V -o seeout.log $questruncmd
     else
         # be nice to not bog down the system.
         exe nice ./questbatches/$fortexe >>fort.log &
@@ -127,6 +133,8 @@ set_parameters
 ./paramList.pl
 
 loopvar=0;
+for moveByi in $moveByList
+do
 for kTrapi in $kTrapList
 do
 for soli in $solList
@@ -151,11 +159,11 @@ do
     stTi=$Ti
     myrand=$(getRandomInt);
     # runID="sol${soli}_mv23"; export runID
-    runID="oneTest"; export runID
-    echo "T$Ti, kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, stTi$stTi, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
-    customRun=r${myrand}.T${Ti}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${stTi}.N${Ni}.ens$ensi.k${ki}.F${Fi}
+    runID="Minspect"; export runID
+    echo "T$Ti, M$moveByi, kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, stTi$stTi, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
+    customRun=r${myrand}.T${Ti}.M${moveByi}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${stTi}.N${Ni}.ens$ensi.k${ki}.F${Fi}
     #INTEGER, PARAMETER :: N=208, Nsim=208,  channelWL=200
-    cFKdataChanges=$(( ${#eqList[@]} * ${#startTlist[@]} * ${#Nlist[@]} * ${#aList[@]} * ${#kTrapList[@]} ))
+    cFKdataChanges=$(( ${#eqList[@]} * ${#startTlist[@]} * ${#Nlist[@]} * ${#aList[@]} * ${#kTrapList[@]} * ${#moveByList[@]} ))
     cFKchanges=$(( ${#Flist[@]} * ${#solList[@]} ))
     make_cFKdata_precompile
     make_cFK_precompile
@@ -179,6 +187,7 @@ do
         sleep 1
         launch_jobs
     fi
+done
 done
 done
 done

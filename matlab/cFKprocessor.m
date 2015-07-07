@@ -24,7 +24,7 @@ if amember(moduleList, 'energyVsTime') && amember(cFKflags,'doFigs')
     [ fh, cFKenergyAxes ] = cFKenergyFigure(900,700,cFKflags)
 end
 
-clear solitonGenesis firstEgress numSolitons numSolitonsInt aPercents finalEnergy kValues;
+clear solitonPresent solitonGenesis firstEgress solitonFitRmse solitonFitEgress numSolitons numSolitonsInt aPercents finalEnergy kValues;
 
 for cFKi=startfile:endfile
      
@@ -35,8 +35,8 @@ for cFKi=startfile:endfile
     cFKfiles    = getcFKfiles( cFKfullFile );
     
     [ cFKsimParams ]    = getcFKsimParams( cFKfiles.log );
-    %runList{cFKi}       = cFKsimParams.ensStr;
-     %runList{cFKi}       = sprintf('%.2f',cFKsimParams.kbar);
+    % runList{cFKi}       = cFKsimParams.ensStr;
+    % runList{cFKi}       = sprintf('%.2f',cFKsimParams.kbar);
      runList{cFKi}       = sprintf('%.2f',cFKsimParams.a/cFKsimParams.lambda);
     % runList{cFKi}       = sprintf('%.1e',cFKsimParams.kbar);
     % runList{cFKi}       = sprintf('%.1e',cFKsimParams.ensStr);
@@ -47,6 +47,7 @@ for cFKi=startfile:endfile
     [ Uxs,  ~,  ~,  ~ ]  = readFortran( cFKfiles.Ux, 0 );
     [  xs, ts, ui, fn ]  = readFortran( cFKfiles.x, cFKsimParams.lambda );
     [ reduced, reducedIndexes ] = cFKreduceVars( xs, ui, Uxs, ts, cFKsettings );
+    cFKsimParams.frameTime = ts(3)-ts(2);
     
     %
     % Modules
@@ -67,13 +68,14 @@ for cFKi=startfile:endfile
     end
 
     if amember(moduleList,'fitSoliton')
-        [ fitResults, fitErrors, fitMessages ] = fitOneSoliton(xs,cFKsimParams.lambda);
+        [ fitResults, fitErrors, fitMessages ] = fitOneSoliton(xs(:,1)*1e10,cFKsimParams.lambda*1e10);
         solitonFitRmse(cFKi) = fitErrors.rmse;
+        solitonFitEgress(cFKi) = fitResults.position;
     end
 
     if amember(moduleList,'animate')
         reduced.temps = reduced.Uxs(:,1)/1.38e-23/cFKsimParams.N*2;
-        [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, reduced.ui, reduced.temps, cFKsimParams, cFKflags, paths );
+        [ animHandle, cFKmovie ] = cFKanimate( reduced.ts, reduced.xs, reduced.ui, reduced.temps, cFKsimParams, cFKflags, paths );
     end
         
     if amember(moduleList, 'plotOverview')
@@ -87,9 +89,16 @@ for cFKi=startfile:endfile
         uiBar = ui/(cFKsimParams.lambda);
         uiInt = round(uiBar);
         solitonLocations = abs( diff( uiInt, [], 2 ) );
+        [ maxSolJumps, solIndices ] = max(solitonLocations,[],2);
+        solitonIndex = find( and(solIndices<(size(xs,2)-12) , solIndices>5) , 1);
+        if isempty(solitonIndex) solitonIndex=NaN; end
+        solitonPresent(cFKi) = solitonIndex;
         numSolitonsFull = sum( solitonLocations, 2 );
-        solitonGenesis(cFKi) = sum(abs( diff( numSolitonsFull ) ));
-        firstEgress(cFKi) = ts(find( numSolitonsFull==0, 1 ));
+        solitonGenesis(cFKi) = sum(abs( diff( numSolitonsFull ) ))/length(numSolitonsFull);
+        tiEgress = find( numSolitonsFull==0, 1 );
+        if isempty(tiEgress) tiEgress=length(ts); end
+        firstEgress(cFKi) = ts(tiEgress);
+        disp(['TIME TO ZERO SOLITONS: ' num2str(1e12*ts(tiEgress))]);
         moduleData.solitons.num(cFKi) = numSolitons(cFKi);
         moduleData.solitons.N(cFKi) = cFKsimParams.N;
         moduleData.solitons.aP(cFKi) = cFKsimParams.a/cFKsimParams.lambda;

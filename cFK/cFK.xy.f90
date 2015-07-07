@@ -22,7 +22,7 @@ program cFK
    CHARACTER(LEN=3) :: StartTchar,NinCharForm,LinCharForm
    CHARACTER(LEN=4) :: runNumberChar
    CHARACTER(LEN=6) :: formatReal
-   CHARACTER(LEN=8) :: kChar,hChar,Gchar,Tchar,etaChar,runtimechar
+   CHARACTER(LEN=8) :: posMulChar,kChar,hChar,Gchar,Tchar,etaChar,runtimechar
    CHARACTER(LEN=9) :: axChar
    CHARACTER(LEN=10) :: startClockChar
    REAL(KIND=BR), DIMENSION(size(Temp)) :: kbT, thermalStrength
@@ -288,13 +288,14 @@ END SUBROUTINE logParams
     write(Tchar,'(ES8.2)') Temp(run)
     write(etaChar,'(ES8.2)') eta(run)
     write(Gchar,'(ES8.2)') G(run)
+    write(posMulChar,'(ES8.2)') positioningMultiplier
     write(runtimechar,'(ES8.2)') T
     write(axChar,'(ES9.3)') ax/WL*WLperN 
     write(eqtChar,'(I0.1)') int(real(coolDownSteps)/1.0e6)
     write(startTchar,'(I0.3)') Tstart
     write(ensChar,'(I0.2)') INT(ens(run))
     
-    runName=runID//'_'//ensChar//'_eqt'//eqtChar//'_Ti'//startTchar//'_L'//trim(adjustl(LinCharForm))//&
+    runName=runID//'_'//ensChar//'_M'//posMulChar//'_eqt'//eqtChar//'_Ti'//startTchar//'_L'//trim(adjustl(LinCharForm))//&
             '_N'//trim(adjustl(NinCharForm))//'_a'//axChar//'_k'//kChar//'_h'//hChar//'_T'//Tchar//&
             '_n'//etaChar//'_F'//Gchar//'_t'//runtimechar
 
@@ -604,6 +605,7 @@ END SUBROUTINE logParams
       REAL(KIND=BR), DIMENSION(NSim) :: dx,dy
       !REAL(KIND=BR) :: dxCorrect
       REAL(KIND=8), SAVE :: runningTime=0.0
+      REAL(KIND=BR) :: lastXoffset
 
       IF (TIMESUBS) THEN
          CALL startTimer()
@@ -634,7 +636,8 @@ END SUBROUTINE logParams
       END SELECT
 
       IF (tstep .eq. positioningOn) THEN
-        trapCenter=x(N)
+        lastXoffset=x(N)+WL/WLperN/two
+        trapCenter = (WL/WLperN) * NINT(lastXoffset/(WL/WLperN)) - WL/WLperN/two
         write(999,*) 'set initial trapCenter ',x(N),trapCenter
       ENDIF
       IF (POSITIONING .gt. 0 .and. (tstep .gt. positioningOn .and. tstep .lt. positioningOff)) THEN
@@ -1085,7 +1088,7 @@ END SUBROUTINE logParams
           CASE (FIRSTATOM)
             !cFKa(1) = 0
           CASE (LASTTRAP)
-            Ftrap = -k(run)*(x(N)-trapCenter)
+            Ftrap = -k(run)*two*(x(N)-trapCenter)
             cFKa(N) = cFKa(N) + oneOverM(run)*Ftrap
         END SELECT
       ENDIF

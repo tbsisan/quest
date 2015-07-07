@@ -1,4 +1,9 @@
 function verticalLine(x,spec,explicitColor,varargin)
+% Plot a set of vertical lines, of type specified in lineSpec, spec.
+% function verticalLine(x,spec,explicitColor,varargin)
+% x can be a vector
+% set explicitColot to 0 to get next color.
+% varargin: labelLocation (to multiply by top of axis), textLabel, 'r' if leftarrow
 
 ax=axis;
 yLimits=[ax(3) ax(4)];
@@ -13,7 +18,7 @@ lineWidth=1;
 for linei=1:length(x)
     xi=x(linei);
     colorLinePlot([xi xi], yLimits, explicitColor, lineWidth, spec)
-    explicitColor=getaNiceolor();
+    explicitColor=getaNiceColor();
 end
 
 if ~isempty(varargin)

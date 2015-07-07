@@ -1,4 +1,5 @@
 function cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList, labelFigs)
+% function cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList, labelFigs)
 % Make a nice overview plot for cFK sims.
 % Plots Temp, spring/substrate Energy ratio, displacement, chain width (relevant for finite length chains), and solitons.
     global angstrom;
@@ -13,13 +14,17 @@ function cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList,
     horizontalLine(Eratio(end),'--', cFKi); 
 
     axes(cFKaxes.x1);hold on;
-    cFKplot(ts*1e9, xs(:,end)*1e10, cFKi, 1, '', 'Position of particle 1', '', ['x (' angstrom ')'], '', labelFigs);
+    cFKplot(ts*1e9, xs(:,1)*1e10, cFKi, 1, '.', 'Position of particles 1,N(scaled)', '', ['x (' angstrom ')'], '', 0);
+    cFKplot(ts*1e9, (xs(:,end)-xs(1,end)+xs(1,1))*1e10, cFKi+16, 1, '-', 'Position of particles 1,N', '', ['x (' angstrom ')'], {'1','N'}, labelFigs);
 
     axes(cFKaxes.chainwidth); hold on;
-    solWidth=max(sol,[],2)-min(sol,[],2);
-    solWidth=solWidth-solWidth(3);
+    %solWidth=max(sol,[],2)-min(sol,[],2);
+    %solWidth=solWidth-solWidth(3);
+    width = xs(:,end)-xs(:,1);
+    noSolitonWidth = (cFKsimParams.N-1)*cFKsimParams.lambda;
+    width = (width - noSolitonWidth)/cFKsimParams.lambda;
     %cFKplot(ts*1e9, (xs(:,end)-xs(:,1))*1e10, cFKi, 1, '-', 'Chain Length','time (ns)', ['length (' angstrom ')'], '', labelFigs);
-    cFKplot(ts*1e9, solWidth*1e10, cFKi, 1, '-', 'Chain Length','time (ns)', ['u_i width (' angstrom ')'], '', labelFigs);
+    cFKplot(ts*1e9, width, cFKi, 1, '-', 'Net expansion solitons','time (ns)', ['u_i width (' angstrom ')'], '', labelFigs);
     %colorLinePlot(0,(xs(1,end)-xs(1,1))*1e10,1,1,'o');
     if (labelFigs) 
         %horizontalLine( (cFKsimParams.N-1)*cFKsimParams.a*1e10, '--', cFKi); 
