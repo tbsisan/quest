@@ -34,46 +34,27 @@ set_parameters() {
     solList=$( seq 0 1 0 );
     Nlist=$( seq 56 50 56 ); export Nlist
     Nlist="56 112 225 450 900";
-    Nlist="60";
-    L=100; export Nlist
+    Nlist="100";
+    L=150; export Nlist
     eqtimes="5e5"; export eqtimes
     eqList=($eqtimes); export eqList
     startTlist=$( seq 0 1 0 ); export startTlist
     Tlist="5 10 17.8 31.6 56.2 77 100"; export Tlist
-    Tlist="5 10 17.8 31.6"; export Tlist
-    Tlist="56.2 77 100"; export Tlist
     Tlist="25"; export Tlist
 # Temp = 1 1.77827941003892 3.16227766016838 5.62341325190349 10 17.7827941003892 31.6227766016838 56.2341325190349 100
-    aList="0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99";
-    aList="1.00 1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09"; export aList
-    aList="1.10 1.12 1.14 1.16 1.18 1.20 1.22 1.25"; export aList
-    aList="1.01 1.03 1.05 1.07 1.09 1.10 1.12 1.14 1.16 1.18 1.20 1.22 1.23 1.24 1.25 "; export aList
-    aList="1.06 1.065 1.07 1.075 1.08 1.085 1.09 1.095 1.10 1.105"; export aList
-    aList="0.98 0.96 0.95";
-    aList="1.01 1.02 1.03 1.04 1.05";
-    aList="1.16 1.17 1.18 1.19 1.20"; export aList
-    aList="1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09 1.1 1.11 1.12 1.13 1.14 1.15 1.16 1.17 1.18 1.19 1.20"; export aList
-    aList="0.95 0.97 0.98 0.99 0.995 1.00 1.005 1.01 1.02 1.03 1.05"
-    aList="0.94 0.95 0.96 1.04 1.05 1.06";
-    aList="1.03 1.05 1.07";
     aList="1.005 1.01 1.02 1.03 1.04 1.05";
+    aList="1.07";
     kTrapList="0"; # The trap strength is currently hardcoded to be the interparticle spring constant
-    moveByList="0.90"
     moveByList="0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95"
     moveByList="0.65 0.675 0.70 0.725 0.75 0.775 0.80 0.85"
+    moveByList="0.65 0.70 0.75 0.80"; # 
 
     # Read from paramList.in file
     enslist=$( seq 0 1 0 ); export enslist
-    klist="20 25 30 40 50 60 80 120"; export klist
-    klist="10 100"; export klist
-    klist="2 4 8 16 32 64 128"; export klist
-    klist="2.5 5 10 20"; export klist
-    klist="3 6 12 24 48 96"; export klist
     klist="2 2.5 3 4 5 6 8 10 12 16 20 24 32 48 64 96 128 160 192"
-    klist="0"
+    klist="5"
     Flist="1.00e-16 1.67e-16 2.78e-16 4.64e-16 7.74e-16 1.29e-15 2.15e-15 3.59e-15 5.99e-15 1.00e-14"; export Flist
     Flist="1.00e-11 1.82e-11 3.31e-11 6.03e-11 1.10e-10 2.00e-10 4.00e-10";
-    Flist="2.01e-10"; export Flist
     Flist="0.00e+00";
     Flist=($Flist);
 }
@@ -159,7 +140,7 @@ do
     stTi=$Ti
     myrand=$(getRandomInt);
     # runID="sol${soli}_mv23"; export runID
-    runID="Minspect"; export runID
+    runID="startHold"; export runID
     echo "T$Ti, M$moveByi, kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, stTi$stTi, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
     customRun=r${myrand}.T${Ti}.M${moveByi}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${stTi}.N${Ni}.ens$ensi.k${ki}.F${Fi}
     #INTEGER, PARAMETER :: N=208, Nsim=208,  channelWL=200

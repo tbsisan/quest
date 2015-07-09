@@ -454,10 +454,13 @@ END SUBROUTINE logParams
             ELSE
                 charge=-1.0
             ENDIF
+
             DO i=1,N
+                ! First particle is at lambda/2
                 x(i)=-WL/WLperN/2.0_BR+i*WL/WLperN
                 vx(i)=vMean*(1+0.1*sampleGaussian())
             ENDDO
+
             DO si=1,abs(numSols)
             DO i=1,N
                uv1=uv(i,solSpacing*si,width,0.0_BR)
@@ -465,6 +468,21 @@ END SUBROUTINE logParams
                x(i)=x(i)-charge*uv1(1)
             ENDDO
             ENDDO
+            IF (POSITIONING .eq. STARTHOLD) THEN
+                DO i=1,N
+                    x(i)=x(i)+positioningMove
+                ENDDO
+            ENDIF
+        CASE (FVDM)
+            l0=sqrt(k(run)*lambda*lambda/4.0/h(run))
+            sinCoeff=pi/two/l0/l0
+            x(N)=positioningMove
+            xNp1 = x(N) + a
+            x(N-1)=
+            DO i=N-2,3,-1
+                x(i)=
+            ENDDO
+                
          CASE (ONEBREATHER)
             center1=20.0_BR
             center2=40.0_BR
@@ -611,6 +629,15 @@ END SUBROUTINE logParams
          CALL startTimer()
       END IF
 
+      IF (tstep .eq. positioningOn) THEN
+        lastXoffset=x(N)+WL/WLperN/two
+        trapCenter = (WL/WLperN) * NINT(lastXoffset/(WL/WLperN)) - WL/WLperN/two
+        IF (POSITIONING .eq. STARTHOLD) THEN
+            trapCenter = x(N)
+        ENDIF
+        write(999,*) 'set initial trapCenter ',x(N),trapCenter
+      ENDIF
+
       SELECT CASE (INTEGRATOR)
          CASE (EULER)
             dx = euler1(1,x,vx)
@@ -635,12 +662,7 @@ END SUBROUTINE logParams
             STOP
       END SELECT
 
-      IF (tstep .eq. positioningOn) THEN
-        lastXoffset=x(N)+WL/WLperN/two
-        trapCenter = (WL/WLperN) * NINT(lastXoffset/(WL/WLperN)) - WL/WLperN/two
-        write(999,*) 'set initial trapCenter ',x(N),trapCenter
-      ENDIF
-      IF (POSITIONING .gt. 0 .and. (tstep .gt. positioningOn .and. tstep .lt. positioningOff)) THEN
+      IF (POSITIONING .gt. 0 .and. (tstep .ge. positioningOn .and. tstep .lt. positioningOff)) THEN
         SELECT CASE (POSITIONING)
             CASE (LASTATOM)
                 x(N) =  x(N) + positioningdx
@@ -652,6 +674,8 @@ END SUBROUTINE logParams
                 dx(N) = positioningdx
             CASE (LASTTRAP)
                 trapCenter = trapCenter + positioningdx
+            CASE (STARTHOLD)
+                ! don't move trapCenter
         END SELECT
       END IF
 
@@ -1061,6 +1085,17 @@ END SUBROUTINE logParams
                Fwash=h(run)*pitch*sin(rSub*pitch+xPhase)
                Ftube=0.0
             ENDIF
+            IF (CHANNELTYPE .eq. SHORTCHANNEL) THEN
+                WHERE (rSub .lt. leftChannelEdge .or. rSub .gt. rightChannelEdge)
+                    Fwash=0.0_BR
+                END WHERE
+                IF (mod(tstep,WRITESTATEWAIT)==0) THEN
+                    write(999,*) 'Fwash:',Fwash(5:40)
+                    write(999,*) 'rSub:',rSub(5:40)
+                    write(999,*) 'channelEdges:[',leftChannelEdge,rightChannelEdge,']'
+                END IF
+            END IF
+
             !if (tstep .ge. steps-0) then
             !write(999,*) Fnear(1), '+', Fwash(1), '+', Ffric(1), '+', FtSub(1), '+', Fbg(1)
             !write(999,*) Fnear(2), '+', Fwash(2), '+', Ffric(2), '+', FtSub(2), '+', Fbg(2)
@@ -1074,9 +1109,8 @@ END SUBROUTINE logParams
             ! subroutine. Calulation is determined by passed parameters.
       END SELECT
 
-
-      IF (POSITIONING .gt. 0 .and. (tstep .gt. positioningOn .and. (tstep .lt. positioningOff .or. HOLDON))) THEN
-        IF (mod(tstep,WRITESTATEWAIT)==0) THEN
+      IF (POSITIONING .gt. 0 .and. (tstep .ge. positioningOn .and. (tstep .lt. positioningOff .or. HOLDON))) THEN
+        IF (tstep .eq. 1 .or. mod(tstep,WRITESTATEWAIT)==0) THEN
           write(999,*) 'tstep:',tstep,'x(N):',x(N),'trapx:',trapCenter
           write(999,*) 'preMod: cFKa(N) ',cFKa(N)
         ENDIF
@@ -1090,10 +1124,13 @@ END SUBROUTINE logParams
           CASE (LASTTRAP)
             Ftrap = -k(run)*two*(x(N)-trapCenter)
             cFKa(N) = cFKa(N) + oneOverM(run)*Ftrap
+          CASE (STARTHOLD)
+            Ftrap = -k(run)*two*(x(N)-trapCenter)
+            cFKa(N) = cFKa(N) + oneOverM(run)*Ftrap
         END SELECT
       ENDIF
 
-      IF (tstep .gt. positioningOn .and. tstep .lt. positioningOff .and. mod(tstep,WRITESTATEWAIT)==0) THEN
+      IF (tstep .ge. positioningOn .and. tstep .lt. positioningOff .and. mod(tstep,WRITESTATEWAIT)==0) THEN
         write(999,*) 'postMod: cFKa(N) ',cFKa(N)
         write(999,*) 'Near:', Fnear(N), '+wash:', Fwash(N), '+fric:', Ffric(1), '+Ft:', FtSub(1), '+Fbg:', Fbg(N), '+trap:', Ftrap
       ENDIF

@@ -14,8 +14,11 @@ function cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList,
     horizontalLine(Eratio(end),'--', cFKi); 
 
     axes(cFKaxes.x1);hold on;
-    cFKplot(ts*1e9, xs(:,1)*1e10, cFKi, 1, '.', 'Position of particles 1,N(scaled)', '', ['x (' angstrom ')'], '', 0);
-    cFKplot(ts*1e9, (xs(:,end)-xs(1,end)+xs(1,1))*1e10, cFKi+16, 1, '-', 'Position of particles 1,N', '', ['x (' angstrom ')'], {'1','N'}, labelFigs);
+    ps=[1,size(xs,2),20,80]
+    cFKplot(ts*1e9, xs(:,ps(1))*1e10, cFKi, 1, '.', 'Position of particles 1,N(scaled)', '', ['x (' angstrom ')'], '', 0);
+    cFKplot(ts*1e9, (xs(:,ps(2))-xs(1,ps(2))+xs(1,ps(1)))*1e10, cFKi+16, 1, '-', 'Position of particles 1,N', '', ['x (' angstrom ')'], {'1','N'}, labelFigs);
+    cFKplot(ts*1e9, (xs(:,ps(3))-xs(1,ps(3))+xs(1,ps(1)))*1e10, cFKi+17, 1, '-', 'Position of particles 1,N', '', ['x (' angstrom ')'], {'1','N','20'}, labelFigs);
+    cFKplot(ts*1e9, (xs(:,ps(4))-xs(1,ps(4))+xs(1,ps(1)))*1e10, cFKi+18, 1, '-', 'Position of particles 1,N', '', ['x (' angstrom ')'], {'1','N','20','80'}, labelFigs);
 
     axes(cFKaxes.chainwidth); hold on;
     %solWidth=max(sol,[],2)-min(sol,[],2);
@@ -36,6 +39,6 @@ function cFKplotOverview(ts, xs, Uxs, sol, cFKsimParams, cFKaxes, cFKi, runList,
     cFKplot(1:length(sol(end,:)), solshift(end,:)*1e10, cFKi, 2, '.', 'Soliton at end of simulation', 'particle i', ['u_i (' angstrom ')'], '', labelFigs);
     if (labelFigs)
         text(0.05,0.7,sprintf(cFKsimParams.allStr),'Units','normalized'); 
-        text(-0.5,1.05,'cFK Finite Chain Results','Units','normalized','FontSize',15,'FontWeight','bold');
+        text(-0.6,1.05,'cFK Finite Chain Short Channel Results','Units','normalized','FontSize',15,'FontWeight','bold');
     end
 end

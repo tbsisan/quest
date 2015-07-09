@@ -21,23 +21,25 @@ REAL(KIND=BR), PARAMETER :: WL=2.456e-10 !the wavelength between waters in the u
 REAL(KIND=BR), PARAMETER :: WLperN=2.0 !should be integer but use real for easier math
 !REAL(KIND=BR), PARAMETER :: a=0.523*WL!*REAL(channelWL)/REAL(Nsim)
 REAL, PARAMETER :: aPercent=0
-REAL(KIND=BR), PARAMETER :: a=aPercent*WL/WLperN!*REAL(channelWL)/REAL(Nsim)
+REAL(KIND=BR), PARAMETER :: lambda=WL/WLperN
+REAL(KIND=BR), PARAMETER :: a=aPercent*lambda !*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: L=WL*real(channelWL,KIND=BR), Lc=a*(N-1)
 REAL(KIND=BR), PARAMETER :: ax=a!L/real(Nsim,KIND=BR)!*REAL(channelWL)/REAL(Nsim)
 REAL(KIND=BR), PARAMETER :: ay=WL/2.0!*REAL(channelWL)/REAL(Nsim)
 INTEGER, PARAMETER :: pitch=0 ! how far does helix advance for each unit in x
 REAL(KIND=BR), PARAMETER :: Ly=WL
+REAL(KIND=BR), PARAMETER :: leftChannelEdge=20.5*lambda, rightChannelEdge=80.5*lambda
 !REAL(KIND=BR), PARAMETER :: a=2.0_BR, L=2.0_BR*pi*real(channelWL,KIND=BR), Lc=a*REAL((N-1),KIND=BR)
 !REAL(KIND=BR), PARAMETER :: Lsim=2.0_BR*pi*real(WLsim,KIND=BR), LcSim=a*(Nsim-1)
 REAL(KIND=BR), PARAMETER :: eps = 10.0_BR**INT(-PRECISION(L)+5.0_BR)
 
-REAL, PARAMETER :: T=50.0e-9, dt=2.0*1.0000e-15
+REAL, PARAMETER :: T=10.0e-9, dt=2.0*1.0000e-15
 INTEGER, PARAMETER :: steps=T/dt
 INTEGER, PARAMETER :: Gwait=1e0, Gramp=1e0
 INTEGER, PARAMETER :: coolDownSteps=0, Tstart=0
-INTEGER, PARAMETER :: positioningDuration = 5.0e5, positioningOn=5e5
+INTEGER, PARAMETER :: positioningDuration = 1, positioningOn=1
 INTEGER, PARAMETER :: positioningOff = positioningOn+positioningDuration
-REAL, PARAMETER :: positioningMultiplier = 0.00, positioningMove=positioningMultiplier*WL/WLperN
+REAL, PARAMETER :: positioningMultiplier = 0.00, positioningMove=positioningMultiplier*lambda
 REAL, PARAMETER :: positioningdx = positioningMove / real(positioningDuration)
 REAL, PARAMETER :: kTrap = 0
 
@@ -59,6 +61,7 @@ REAL(KIND=BR), DIMENSION(2500) :: ens,k,h,eta,Temp,bgH,G,M,oneOverM
 !
 INTEGER, PARAMETER :: INFINITECHAIN=1, CATERPILLARCHAIN=2
 INTEGER, PARAMETER :: INFINITECOORD=1, CHANNELCOORD=2
+INTEGER, PARAMETER :: FULLCHANNEL=1, SHORTCHANNEL=2
 INTEGER, PARAMETER :: SPRINGMODEL=1, RIGIDBARS=2, ONEPARTICLE=3, NONLINEAR=4
 INTEGER, PARAMETER :: EULER=1, RUNGEKUTTA=2, PREDICTOR=3, SDEVERLET=4, VVERLET=5, EULERM=6
 CHARACTER(LEN=35), DIMENSION(6) :: INTEGRATORstr = [character(len=35) :: &
@@ -86,18 +89,19 @@ INTEGER, PARAMETER :: BUILTIN=1, KISS=2, TWIST=3, SHIFT=4, RAN2=5, RAN3=6, COMB8
 CHARACTER(LEN=40), DIMENSION(8) :: URNGstring = [character(len=40) :: &
         "Builtin", "KISS", "Mersenne Twister", "3-shift shift-register", "Knuth Ran2 recursive+shuffle", &
         "Knuth ran3 subtractive lagged fib", "R4_UNI L'Ecuyer", "Multiplicative Lagged Fib"]
-INTEGER, PARAMETER :: NOATOM=0, ALLATOM=1, LASTATOM=2, FIRSTATOM=3, LASTTRAP=4
+INTEGER, PARAMETER :: NOATOM=0, ALLATOM=1, LASTATOM=2, FIRSTATOM=3, LASTTRAP=4, STARTHOLD=5
 !
 !  The Control Parameters are Set to the Following:
 !
 LOGICAL, PARAMETER :: RUNTESTS = .FALSE.
 LOGICAL, PARAMETER :: HOLDON = .TRUE.
 INTEGER, PARAMETER :: FORCEAPPLY = NOATOM
-INTEGER, PARAMETER :: POSITIONING = LASTTRAP
+INTEGER, PARAMETER :: POSITIONING = STARTHOLD
 INTEGER, PARAMETER :: ICS = KINKS
 INTEGER, PARAMETER :: INTERACTIONMODEL = SPRINGMODEL
 INTEGER, PARAMETER :: CHAINBC = CATERPILLARCHAIN
 INTEGER, PARAMETER :: COORDBC = INFINITECOORD
+INTEGER, PARAMETER :: CHANNELTYPE = FULLCHANNEL
 INTEGER, PARAMETER :: INTEGRATOR = EULERM
 INTEGER, PARAMETER :: REPLACEMENTMETHOD = IDENTICALREPLACEMENT
 ! need to add sanity checks for boundary forces (channelBCs?)
@@ -117,7 +121,7 @@ LOGICAL, PARAMETER :: QTRACKLABELSON=.false., VCORRELATIONS=.false., TIMEPARTICL
 LOGICAL, PARAMETER :: WRITETIMEDAT=.false., WRITEEVENTS=.false.
 LOGICAL, PARAMETER :: WRITEX=.true.,WRITEV=.true.,WRITEU=.true.
 LOGICAL, PARAMETER :: TIMESUBS=.false.
-INTEGER, PARAMETER :: WRITESTATEWAIT=3000, corWindow=floor(1.0/(dt*1.0e9*0.513*10.0))
+INTEGER, PARAMETER :: WRITESTATEWAIT=2000, corWindow=floor(1.0/(dt*1.0e9*0.513*10.0))
 LOGICAL, PARAMETER :: ASCIIFORMAT=.false.
 INTEGER, PARAMETER :: STATUSWAIT=steps/10-mod(steps/10,corWindow)
 REAL(KIND=4), PARAMETER :: writeSize=(steps/WRITESTATEWAIT)*N*printingWidthReals + 10*(steps/WRITESTATEWAIT)
