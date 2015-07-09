@@ -1,0 +1,14 @@
+i=1:100;
+N=length(i);
+WL=2.456e-10;
+WLperN=2;
+lambda=WL/WLperN;
+aPercent=1.01;
+k=50;
+h=1.53e-21;
+x=(i-1)*WL/WLperN;
+oneOverP0=aPercent-1;
+l0=sqrt(k*lambda*lambda/4.0/h);
+positioningMove=(0.7)*lambda;
+ui=uFvdM(-1.0,positioningMove,N/2,l0,oneOverP0);
+x=x+ui;
