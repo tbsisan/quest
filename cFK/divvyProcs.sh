@@ -47,7 +47,7 @@ set_parameters() {
     kTrapList="0"; # The trap strength is currently hardcoded to be the interparticle spring constant
     moveByList="0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95"
     moveByList="0.65 0.675 0.70 0.725 0.75 0.775 0.80 0.85"
-    moveByList="0.65 0.70 0.75 0.80"; # 
+    moveByList="0.65"; # 
 
     # Read from paramList.in file
     enslist=$( seq 0 1 0 ); export enslist
@@ -140,7 +140,7 @@ do
     stTi=$Ti
     myrand=$(getRandomInt);
     # runID="sol${soli}_mv23"; export runID
-    runID="startHold"; export runID
+    runID="fvdm"; export runID
     echo "T$Ti, M$moveByi, kTr$kTrapi, a$ai, sol$soli, ID$runID, eq$eqti, stTi$stTi, N$Ni, ens$ensi, k$ki, F$Fi, $myrand";
     customRun=r${myrand}.T${Ti}.M${moveByi}.kTr${kTrapi}.sol${soli}.a${ai}.eq${eqti}.Tst${stTi}.N${Ni}.ens$ensi.k${ki}.F${Fi}
     #INTEGER, PARAMETER :: N=208, Nsim=208,  channelWL=200

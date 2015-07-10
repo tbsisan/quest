@@ -410,7 +410,8 @@ END SUBROUTINE logParams
 
    SUBROUTINE initState()
       REAL(KIND=BR) :: solSpacing, chainL, particleSep, center1, center2, width, vMean
-      REAL(KIND=BR) :: charge=-1.0_BR
+      REAL(KIND=BR) :: charge=-1.0_BR, oneOverP0, l0
+      REAL(KIND=BR), DIMENSION(N) :: ui
       REAL(KIND=BR), DIMENSION(2) :: uv1, uv2
       INTEGER :: i, si, numSols
       chainL=(real(N,KIND=BR)-one)*a
@@ -473,16 +474,20 @@ END SUBROUTINE logParams
                     x(i)=x(i)+positioningMove
                 ENDDO
             ENDIF
-        CASE (FVDM)
-            l0=sqrt(k(run)*lambda*lambda/4.0/h(run))
-            sinCoeff=pi/two/l0/l0
-            x(N)=positioningMove
-            xNp1 = x(N) + a
-            x(N-1)=
-            DO i=N-2,3,-1
-                x(i)=
+          CASE (FVDM)
+            DO i=1,N
+                ! First particle is at lambda/2
+                x(i)=-WL/WLperN/2.0_BR+i*WL/WLperN
+                vx(i)=vMean*(1+0.1*sampleGaussian())
             ENDDO
-                
+            ! b=aP*lambda
+            ! P0=lambda/(b-lambda)
+            oneOverP0=aPercent-1
+            l0=sqrt(k(run)*lambda*lambda/4.0/h(run))
+
+            ui=uFvdM(-1.0_BR,positioningMove,N/2,l0,oneOverP0)
+            x=x+ui
+
          CASE (ONEBREATHER)
             center1=20.0_BR
             center2=40.0_BR
@@ -537,6 +542,33 @@ END SUBROUTINE logParams
 
    END SUBROUTINE initState
 !
+   FUNCTION uFvdM(u1_bc,uN_bc,halfi,l0,oneOverP0) RESULT(ui)
+      REAL(KIND=BR) :: u1_bc, uN_bc, l0, oneOverP0, A, kv
+      INTEGER :: halfi
+      REAL(KIND=BR), DIMENSION(Nsim) :: ui
+      A=pi/two/l0/l0
+      kv=two*pi/lambda
+      IF (u1_bc .eq. -1.0_BR) THEN
+          ui(1) = -lambda/pi * asin(l0*oneOverP0)
+      ELSE
+          ui(1) = u1_bc
+      ENDIF
+      ui(2) = ui(1) + lambda*( A*sin(kv*ui(1))+oneOverP0 )
+      DO i=3,halfi
+        ui(i) = 2*ui(i-1)-ui(i-2) + lambda*( A*sin(kv*ui(i-1)) )
+      ENDDO
+
+      IF (uN_bc .eq. -1.0_BR) THEN
+          ui(N) = lambda/pi * asin(l0*oneOverP0)
+      ELSE
+          ui(N) = uN_bc
+      ENDIF
+      ui(N-1) = ui(N) + lambda*( A*sin(kv*ui(1))-oneOverP0 )
+      DO i=N-2,halfi+1,-1
+        ui(i) = 2*ui(i+1)-ui(i+2) + lambda*( A*sin(kv*ui(i+1)) )
+      ENDDO
+   END FUNCTION uFvdM
+
    SUBROUTINE eigenStretch()
       REAL(KIND=BR) :: chainL
       INTEGER :: i
